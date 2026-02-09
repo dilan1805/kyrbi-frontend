@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+
+    <title>Asistente IA — Kyrbi | Ciencias para vivir mejor</title>
+    <meta
+      name="description"
+      content="Vista dedicada del asistente Kyrbi con modos: Guía general, Chef, Coach y Descanso."
+    />
+
+    <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="assets/css/styles.css" />
+  </head>
+
+  <body>
+    <a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+    <header class="app-header" id="top">
+      <nav class="nav" aria-label="Navegación principal">
+        <div class="nav__inner">
+          <a class="brand" href="index.html" aria-label="Ir al inicio">
+            <span class="brand__mark" aria-hidden="true"></span>
+            <span class="brand__text">Ciencias para vivir mejor</span>
+          </a>
+
+          <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="nav-links">
+            <span class="sr-only">Abrir menú</span>
+            <span class="nav__toggle-lines" aria-hidden="true"></span>
+          </button>
+
+          <div class="nav__links" id="nav-links">
+            <a class="nav__link" href="index.html" data-nav="index">Inicio</a>
+            <a class="nav__link" href="assistant.html" data-nav="assistant">Asistente IA</a>
+            <a class="nav__link" href="habitos.html" data-nav="habitos">Hábitos Saludables</a>
+            <a class="nav__link" href="equipo.html" data-nav="equipo">Equipo</a>
+            <a class="nav__link" href="evaluacion.html" data-nav="evaluacion">Evaluación</a>
+            <a class="nav__link" href="seguridad.html" data-nav="seguridad">Seguridad</a>
+          </div>
+
+          <div class="nav__cta">
+            <a class="button button--ghost" href="assistant.html">Abrir Kyrbi</a>
+            <button class="button button--secondary" id="theme-toggle" aria-label="Cambiar tema">Tema</button>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="app-main" id="contenido">
+      <section class="section assistant" aria-label="Asistente IA">
+        <div class="container">
+          <div class="section__head">
+            <h1 class="section__title">Asistente IA: Kyrbi</h1>
+            <p class="section__lead">
+              Conversación fluida, modos claros y orientación educativa. Elige un modo y responde: Kyrbi te guiará.
+            </p>
+          </div>
+
+          <div class="assistant__layout">
+            <aside class="assistant__aside" aria-label="Modos del asistente">
+              <div class="card card--soft">
+                <h2 class="card__title">Modos</h2>
+                <p class="card__text">
+                  Cambia el enfoque de la conversación. Kyrbi ajusta preguntas y recomendaciones según el modo.
+                </p>
+
+                <div class="mode-tabs" role="tablist" aria-label="Modos de Kyrbi">
+                  <button class="mode-tab is-active" type="button" role="tab" aria-selected="true" data-mode="general">
+                    Guía general
+                  </button>
+                  <button class="mode-tab" type="button" role="tab" aria-selected="false" data-mode="chef">
+                    Chef
+                  </button>
+                  <button class="mode-tab" type="button" role="tab" aria-selected="false" data-mode="coach">
+                    Coach
+                  </button>
+                  <button class="mode-tab" type="button" role="tab" aria-selected="false" data-mode="descanso">
+                    Descanso
+                  </button>
+                </div>
+
+                <div class="aside__note">
+                  <p class="aside__note-title">Aviso importante</p>
+                  <p class="aside__note-text">
+                    Kyrbi ofrece orientación general para aprender. No sustituye a un profesional de la salud.
+                  </p>
+                </div>
+              </div>
+            </aside>
+
+            <div class="assistant__chat">
+              <div class="chat-shell" id="kyrbi-app" aria-label="Chat principal con Kyrbi"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer" aria-label="Pie de página">
+      <div class="container footer__grid">
+        <div class="footer__block">
+          <h3 class="footer__title">Seguridad y privacidad</h3>
+          <ul class="footer__list">
+            <li><a href="seguridad.html" style="color: inherit;">No se recopilan datos personales.</a></li>
+            <li><a href="seguridad.html" style="color: inherit;">No se guardan conversaciones.</a></li>
+            <li><a href="seguridad.html" style="color: inherit;">Uso educativo y general.</a></li>
+            <li><a href="seguridad.html" style="color: inherit;">El asistente no sustituye a un médico.</a></li>
+          </ul>
+        </div>
+
+        <div class="footer__block">
+          <h3 class="footer__title">Evaluación del proyecto</h3>
+          <ul class="footer__list">
+            <li><a href="evaluacion.html" style="color: inherit;">Facilidad de uso</a></li>
+            <li><a href="evaluacion.html" style="color: inherit;">Claridad de la información</a></li>
+            <li><a href="evaluacion.html" style="color: inherit;">Experiencia del usuario</a></li>
+          </ul>
+        </div>
+
+        <div class="footer__bottom">
+          <p class="footer__fineprint">
+            © <span id="year"></span> Ciencias para vivir mejor — Proyecto educativo.
+          </p>
+        </div>
+      </div>
+    </footer>
+    <div class="toast-container" id="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+    <script src="assets/js/config.js" defer></script>
+    <script src="assets/js/api.js" defer></script>
+    <script src="assets/js/app.js" defer></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const root = document.documentElement;
+        const toggle = document.getElementById('theme-toggle');
+        const saved = localStorage.getItem('theme');
+        if (saved) root.setAttribute('data-theme', saved);
+        toggle?.addEventListener('click', () => {
+          const current = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+          root.setAttribute('data-theme', current);
+          localStorage.setItem('theme', current);
+        });
+      });
+    </script>
+  </body>
+</html>
+

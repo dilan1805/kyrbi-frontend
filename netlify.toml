@@ -1,0 +1,17 @@
+[build]
+publish = "kyrbi-frontend"
+
+[[headers]]
+for = "/*"
+[headers.values]
+Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; connect-src 'self' https:; font-src 'self' data: https:; frame-ancestors 'none'; upgrade-insecure-requests"
+Strict-Transport-Security = "max-age=15552000"
+X-Frame-Options = "DENY"
+Referrer-Policy = "no-referrer"
+X-Content-Type-Options = "nosniff"
+
+[[redirects]]
+from = "/api/*"
+to = "https://kyrbi-backend.onrender.com/:splat"
+status = 200
+force = true

@@ -1,0 +1,62 @@
+
+/* Linked Accounts Grid */
+.linked-accounts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.account-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  background: var(--surface-2);
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius-sm);
+  transition: all 0.2s;
+}
+
+.account-card.linked {
+  border-color: var(--accent);
+  background: rgba(22, 163, 74, 0.05);
+}
+
+.account-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.account-info i {
+  font-size: 1.25rem;
+}
+
+.account-status {
+  font-size: 0.85rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 999px;
+  background: var(--muted);
+  color: white;
+}
+
+.account-card.linked .account-status {
+  background: var(--accent);
+}
+
+.btn-link {
+  font-size: 0.85rem;
+  padding: 0.4rem 0.8rem;
+  cursor: pointer;
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.btn-link:hover {
+  background: var(--surface-hover);
+}

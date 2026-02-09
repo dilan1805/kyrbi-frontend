@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+
+    <title>Evaluación del proyecto | Ciencias para vivir mejor</title>
+    <meta
+      name="description"
+      content="Criterios de evaluación del proyecto Ciencias para vivir mejor: facilidad de uso, claridad de información y experiencia del usuario."
+    />
+
+    <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="assets/css/styles.css" />
+  </head>
+
+  <body>
+    <a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+    <header class="app-header" id="top">
+      <nav class="nav" aria-label="Navegación principal">
+        <div class="nav__inner">
+          <a class="brand" href="index.html" aria-label="Ir al inicio">
+            <span class="brand__mark" aria-hidden="true"></span>
+            <span class="brand__text">Ciencias para vivir mejor</span>
+          </a>
+
+          <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="nav-links">
+            <span class="sr-only">Abrir menú</span>
+            <span class="nav__toggle-lines" aria-hidden="true"></span>
+          </button>
+
+          <div class="nav__links" id="nav-links">
+            <a class="nav__link" href="index.html" data-nav="index">Inicio</a>
+            <a class="nav__link" href="assistant.html" data-nav="assistant">Asistente IA</a>
+            <a class="nav__link" href="habitos.html" data-nav="habitos">Hábitos Saludables</a>
+            <a class="nav__link" href="equipo.html" data-nav="equipo">Equipo</a>
+            <a class="nav__link" href="evaluacion.html" data-nav="evaluacion">Evaluación</a>
+            <a class="nav__link" href="seguridad.html" data-nav="seguridad">Seguridad</a>
+          </div>
+
+          <div class="nav__cta">
+            <a class="button button--ghost" href="assistant.html">Abrir Kyrbi</a>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="app-main" id="contenido">
+      <section class="section evaluation" aria-label="Evaluación del proyecto">
+        <div class="container">
+          <div class="section__head">
+            <h1 class="section__title">Evaluación del proyecto</h1>
+            <p class="section__lead">
+              Criterios de evaluación para jueces y evaluadores. El proyecto se enfoca en claridad, utilidad y experiencia del usuario.
+            </p>
+          </div>
+
+          <div class="grid-cards">
+            <article class="card">
+              <div class="card__icon" aria-hidden="true">🎯</div>
+              <h2 class="card__title">Facilidad de uso</h2>
+              <p class="card__text">
+                La interfaz está diseñada para ser intuitiva. Navegación clara, botones con propósito definido y flujo lógico sin fricciones.
+              </p>
+              <ul class="card__text" style="margin-top: 12px; padding-left: 20px; list-style: disc;">
+                <li>Navegación multipágina clara y accesible</li>
+                <li>Asistente Kyrbi con modos visibles y explicados</li>
+                <li>Interfaz responsive en todos los dispositivos</li>
+                <li>Accesibilidad: skip links, ARIA labels, contraste adecuado</li>
+              </ul>
+            </article>
+
+            <article class="card">
+              <div class="card__icon" aria-hidden="true">📚</div>
+              <h2 class="card__title">Claridad de la información</h2>
+              <p class="card__text">
+                Contenido educativo estructurado, sin jerga médica. Información práctica y accionable para estudiantes de 13-15 años.
+              </p>
+              <ul class="card__text" style="margin-top: 12px; padding-left: 20px; list-style: disc;">
+                <li>Hábitos explicados de forma simple y directa</li>
+                <li>Asistente con respuestas contextuales según el modo</li>
+                <li>Lenguaje apropiado para la edad objetivo</li>
+                <li>Separación clara entre educación y consejo médico</li>
+              </ul>
+            </article>
+
+            <article class="card">
+              <div class="card__icon" aria-hidden="true">✨</div>
+              <h2 class="card__title">Experiencia del usuario</h2>
+              <p class="card__text">
+                Diseño premium que transmite seriedad y profesionalismo. Sensación de producto real, no demo visual.
+              </p>
+              <ul class="card__text" style="margin-top: 12px; padding-left: 20px; list-style: disc;">
+                <li>Diseño moderno y profesional</li>
+                <li>Paleta de colores coherente (azul marino + verde)</li>
+                <li>Transiciones suaves y feedback visual</li>
+                <li>Experiencia conversacional fluida con Kyrbi</li>
+              </ul>
+            </article>
+          </div>
+
+          <div class="habits__cta" style="margin-top: 32px;">
+            <div class="card card--soft habits__cta-card">
+              <h2 class="card__title">Aspectos técnicos destacables</h2>
+              <p class="card__text">
+                <strong>Arquitectura:</strong> Código modular sin frameworks, listo para integrar IA real. Separación clara entre UI, lógica y configuración.
+              </p>
+              <p class="card__text" style="margin-top: 10px;">
+                <strong>Preparación para producción:</strong> El motor de respuestas (kyrbi-engine.js) puede reemplazarse fácilmente por llamadas a API real. La estructura de estado y mensajes está diseñada para escalar.
+              </p>
+              <p class="card__text" style="margin-top: 10px;">
+                <strong>Responsive:</strong> Diseño adaptativo que funciona en móviles, tablets y escritorio. Navegación móvil con menú hamburguesa.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer" aria-label="Pie de página">
+      <div class="container footer__grid">
+        <div class="footer__block">
+          <h3 class="footer__title">Seguridad y privacidad</h3>
+          <ul class="footer__list">
+            <li>No se recopilan datos personales.</li>
+            <li>No se guardan conversaciones.</li>
+            <li>Uso educativo y general.</li>
+            <li>El asistente no sustituye a un médico.</li>
+          </ul>
+        </div>
+
+        <div class="footer__block">
+          <h3 class="footer__title">Evaluación del proyecto</h3>
+          <ul class="footer__list">
+            <li>Facilidad de uso</li>
+            <li>Claridad de la información</li>
+            <li>Experiencia del usuario</li>
+          </ul>
+        </div>
+
+        <div class="footer__bottom">
+          <p class="footer__fineprint">
+            © <span id="year"></span> Ciencias para vivir mejor — Proyecto educativo.
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <script src="assets/js/config.js" defer></script>
+    <script src="assets/js/api.js" defer></script>
+    <script src="assets/js/app.js" defer></script>
+  </body>
+</html>

@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+
+    <title>Hábitos saludables | Ciencias para vivir mejor</title>
+    <meta
+      name="description"
+      content="Hábitos saludables: alimentación, actividad física y descanso. Conecta cada hábito con Kyrbi."
+    />
+
+    <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="assets/css/styles.css" />
+  </head>
+
+  <body>
+    <a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+    <header class="app-header" id="top">
+      <nav class="nav" aria-label="Navegación principal">
+        <div class="nav__inner">
+          <a class="brand" href="index.html" aria-label="Ir al inicio">
+            <span class="brand__mark" aria-hidden="true"></span>
+            <span class="brand__text">Ciencias para vivir mejor</span>
+          </a>
+
+          <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="nav-links">
+            <span class="sr-only">Abrir menú</span>
+            <span class="nav__toggle-lines" aria-hidden="true"></span>
+          </button>
+
+          <div class="nav__links" id="nav-links">
+            <a class="nav__link" href="index.html" data-nav="index">Inicio</a>
+            <a class="nav__link" href="assistant.html" data-nav="assistant">Asistente IA</a>
+            <a class="nav__link" href="habitos.html" data-nav="habitos">Hábitos Saludables</a>
+            <a class="nav__link" href="equipo.html" data-nav="equipo">Equipo</a>
+            <a class="nav__link" href="evaluacion.html" data-nav="evaluacion">Evaluación</a>
+            <a class="nav__link" href="seguridad.html" data-nav="seguridad">Seguridad</a>
+          </div>
+
+          <div class="nav__cta">
+            <a class="button button--ghost" href="assistant.html">Abrir Kyrbi</a>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="app-main" id="contenido">
+      <section class="section habits" aria-label="Hábitos Saludables">
+        <div class="container">
+          <div class="section__head">
+            <h1 class="section__title">Hábitos saludables</h1>
+            <p class="section__lead">
+              No es solo información: cada pilar se conecta con Kyrbi para convertirlo en un plan real y personalizable.
+            </p>
+          </div>
+
+          <div class="grid-cards">
+            <article class="card">
+              <div class="card__icon" aria-hidden="true">🍽️</div>
+              <h2 class="card__title">Alimentación</h2>
+              <p class="card__text">
+                Energía estable para clases: desayunos simples, meriendas inteligentes y equilibrio sin extremos.
+              </p>
+              <a class="button button--secondary" href="assistant.html?mode=chef">
+                Hablar con Kyrbi sobre esto
+              </a>
+            </article>
+
+            <article class="card">
+              <div class="card__icon" aria-hidden="true">🏃‍♂️</div>
+              <h2 class="card__title">Actividad física</h2>
+              <p class="card__text">
+                Movimiento práctico: rutinas cortas, metas realistas y constancia sin depender de “motivación”.
+              </p>
+              <a class="button button--secondary" href="assistant.html?mode=coach">
+                Hablar con Kyrbi sobre esto
+              </a>
+            </article>
+
+            <article class="card">
+              <div class="card__icon" aria-hidden="true">🌙</div>
+              <h2 class="card__title">Descanso</h2>
+              <p class="card__text">
+                Sueño y bienestar: rutina nocturna, manejo de pantallas y estrategias para despertar con más energía.
+              </p>
+              <a class="button button--secondary" href="assistant.html?mode=descanso">
+                Hablar con Kyrbi sobre esto
+              </a>
+            </article>
+          </div>
+
+          <div class="habits__cta">
+            <div class="card card--soft habits__cta-card">
+              <h2 class="card__title">¿No sabes por dónde empezar?</h2>
+              <p class="card__text">
+                Entra a Kyrbi en modo Guía general y responde 2 preguntas: te propone un plan simple para esta semana.
+              </p>
+              <a class="button button--primary" href="assistant.html?mode=general">Ir con Kyrbi</a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer" aria-label="Pie de página">
+      <div class="container footer__grid">
+        <div class="footer__block">
+          <h3 class="footer__title">Seguridad y privacidad</h3>
+          <ul class="footer__list">
+            <li><a href="seguridad.html" style="color: inherit;">No se recopilan datos personales.</a></li>
+            <li><a href="seguridad.html" style="color: inherit;">No se guardan conversaciones.</a></li>
+            <li><a href="seguridad.html" style="color: inherit;">Uso educativo y general.</a></li>
+            <li><a href="seguridad.html" style="color: inherit;">El asistente no sustituye a un médico.</a></li>
+          </ul>
+        </div>
+
+        <div class="footer__block">
+          <h3 class="footer__title">Evaluación del proyecto</h3>
+          <ul class="footer__list">
+            <li><a href="evaluacion.html" style="color: inherit;">Facilidad de uso</a></li>
+            <li><a href="evaluacion.html" style="color: inherit;">Claridad de la información</a></li>
+            <li><a href="evaluacion.html" style="color: inherit;">Experiencia del usuario</a></li>
+          </ul>
+        </div>
+
+        <div class="footer__bottom">
+          <p class="footer__fineprint">
+            © <span id="year"></span> Ciencias para vivir mejor — Proyecto educativo.
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <script src="assets/js/config.js" defer></script>
+    <script src="assets/js/api.js" defer></script>
+    <script src="assets/js/app.js" defer></script>
+  </body>
+</html>
+

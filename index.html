@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+
+    <title>Ciencias para vivir mejor</title>
+    <meta
+      name="description"
+      content="Plataforma educativa para promover hábitos saludables en adolescentes con el asistente Kyrbi."
+    />
+
+    <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="assets/css/styles.css" />
+  </head>
+
+  <body>
+    <a class="skip-link" href="#inicio">Saltar al contenido</a>
+
+    <header class="app-header" id="top">
+      <nav class="nav" aria-label="Navegación principal">
+        <div class="nav__inner">
+          <a class="brand" href="index.html" aria-label="Ir al inicio">
+            <span class="brand__mark" aria-hidden="true"></span>
+            <span class="brand__text">Ciencias para vivir mejor</span>
+          </a>
+
+          <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="nav-links">
+            <span class="sr-only">Abrir menú</span>
+            <span class="nav__toggle-lines" aria-hidden="true"></span>
+          </button>
+
+          <div class="nav__links" id="nav-links">
+            <a class="nav__link" href="index.html" data-nav="index">Inicio</a>
+            <a class="nav__link" href="assistant.html" data-nav="assistant">Asistente IA</a>
+            <a class="nav__link" href="habitos.html" data-nav="habitos">Hábitos Saludables</a>
+            <a class="nav__link" href="equipo.html" data-nav="equipo">Equipo</a>
+            <a class="nav__link" href="evaluacion.html" data-nav="evaluacion">Evaluación</a>
+            <a class="nav__link" href="seguridad.html" data-nav="seguridad">Seguridad</a>
+          </div>
+
+          <div class="nav__cta">
+            <a class="button button--ghost" href="assistant.html">Abrir Kyrbi</a>
+            <button class="button button--secondary" id="theme-toggle" aria-label="Cambiar tema">Tema</button>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="app-main">
+      <!-- Inicio (Hero) -->
+      <section class="section hero" id="inicio" aria-label="Inicio">
+        <div class="container hero__grid">
+          <div class="hero__copy">
+            <p class="eyebrow">Educación digital • Bienestar adolescente</p>
+            <h1 class="hero__title">Ciencias para vivir mejor</h1>
+            <p class="hero__subtitle">
+              Una plataforma moderna para aprender hábitos saludables con acompañamiento conversacional.
+              Diseñada para estudiantes de 13 a 15 años.
+            </p>
+
+            <div class="hero__actions">
+              <a class="button button--primary" href="assistant.html" data-action="start-kyrbi">
+                Comenzar con Kyrbi
+              </a>
+              <a class="button button--secondary" href="habitos.html">Explorar hábitos</a>
+            </div>
+
+            <div class="hero__trust">
+              <div class="trust-pill">
+                <span class="trust-pill__dot" aria-hidden="true"></span>
+                <span>Sin datos personales</span>
+              </div>
+              <div class="trust-pill">
+                <span class="trust-pill__dot trust-pill__dot--green" aria-hidden="true"></span>
+                <span>Contenido educativo, no médico</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="hero__assistant">
+            <div class="panel">
+              <div class="panel__head">
+                <div class="panel__title">
+                  <span class="badge">Kyrbi</span>
+                  <span class="panel__title-text">Asistente educativo</span>
+                </div>
+                <div class="panel__status" aria-live="polite">
+                  <span class="status-dot" aria-hidden="true"></span>
+                  <span class="status-text">Listo</span>
+                </div>
+              </div>
+
+              <div class="panel__body" id="kyrbi-hero" aria-label="Chat con Kyrbi (vista rápida)"></div>
+            </div>
+            <div class="panel__footer">
+              <a class="link-inline" href="assistant.html">Ver conversación completa</a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer" aria-label="Pie de página">
+      <div class="container footer__grid">
+        <div class="footer__block">
+          <h3 class="footer__title">Seguridad y privacidad</h3>
+          <ul class="footer__list">
+            <li><a href="seguridad.html" style="color: inherit;">No se recopilan datos personales.</a></li>
+            <li><a href="seguridad.html" style="color: inherit;">No se guardan conversaciones.</a></li>
+            <li><a href="seguridad.html" style="color: inherit;">Uso educativo y general.</a></li>
+            <li><a href="seguridad.html" style="color: inherit;">El asistente no sustituye a un médico.</a></li>
+          </ul>
+        </div>
+
+        <div class="footer__block">
+          <h3 class="footer__title">Evaluación del proyecto</h3>
+          <ul class="footer__list">
+            <li><a href="evaluacion.html" style="color: inherit;">Facilidad de uso</a></li>
+            <li><a href="evaluacion.html" style="color: inherit;">Claridad de la información</a></li>
+            <li><a href="evaluacion.html" style="color: inherit;">Experiencia del usuario</a></li>
+          </ul>
+        </div>
+
+        <div class="footer__bottom">
+          <p class="footer__fineprint">
+            © <span id="year"></span> Ciencias para vivir mejor — Proyecto educativo.
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <div class="toast-container" id="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+    <script src="assets/js/config.js" defer></script>
+    <script src="assets/js/api.js" defer></script>
+    <script src="assets/js/app.js" defer></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const root = document.documentElement;
+        const toggle = document.getElementById('theme-toggle');
+        const saved = localStorage.getItem('theme');
+        if (saved) root.setAttribute('data-theme', saved);
+        toggle?.addEventListener('click', () => {
+          const current = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+          root.setAttribute('data-theme', current);
+          localStorage.setItem('theme', current);
+        });
+      });
+    </script>
+</body>
+</html>
+
