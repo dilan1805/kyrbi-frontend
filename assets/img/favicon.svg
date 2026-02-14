@@ -1,11 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" fill="none">
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="g" x1="12" y1="10" x2="54" y2="58" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#7C3AED"/>
-      <stop offset="1" stop-color="#F97316"/>
+    <linearGradient id="fav-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e12d8a" />
+      <stop offset="100%" stop-color="#1a7c85" />
     </linearGradient>
   </defs>
-  <rect x="8" y="8" width="48" height="48" rx="16" fill="url(#g)"/>
-  <path d="M23 35.5c0-6.9 5.6-12.5 12.5-12.5H41c.6 0 1 .4 1 1v4c0 .6-.4 1-1 1h-5.5c-3.6 0-6.5 2.9-6.5 6.5V41c0 .6-.4 1-1 1h-4c-.6 0-1-.4-1-1v-5.5Z" fill="rgba(255,255,255,.92)"/>
+  <path d="M16 2C16 2 13 6 13 9C13 12 16 15 16 15C16 15 19 12 19 9C19 6 16 2 16 2Z" fill="url(#fav-gradient)" />
+  <circle cx="16" cy="8.5" r="1.5" fill="#1a7c85" />
+  <path d="M16 10C14.5 10 14 11.5 14 13C14 14.5 14.5 15 16 15C17.5 15 18 14.5 18 13C18 11.5 17.5 10 16 10Z" fill="#1a7c85" />
 </svg>
-

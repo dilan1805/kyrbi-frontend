@@ -19,26 +19,26 @@
       <nav class="nav" aria-label="Navegación principal">
         <div class="nav__inner">
           <a class="brand" href="index.html" aria-label="Ir al inicio">
-            <span class="brand__mark" aria-hidden="true"></span>
-            <span class="brand__text">Ciencias para vivir mejor</span>
+            <img src="assets/img/logo.svg" alt="Logo Ciencias para vivir mejor">
+            <span class="brand__text sr-only">Ciencias para vivir mejor</span>
           </a>
 
-          <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="nav-links">
-            <span class="sr-only">Abrir menú</span>
+          <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Menu">
+            <span class="nav__toggle-lines" aria-hidden="true"></span>
+            <span class="nav__toggle-lines" aria-hidden="true"></span>
             <span class="nav__toggle-lines" aria-hidden="true"></span>
           </button>
 
           <div class="nav__links" id="nav-links">
             <a class="nav__link" href="index.html" data-nav="index">Inicio</a>
-            <a class="nav__link" href="assistant.html" data-nav="assistant">Asistente IA</a>
-            <a class="nav__link" href="habitos.html" data-nav="habitos">Hábitos Saludables</a>
+            <a class="nav__link" href="assistant.html" data-nav="assistant">Kyrbi IA</a>
+            <a class="nav__link" href="habitos.html" data-nav="habitos">Hábitos</a>
             <a class="nav__link" href="equipo.html" data-nav="equipo">Equipo</a>
-            <a class="nav__link" href="evaluacion.html" data-nav="evaluacion">Evaluación</a>
-            <a class="nav__link" href="seguridad.html" data-nav="seguridad">Seguridad</a>
-          </div>
-
-          <div class="nav__cta">
-            <a class="button button--ghost" href="assistant.html">Abrir Kyrbi</a>
+            
+            <div class="nav__auth" id="nav-auth">
+              <a href="login.html" class="button button--ghost button--sm">Entrar</a>
+              <a href="register.html" class="button button--primary button--sm">Registro</a>
+            </div>
           </div>
         </div>
       </nav>

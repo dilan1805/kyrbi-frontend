@@ -16,22 +16,29 @@
   </head>
 
   <body>
-    <header class="app-header">
-      <nav class="nav">
+    <header class="app-header" id="top">
+      <nav class="nav" aria-label="Navegación principal">
         <div class="nav__inner">
-          <a class="brand" href="index.html">
-            <span class="brand__mark"></span>
-            <span class="brand__text">Ciencias para vivir mejor</span>
+          <a class="brand" href="index.html" aria-label="Ir al inicio">
+            <img src="assets/img/logo.svg" alt="Logo Ciencias para vivir mejor">
+            <span class="brand__text sr-only">Ciencias para vivir mejor</span>
           </a>
 
-          <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="nav-links">
-            <span class="sr-only">Abrir menú</span>
+          <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Menu">
+            <span class="nav__toggle-lines" aria-hidden="true"></span>
+            <span class="nav__toggle-lines" aria-hidden="true"></span>
             <span class="nav__toggle-lines" aria-hidden="true"></span>
           </button>
-          
+
           <div class="nav__links" id="nav-links">
-            <a class="nav__link" href="assistant.html">Chat IA</a>
-            <!-- La navegación de usuario (Dashboard, Logout) se genera dinámicamente en app.js -->
+            <a class="nav__link" href="index.html" data-nav="index">Inicio</a>
+            <a class="nav__link" href="assistant.html" data-nav="assistant">Kyrbi IA</a>
+            <a class="nav__link" href="habitos.html" data-nav="habitos">Hábitos</a>
+            <a class="nav__link" href="equipo.html" data-nav="equipo">Equipo</a>
+            
+            <div class="nav__auth" id="nav-auth">
+              <a href="#" class="button button--ghost button--sm" id="logout-btn">Cerrar Sesión</a>
+            </div>
           </div>
         </div>
       </nav>
