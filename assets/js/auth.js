@@ -33,16 +33,25 @@ document.addEventListener('DOMContentLoaded', () => {
     window.KyrbiAPI.getCsrfToken().catch(() => {});
   }
 
-  // Utilidad para mostrar errores
   const showError = (message) => {
     if (errorContainer) {
       errorContainer.textContent = message;
       errorContainer.style.display = 'block';
       errorContainer.classList.add('animate-shake');
+      // Asegurarse de que el usuario vea el error
+      errorContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
       setTimeout(() => errorContainer.classList.remove('animate-shake'), 500);
     } else {
-      alert(message);
+      showToast(message, 'error');
     }
+  };
+
+  const validateEmail = (email) => {
+    return String(email)
+      .toLowerCase()
+      .match(
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+      );
   };
 
   const clearError = () => {
@@ -123,10 +132,20 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       clearError();
       
-      const email = document.getElementById('email').value;
+      const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
       const remember = document.getElementById('remember')?.checked;
       const submitBtn = loginForm.querySelector('button[type="submit"]');
+
+      if (!email || !password) {
+        showError('Por favor, completa todos los campos');
+        return;
+      }
+
+      if (!validateEmail(email)) {
+        showError('Por favor, ingresa un correo electrónico válido');
+        return;
+      }
 
       try {
         submitBtn.disabled = true;
@@ -152,6 +171,9 @@ document.addEventListener('DOMContentLoaded', () => {
           localStorage.removeItem('kyrbi_token');
         }
         showToast('Inicio de sesión exitoso', 'success');
+        
+        // Limpiar sesión local del chat para que cargue la del servidor
+        sessionStorage.removeItem('kyrbi_chat_v1');
         
         // Redirigir al dashboard o home
         window.location.href = 'index.html';
@@ -214,11 +236,26 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       clearError();
 
-      const username = document.getElementById('username').value;
-      const email = document.getElementById('email').value;
+      const username = document.getElementById('username').value.trim();
+      const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
       const confirmPassword = document.getElementById('confirm-password').value;
       const submitBtn = registerForm.querySelector('button[type="submit"]');
+
+      if (!username || !email || !password || !confirmPassword) {
+        showError('Por favor, completa todos los campos obligatorios');
+        return;
+      }
+
+      if (!validateEmail(email)) {
+        showError('El correo electrónico no es válido');
+        return;
+      }
+
+      if (password.length < 6) {
+        showError('La contraseña debe tener al menos 6 caracteres');
+        return;
+      }
 
       if (password !== confirmPassword) {
         showError('Las contraseñas no coinciden');
@@ -232,6 +269,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const captchaToken = await getCaptchaToken('register');
         const r = await window.KyrbiAPI.register(username, email, password, captchaToken);
         showToast('Cuenta creada. Verifica tu correo (simulado).', 'success');
+        
+        // Limpiar sesión local del chat
+        sessionStorage.removeItem('kyrbi_chat_v1');
+
         if (r?.verifyTokenPreview) {
           const useToken = confirm('¿Verificar correo automáticamente (solo desarrollo)?');
           if (useToken) {
