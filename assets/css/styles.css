@@ -468,18 +468,22 @@ a {
 }
 
 .reveal {
-  opacity: 0;
+  opacity: 1;
   transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.reveal.active {
+html.reveal-ready .reveal {
+  opacity: 0;
+}
+
+html.reveal-ready .reveal.active {
   opacity: 1;
   transform: translateY(0);
 }
 
-.reveal--left { transform: translateX(-50px); }
-.reveal--right { transform: translateX(50px); }
-.reveal--up { transform: translateY(50px); }
+html.reveal-ready .reveal--left { transform: translateX(-50px); }
+html.reveal-ready .reveal--right { transform: translateX(50px); }
+html.reveal-ready .reveal--up { transform: translateY(50px); }
 
 /* ==========================================================================
    Animations & Keyframes
