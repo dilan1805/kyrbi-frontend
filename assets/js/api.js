@@ -3,46 +3,51 @@
    ========================================================================== */
 
 if (!window.API_CONFIG) {
+  const host = (window.location.hostname || "").toLowerCase();
+  const isStaticHost = host.endsWith("github.io") || host.endsWith("netlify.app");
+  const fallbackBaseURL =
+    typeof window.BACKEND_FALLBACK_URL === "string" && window.BACKEND_FALLBACK_URL.trim().length > 0
+      ? window.BACKEND_FALLBACK_URL.trim()
+      : "https://kyrbi-backend.onrender.com";
+
   window.API_CONFIG = {
-    // URL del backend - cambiar según el entorno
-    baseURL: (typeof window.BACKEND_URL === 'string' && window.BACKEND_URL.trim().length > 0)
-      ? window.BACKEND_URL.trim()
-      : window.location.origin,
+    baseURL:
+      typeof window.BACKEND_URL === "string" && window.BACKEND_URL.trim().length > 0
+        ? window.BACKEND_URL.trim()
+        : (isStaticHost ? fallbackBaseURL : window.location.origin),
+    fallbackBaseURL,
     endpoints: {
-      chat: '/api/chat',
-      chatPublic: '/api/chat/public',
-      history: '/api/chat/history',
-      historyPublic: '/api/chat/public/history',
-      memory: '/api/chat/memory',
-      login: '/api/auth/login',
-      register: '/api/auth/register',
-      me: '/api/auth/me',
-      preferences: '/api/auth/preferences',
-      csrfToken: '/api/auth/csrf-token',
-      verifyEmail: '/api/auth/verify-email',
-      resendVerify: '/api/auth/verify-email/resend',
-      setup2FA: '/api/auth/2fa/setup',
-      verify2FASetup: '/api/auth/2fa/verify-setup',
-      disable2FA: '/api/auth/2fa/disable',
-      requestReset: '/api/auth/password/reset/request',
-      confirmReset: '/api/auth/password/reset/confirm',
-      verify2FA: '/api/auth/login/verify-2fa'
+      chat: "/api/chat",
+      chatPublic: "/api/chat/public",
+      history: "/api/chat/history",
+      historyPublic: "/api/chat/public/history",
+      memory: "/api/chat/memory",
+      login: "/api/auth/login",
+      register: "/api/auth/register",
+      me: "/api/auth/me",
+      preferences: "/api/auth/preferences",
+      csrfToken: "/api/auth/csrf-token",
+      verifyEmail: "/api/auth/verify-email",
+      resendVerify: "/api/auth/verify-email/resend",
+      setup2FA: "/api/auth/2fa/setup",
+      verify2FASetup: "/api/auth/2fa/verify-setup",
+      disable2FA: "/api/auth/2fa/disable",
+      requestReset: "/api/auth/password/reset/request",
+      confirmReset: "/api/auth/password/reset/confirm",
+      verify2FA: "/api/auth/login/verify-2fa",
     },
-    timeout: 30000, // 30 segundos
+    timeout: 30000,
   };
 }
 
-/**
- * Clase para manejar la comunicación con la API
- */
 if (!window.KyrbiAPI) {
   class KyrbiClient {
     constructor() {
-      this.token = localStorage.getItem('kyrbi_token') || sessionStorage.getItem('kyrbi_token');
-      this.sessionId = localStorage.getItem('kyrbi_session');
+      this.token = localStorage.getItem("kyrbi_token") || sessionStorage.getItem("kyrbi_token");
+      this.sessionId = localStorage.getItem("kyrbi_session");
       if (!this.sessionId) {
         this.sessionId = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
-        localStorage.setItem('kyrbi_session', this.sessionId);
+        localStorage.setItem("kyrbi_session", this.sessionId);
       }
     }
 
@@ -51,109 +56,130 @@ if (!window.KyrbiAPI) {
     }
 
     getHeaders() {
-      const headers = {
-        'Content-Type': 'application/json',
-      };
-      if (this.token) {
-        headers['Authorization'] = `Bearer ${this.token}`;
-      }
-      if (window.CSRF_TOKEN) {
-        headers['x-csrf-token'] = window.CSRF_TOKEN;
-      }
+      const headers = { "Content-Type": "application/json" };
+      if (this.token) headers.Authorization = `Bearer ${this.token}`;
+      if (window.CSRF_TOKEN) headers["x-csrf-token"] = window.CSRF_TOKEN;
       return headers;
     }
 
     setToken(token) {
       this.token = token;
-      localStorage.setItem('kyrbi_token', token);
+      localStorage.setItem("kyrbi_token", token);
     }
 
     logout() {
       this.token = null;
-      localStorage.removeItem('kyrbi_token');
-      localStorage.removeItem('kyrbi_user');
-      sessionStorage.removeItem('kyrbi_token');
-      window.location.href = 'login.html';
+      localStorage.removeItem("kyrbi_token");
+      localStorage.removeItem("kyrbi_user");
+      sessionStorage.removeItem("kyrbi_token");
+      window.location.href = "login.html";
+    }
+
+    normalizePath(endpoint) {
+      return String(endpoint || "").startsWith("/") ? String(endpoint) : `/${String(endpoint || "")}`;
+    }
+
+    getBaseCandidates() {
+      const primaryBase = String(window.API_CONFIG.baseURL || "").replace(/\/+$/, "");
+      const fallbackBase = String(window.API_CONFIG.fallbackBaseURL || "").replace(/\/+$/, "");
+      const bases = [primaryBase];
+      if (fallbackBase && fallbackBase !== primaryBase) bases.push(fallbackBase);
+      return bases;
+    }
+
+    shouldRetryStatus(statusCode) {
+      return statusCode === 404 || statusCode === 405 || statusCode >= 500;
     }
 
     async request(endpoint, method, body = null) {
-      try {
-        const base = String(window.API_CONFIG.baseURL || '').replace(/\/+$/, '');
-        const path = String(endpoint || '').startsWith('/') ? endpoint : `/${String(endpoint || '')}`;
+      const path = this.normalizePath(endpoint);
+      const bases = this.getBaseCandidates();
+      let lastError = null;
+
+      for (let i = 0; i < bases.length; i += 1) {
+        const base = bases[i];
         const url = `${base}${path}`;
         const options = {
           method,
           headers: this.getHeaders(),
         };
+        if (body) options.body = JSON.stringify(body);
 
-        if (body) {
-          options.body = JSON.stringify(body);
-        }
+        try {
+          const response = await fetch(url, options);
+          const payload = await response.json().catch(() => ({}));
 
-        const response = await fetch(url, options);
-        const payload = await response.json().catch(() => ({}));
-
-        if (!response.ok) {
-          const errorData = payload || {};
-          if (response.status === 401) {
-              // Token expirado o inválido
-              if (!window.location.pathname.includes('login.html') && 
-                  !window.location.pathname.includes('register.html')) {
-                  // this.logout(); // Opcional: forzar logout
-              }
+          if (!response.ok) {
+            if (i < bases.length - 1 && this.shouldRetryStatus(response.status)) {
+              continue;
+            }
+            const errorData = payload || {};
+            throw new Error(errorData.error || `Error del servidor: ${response.status}`);
           }
-          throw new Error(errorData.error || `Error del servidor: ${response.status}`);
-        }
 
-        return payload;
-      } catch (error) {
-        console.error('API Request Error:', error);
-        throw error;
+          if (base !== String(window.API_CONFIG.baseURL || "").replace(/\/+$/, "")) {
+            window.API_CONFIG.baseURL = base;
+          }
+          return payload;
+        } catch (error) {
+          lastError = error;
+          if (i === bases.length - 1) {
+            console.error("API Request Error:", error);
+            throw error;
+          }
+        }
       }
+
+      throw lastError || new Error("Error de red");
     }
 
     async login(email, password, captchaToken = null) {
-      const data = await this.request(window.API_CONFIG.endpoints.login, 'POST', { email, password, captchaToken });
+      const data = await this.request(window.API_CONFIG.endpoints.login, "POST", { email, password, captchaToken });
       if (data.token) {
         this.setToken(data.token);
-        localStorage.setItem('kyrbi_user', JSON.stringify(data.user));
+        localStorage.setItem("kyrbi_user", JSON.stringify(data.user));
       }
       return data;
     }
 
     async register(username, email, password, captchaToken = null) {
-      const data = await this.request(window.API_CONFIG.endpoints.register, 'POST', { username, email, password, captchaToken });
+      const data = await this.request(window.API_CONFIG.endpoints.register, "POST", {
+        username,
+        email,
+        password,
+        captchaToken,
+      });
       if (data.token) {
         this.setToken(data.token);
-        localStorage.setItem('kyrbi_user', JSON.stringify(data.user));
+        localStorage.setItem("kyrbi_user", JSON.stringify(data.user));
       }
       return data;
     }
-    
+
     async verifyEmail(token) {
-      return await this.request(window.API_CONFIG.endpoints.verifyEmail, 'POST', { token });
+      return this.request(window.API_CONFIG.endpoints.verifyEmail, "POST", { token });
     }
-    
+
     async resendVerificationEmail(email = null) {
       const body = email ? { email } : {};
-      return await this.request(window.API_CONFIG.endpoints.resendVerify, 'POST', body);
+      return this.request(window.API_CONFIG.endpoints.resendVerify, "POST", body);
     }
-    
+
     async setup2FA() {
-      return await this.request(window.API_CONFIG.endpoints.setup2FA, 'POST');
+      return this.request(window.API_CONFIG.endpoints.setup2FA, "POST");
     }
 
     async verify2FASetup(token) {
-      return await this.request(window.API_CONFIG.endpoints.verify2FASetup, 'POST', { token });
+      return this.request(window.API_CONFIG.endpoints.verify2FASetup, "POST", { token });
     }
 
     async disable2FA() {
-      return await this.request(window.API_CONFIG.endpoints.disable2FA, 'POST');
+      return this.request(window.API_CONFIG.endpoints.disable2FA, "POST");
     }
-    
+
     async getCsrfToken() {
       try {
-        const data = await this.request(window.API_CONFIG.endpoints.csrfToken, 'GET');
+        const data = await this.request(window.API_CONFIG.endpoints.csrfToken, "GET");
         window.CSRF_TOKEN = data?.token || null;
         return window.CSRF_TOKEN;
       } catch {
@@ -161,73 +187,75 @@ if (!window.KyrbiAPI) {
         return null;
       }
     }
-    
+
     async requestPasswordReset(email) {
-      return await this.request(window.API_CONFIG.endpoints.requestReset, 'POST', { email });
+      return this.request(window.API_CONFIG.endpoints.requestReset, "POST", { email });
     }
-    
+
     async confirmPasswordReset(token, password) {
-      return await this.request(window.API_CONFIG.endpoints.confirmReset, 'POST', { token, password });
+      return this.request(window.API_CONFIG.endpoints.confirmReset, "POST", { token, password });
     }
-    
+
     async verify2FA(email, code) {
-      return await this.request(window.API_CONFIG.endpoints.verify2FA, 'POST', { email, token: code, code });
+      return this.request(window.API_CONFIG.endpoints.verify2FA, "POST", { email, token: code, code });
     }
 
     async getHistory() {
       if (!this.token) {
         const url = `${window.API_CONFIG.endpoints.historyPublic}?sessionId=${encodeURIComponent(this.sessionId)}`;
-        return await this.request(url, 'GET');
+        return this.request(url, "GET");
       }
-      return await this.request(window.API_CONFIG.endpoints.history, 'GET');
+      return this.request(window.API_CONFIG.endpoints.history, "GET");
     }
 
     async getConversation(id) {
       if (!this.token) {
         const url = `${window.API_CONFIG.endpoints.historyPublic}/${id}?sessionId=${encodeURIComponent(this.sessionId)}`;
-        return await this.request(url, 'GET');
+        return this.request(url, "GET");
       }
-      return await this.request(`${window.API_CONFIG.endpoints.history}/${id}`, 'GET');
+      return this.request(`${window.API_CONFIG.endpoints.history}/${id}`, "GET");
     }
 
     async getConversationMemory(id) {
-      if (!this.token || !id) return { summary: '' };
-      return await this.request(`${window.API_CONFIG.endpoints.memory}/${id}`, 'GET');
+      if (!this.token || !id) return { summary: "" };
+      return this.request(`${window.API_CONFIG.endpoints.memory}/${id}`, "GET");
     }
 
     async getMe() {
       if (!this.token) return null;
-      return await this.request(window.API_CONFIG.endpoints.me, 'GET');
+      return this.request(window.API_CONFIG.endpoints.me, "GET");
     }
 
     async updatePreferences(preferences = {}) {
       if (!this.token) return null;
-      return await this.request(window.API_CONFIG.endpoints.preferences, 'PUT', { preferences });
+      return this.request(window.API_CONFIG.endpoints.preferences, "PUT", { preferences });
     }
 
-    async sendMessage(message, mode = 'general', conversationId = null) {
+    async sendMessage(message, mode = "general", conversationId = null) {
       const body = {
         message: message.trim(),
-        mode: mode,
-        conversationId: conversationId
+        mode,
+        conversationId,
       };
 
       let response;
       if (this.token) {
-        response = await this.request(window.API_CONFIG.endpoints.chat, 'POST', body);
+        response = await this.request(window.API_CONFIG.endpoints.chat, "POST", body);
       } else {
-        response = await this.request(window.API_CONFIG.endpoints.chatPublic, 'POST', { ...body, sessionId: this.sessionId });
+        response = await this.request(window.API_CONFIG.endpoints.chatPublic, "POST", {
+          ...body,
+          sessionId: this.sessionId,
+        });
       }
-      
+
       return {
-        text: response.content || response.text || 'Lo siento, no pude generar una respuesta.',
+        text: response.content || response.text || "Lo siento, no pude generar una respuesta.",
         mode: response.mode || mode,
         timestamp: response.timestamp,
-        conversationId: response.conversationId
+        conversationId: response.conversationId,
       };
     }
   }
 
-  // Exportar instancia única
   window.KyrbiAPI = new KyrbiClient();
 }
