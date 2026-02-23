@@ -141,7 +141,7 @@ document.addEventListener("DOMContentLoaded", () => {
       e.preventDefault();
       clearError();
 
-      const email = document.getElementById("email")?.value.trim();
+      const email = document.getElementById("email")?.value.trim().toLowerCase();
       const password = document.getElementById("password")?.value || "";
       const remember = document.getElementById("remember")?.checked;
       const submitBtn = loginForm.querySelector('button[type="submit"]');
@@ -182,6 +182,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (authUser) {
           localStorage.setItem("kyrbi_user", JSON.stringify(authUser));
+          if (authUser.preferences?.chatSettings) {
+            localStorage.setItem("kyrbi_preferences_v1", JSON.stringify(authUser.preferences.chatSettings));
+          }
         }
 
         if (remember) {
@@ -248,8 +251,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const confirmField = document.getElementById("confirm-password");
       const submitBtn = registerForm.querySelector('button[type="submit"]');
 
-      const usernameValue = usernameField?.value.trim() || "";
-      const emailValue = emailField?.value.trim() || "";
+      const usernameValue = (usernameField?.value || "").trim().replace(/\s+/g, " ");
+      const emailValue = (emailField?.value || "").trim().toLowerCase();
       const passwordValue = passwordField?.value || "";
       const confirmValue = confirmField?.value || "";
 
@@ -260,6 +263,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (!validateEmail(emailValue)) {
         showError("El correo electronico no es valido.");
+        return;
+      }
+
+      if (usernameValue.length < 3) {
+        showError("El nombre de usuario debe tener al menos 3 caracteres.");
         return;
       }
 
@@ -287,6 +295,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (registerData?.token && window.KyrbiAPI) {
           window.KyrbiAPI.token = registerData.token;
+        }
+        if (registerData?.user?.preferences?.chatSettings) {
+          localStorage.setItem("kyrbi_preferences_v1", JSON.stringify(registerData.user.preferences.chatSettings));
         }
 
         sessionStorage.removeItem("kyrbi_chat_v1");

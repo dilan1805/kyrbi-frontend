@@ -1,19 +1,10 @@
 /* ==========================================================================
-   Ciencias para vivir mejor — Kyrbi (chat simulado, listo para integrar IA)
-   - Sin frameworks, ES6+, arquitectura modular simple.
-   - Usa KYRBI_CONFIG y KyrbiEngine (definidos en archivos separados).
+   Kyrbi frontend app
+   - Navigation behavior
+   - Chat UI render
+   - Session/history/memory handling
+   - User chat settings
    ========================================================================== */
-
-/**
- * Arquitectura (lista para conectar API real):
- * - state: { mode, messages }
- * - engine: genera respuestas (simuladas) según modo e historial
- * - ui: renderiza el chat en 1 o más contenedores (hero + vista dedicada)
- *
- * Para integrar IA real en el futuro:
- * - reemplazar `engine.getAssistantReply()` por un fetch a tu API
- * - mantener el mismo contrato: (state, userText) -> {text, followups?}
- */
 
 (() => {
   "use strict";
@@ -21,12 +12,40 @@
   const CONFIG = window.KYRBI_CONFIG || {};
   const MODES = CONFIG.modes || {};
 
-  /** @type {{mode: keyof typeof MODES, messages: Array<any>, typing: boolean, conversationId: string|null}} */
+  const MODE_TO_API = {
+    general: "guia",
+    chef: "chef",
+    coach: "coach",
+    descanso: "descanso",
+  };
+
+  const API_TO_MODE = {
+    guia: "general",
+    general: "general",
+    chef: "chef",
+    coach: "coach",
+    descanso: "descanso",
+  };
+
+  const STORAGE_KEYS = {
+    session: CONFIG.storage?.key || "kyrbi_session_v1",
+    settings: "kyrbi_preferences_v1",
+    publicMemory: "kyrbi_public_memory_v1",
+  };
+
+  const DEFAULT_SETTINGS = {
+    autoSave: true,
+    defaultMode: "general",
+    theme: "system", // system | light | dark
+  };
+
   const state = {
     mode: "general",
     messages: [],
     typing: false,
     conversationId: null,
+    history: [],
+    settings: { ...DEFAULT_SETTINGS },
   };
 
   const dom = {
@@ -38,42 +57,93 @@
     startButtons: Array.from(document.querySelectorAll('[data-action="start-kyrbi"]')),
     heroMount: document.getElementById("kyrbi-hero"),
     appMount: document.getElementById("kyrbi-app"),
-  };
 
-  /* ---------------------------
-   * Utilidades
-   * ------------------------- */
+    historyList: document.getElementById("conversation-history"),
+    historyStatus: document.getElementById("history-status"),
+    newChatBtn: document.getElementById("new-chat-btn"),
+
+    memorySummary: document.getElementById("memory-summary"),
+    memoryMeta: document.getElementById("memory-meta"),
+
+    settingsForm: document.getElementById("chat-settings"),
+    settingsAutoSave: document.getElementById("setting-autosave"),
+    settingsTheme: document.getElementById("setting-theme"),
+    settingsDefaultMode: document.getElementById("setting-default-mode"),
+    settingsSave: document.getElementById("settings-save"),
+  };
 
   const nowTime = () => {
     const d = new Date();
     return d.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" });
   };
 
-  const clampText = (text, max = 320) => (text.length > max ? `${text.slice(0, max).trim()}…` : text);
-
   const sanitizeUserText = (value) =>
     String(value || "")
       .replace(/\s+/g, " ")
       .trim();
 
+  const clampText = (text, max = 320) => (text.length > max ? `${text.slice(0, max).trim()}...` : text);
+  const makeId = () => `${Date.now()}-${Math.random().toString(16).slice(2)}`;
   const scrollToBottom = (el) => {
-    if (!el) return;
-    el.scrollTop = el.scrollHeight;
+    if (el) el.scrollTop = el.scrollHeight;
   };
 
-  const makeId = () => `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  const mapModeFromApi = (mode) => API_TO_MODE[String(mode || "").toLowerCase()] || "general";
+  const mapModeToApi = (mode) => MODE_TO_API[String(mode || "").toLowerCase()] || "guia";
 
-  // El engine simulado ya no se usa - ahora usamos el backend real vía API
+  const formatDate = (value) => {
+    try {
+      return new Date(value).toLocaleString("es-ES", {
+        day: "2-digit",
+        month: "short",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    } catch {
+      return "";
+    }
+  };
 
-  /* ---------------------------
-   * UI (render + eventos)
-   * ------------------------- */
+  const parseJSON = (raw, fallback) => {
+    try {
+      return JSON.parse(raw);
+    } catch {
+      return fallback;
+    }
+  };
 
-  /**
-   * Crea el DOM de un chat y devuelve referencias (para render).
-   * @param {HTMLElement} mount
-   * @param {{variant: "hero"|"app"}} opts
-   */
+  const getMemoryMap = () => parseJSON(localStorage.getItem(STORAGE_KEYS.publicMemory) || "{}", {});
+  const setMemoryMap = (value) => {
+    try {
+      localStorage.setItem(STORAGE_KEYS.publicMemory, JSON.stringify(value));
+    } catch {}
+  };
+
+  const applyTheme = (theme) => {
+    const root = document.documentElement;
+    if (theme === "light" || theme === "dark") {
+      root.setAttribute("data-theme", theme);
+      return;
+    }
+    root.removeAttribute("data-theme");
+  };
+
+  const buildLocalMemory = (messages) => {
+    const userMessages = messages.filter((m) => m.role === "user").slice(-6).map((m) => m.text).filter(Boolean);
+    if (!userMessages.length) return "Aun no hay memoria guardada.";
+    const compact = userMessages.map((text, i) => `${i + 1}. ${text}`).join("\n");
+    return `Resumen local (sesion):\n${compact}`;
+  };
+
+  const getSettingsFromStorage = () => {
+    const data = parseJSON(localStorage.getItem(STORAGE_KEYS.settings) || "{}", {});
+    return {
+      autoSave: data.autoSave !== false,
+      defaultMode: MODES[data.defaultMode] ? data.defaultMode : DEFAULT_SETTINGS.defaultMode,
+      theme: ["system", "light", "dark"].includes(data.theme) ? data.theme : DEFAULT_SETTINGS.theme,
+    };
+  };
+
   function createChatUI(mount, opts) {
     mount.innerHTML = "";
 
@@ -92,7 +162,7 @@
 
     const subtitle = document.createElement("p");
     subtitle.className = "chat__subtitle";
-    subtitle.textContent = "Acompañamiento educativo • Conversación activa";
+    subtitle.textContent = "Acompanamiento educativo";
 
     topLeft.appendChild(title);
     topLeft.appendChild(subtitle);
@@ -100,7 +170,7 @@
     const tools = document.createElement("div");
     tools.className = "chat__tools";
 
-        const chip = document.createElement("div");
+    const chip = document.createElement("div");
     chip.className = "chip";
     chip.setAttribute("aria-label", "Estado del asistente");
 
@@ -118,7 +188,7 @@
     const resetBtn = document.createElement("button");
     resetBtn.className = "icon-btn";
     resetBtn.type = "button";
-    resetBtn.setAttribute("aria-label", "Reiniciar conversación");
+    resetBtn.setAttribute("aria-label", "Nueva conversacion");
     resetBtn.textContent = "↻";
 
     tools.appendChild(chip);
@@ -145,7 +215,7 @@
     input.name = "message";
     input.type = "text";
     input.inputMode = "text";
-    input.placeholder = opts.variant === "hero" ? "Escribe algo (vista rápida)…" : "Escribe tu mensaje…";
+    input.placeholder = opts.variant === "hero" ? "Escribe algo..." : "Escribe tu mensaje...";
     input.maxLength = opts.variant === "hero" ? (CONFIG.limits?.userText || 140) : (CONFIG.limits?.userTextApp || 260);
     input.setAttribute("aria-label", "Escribir mensaje");
 
@@ -163,7 +233,10 @@
 
     const hint = document.createElement("div");
     hint.className = "helper-row__hint";
-    hint.textContent = opts.variant === "hero" ? "Tip: cambia a la vista completa para más espacio." : "Tip: responde corto; Kyrbi hará preguntas.";
+    hint.textContent =
+      opts.variant === "hero"
+        ? "Tip: abre la vista completa para guardar tu progreso."
+        : "Tip: Kyrbi guarda tus conversaciones para continuidad.";
 
     const actions = document.createElement("div");
     actions.className = "helper-row__actions";
@@ -177,7 +250,7 @@
     const quick2 = document.createElement("button");
     quick2.className = "link-btn";
     quick2.type = "button";
-    quick2.textContent = "Tengo poca energía";
+    quick2.textContent = "Tengo poca energia";
     quick2.dataset.quick = "energia";
 
     actions.appendChild(quick1);
@@ -203,44 +276,85 @@
     app: null,
 
     updateNavigation() {
-      const user = localStorage.getItem('kyrbi_user');
-      const navLinks = document.getElementById('nav-links');
+      const user = localStorage.getItem("kyrbi_user");
+      const navLinks = document.getElementById("nav-links");
       if (!navLinks) return;
 
-      // Eliminar enlaces de auth existentes para evitar duplicados
-      const authLinks = navLinks.querySelectorAll('.nav-auth-link');
-      authLinks.forEach(el => el.remove());
+      const authLinks = navLinks.querySelectorAll(".nav-auth-link");
+      authLinks.forEach((el) => el.remove());
 
       if (user) {
-        // Usuario Logueado: Añadir Dashboard y Logout
-        const dashboardLink = document.createElement('a');
-        dashboardLink.className = 'nav__link nav-auth-link';
-        dashboardLink.href = 'dashboard.html';
-        dashboardLink.textContent = 'Dashboard';
-        if (window.location.pathname.includes('dashboard.html')) {
-            dashboardLink.classList.add('is-active');
+        const dashboardLink = document.createElement("a");
+        dashboardLink.className = "nav__link nav-auth-link";
+        dashboardLink.href = "dashboard.html";
+        dashboardLink.textContent = "Dashboard";
+        if (window.location.pathname.includes("dashboard.html")) {
+          dashboardLink.classList.add("is-active");
         }
-        
-        const logoutLink = document.createElement('a');
-        logoutLink.className = 'nav__link nav-auth-link';
-        logoutLink.href = '#';
-        logoutLink.textContent = 'Cerrar Sesión';
-        logoutLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (window.KyrbiAPI) window.KyrbiAPI.logout();
+
+        const logoutLink = document.createElement("a");
+        logoutLink.className = "nav__link nav-auth-link";
+        logoutLink.href = "#";
+        logoutLink.textContent = "Cerrar sesion";
+        logoutLink.addEventListener("click", (e) => {
+          e.preventDefault();
+          window.KyrbiAPI?.logout?.();
         });
 
         navLinks.appendChild(dashboardLink);
         navLinks.appendChild(logoutLink);
       } else {
-        // Usuario No Logueado: Añadir Login
-        const loginLink = document.createElement('a');
-        loginLink.className = 'nav__link nav-auth-link';
-        loginLink.href = 'login.html';
-        loginLink.textContent = 'Iniciar Sesión';
-
+        const loginLink = document.createElement("a");
+        loginLink.className = "nav__link nav-auth-link";
+        loginLink.href = "login.html";
+        loginLink.textContent = "Iniciar sesion";
         navLinks.appendChild(loginLink);
       }
+    },
+
+    syncModeTabs() {
+      dom.modeTabs.forEach((btn) => {
+        const active = btn.dataset.mode === state.mode;
+        btn.classList.toggle("is-active", active);
+        btn.setAttribute("aria-selected", active ? "true" : "false");
+      });
+    },
+
+    syncSettingsForm() {
+      if (dom.settingsAutoSave) dom.settingsAutoSave.checked = Boolean(state.settings.autoSave);
+      if (dom.settingsTheme) dom.settingsTheme.value = state.settings.theme;
+      if (dom.settingsDefaultMode) dom.settingsDefaultMode.value = state.settings.defaultMode;
+    },
+
+    renderHistory() {
+      if (!dom.historyList) return;
+      dom.historyList.innerHTML = "";
+
+      if (!state.history.length) {
+        dom.historyList.innerHTML = '<li class="history-item history-item--empty">Aun no hay conversaciones guardadas.</li>';
+        return;
+      }
+
+      state.history.slice(0, 20).forEach((conv) => {
+        const li = document.createElement("li");
+        li.className = `history-item ${state.conversationId === conv.id ? "is-active" : ""}`;
+        li.innerHTML = `
+          <button type="button" class="history-item__button" data-conversation-id="${conv.id}">
+            <span class="history-item__title">${conv.title || "Conversacion sin titulo"}</span>
+            <span class="history-item__meta">${formatDate(conv.updatedAt)} · ${mapModeFromApi(conv.mode)}</span>
+          </button>
+        `;
+        dom.historyList.appendChild(li);
+      });
+    },
+
+    renderMemory(text, updated = "") {
+      if (dom.memorySummary) dom.memorySummary.textContent = text || "Sin memoria disponible.";
+      if (dom.memoryMeta) dom.memoryMeta.textContent = updated ? `Actualizado: ${updated}` : "";
+    },
+
+    setHistoryStatus(text) {
+      if (dom.historyStatus) dom.historyStatus.textContent = text || "";
     },
 
     init() {
@@ -266,7 +380,6 @@
       window.addEventListener("resize", syncNavOffset, { passive: true });
       window.addEventListener("scroll", syncNavOffset, { passive: true });
 
-      // Navbar (mobile)
       if (dom.navToggle && dom.navLinks) {
         dom.navToggle.addEventListener("click", () => {
           syncNavOffset();
@@ -282,37 +395,26 @@
           const target = event.target;
           if (!(target instanceof Element)) return;
           const clickInsideMenu = dom.navLinks.contains(target) || dom.navToggle.contains(target);
-          if (!clickInsideMenu) {
-            closeMobileMenu();
-          }
+          if (!clickInsideMenu) closeMobileMenu();
         });
 
         document.addEventListener("keydown", (event) => {
-          if (event.key !== "Escape") return;
-          closeMobileMenu();
+          if (event.key === "Escape") closeMobileMenu();
         });
       }
 
       this.updateNavigation();
 
-      // Cierra menú móvil al navegar
       dom.navAnchors.forEach((a) => {
-        a.addEventListener("click", () => {
-          closeMobileMenu();
-        });
+        a.addEventListener("click", () => closeMobileMenu());
       });
 
-      // Resalta el link activo según la página actual (multi-page real)
       const active = getActiveNavKey();
-      if (active) {
-        dom.navAnchors.forEach((a) => a.classList.toggle("is-active", a.dataset.nav === active));
-      }
+      if (active) dom.navAnchors.forEach((a) => a.classList.toggle("is-active", a.dataset.nav === active));
 
-      // Render UI
       this.hero = dom.heroMount ? createChatUI(dom.heroMount, { variant: "hero" }) : null;
       this.app = dom.appMount ? createChatUI(dom.appMount, { variant: "app" }) : null;
 
-      // Eventos de envío (ambas vistas comparten el mismo estado)
       const bindChat = (chatRefs, focusAfterSend = true) => {
         if (!chatRefs) return;
         chatRefs.form.addEventListener("submit", (e) => {
@@ -329,13 +431,12 @@
         });
 
         chatRefs.quick1.addEventListener("click", () => actions.sendUserMessage("Quiero un plan semanal.", { focusAfterSend }));
-        chatRefs.quick2.addEventListener("click", () => actions.sendUserMessage("Tengo poca energía en clases.", { focusAfterSend }));
+        chatRefs.quick2.addEventListener("click", () => actions.sendUserMessage("Tengo poca energia en clases.", { focusAfterSend }));
       };
 
       bindChat(this.hero, false);
       bindChat(this.app, true);
 
-      // Tabs de modo
       dom.modeTabs.forEach((btn) => {
         btn.addEventListener("click", () => {
           const mode = btn.dataset.mode;
@@ -344,7 +445,6 @@
         });
       });
 
-      // Botón principal del hero
       dom.startButtons.forEach((btn) => {
         btn.addEventListener("click", () => {
           actions.ensureAssistantVisible();
@@ -352,35 +452,35 @@
         });
       });
 
-      // Modo inicial por URL (assistant.html?mode=chef)
-      const urlMode = getModeFromUrl();
-      if (urlMode && MODES[urlMode]) {
-        actions.setMode(urlMode, { announce: false });
-      }
+      dom.newChatBtn?.addEventListener("click", () => actions.resetConversation());
 
-      // En páginas multipágina, no se necesita scroll-spy de secciones
-    },
+      dom.historyList?.addEventListener("click", (event) => {
+        const target = event.target;
+        if (!(target instanceof Element)) return;
+        const button = target.closest("[data-conversation-id]");
+        const id = button?.getAttribute("data-conversation-id");
+        if (!id) return;
+        actions.loadConversation(id);
+      });
 
-    initScrollSpy() {
-      const sections = ["inicio", "asistente", "habitos", "equipo"]
-        .map((id) => document.getElementById(id))
-        .filter(Boolean);
+      dom.settingsSave?.addEventListener("click", async () => {
+        await actions.saveSettings({ syncRemote: true });
+      });
 
-      if (!sections.length) return;
+      dom.settingsAutoSave?.addEventListener("change", () => {
+        state.settings.autoSave = Boolean(dom.settingsAutoSave.checked);
+      });
 
-      const obs = new IntersectionObserver(
-        (entries) => {
-          const visible = entries
-            .filter((e) => e.isIntersecting)
-            .sort((a, b) => (b.intersectionRatio || 0) - (a.intersectionRatio || 0))[0];
-          if (!visible) return;
-          const id = visible.target.id;
-          dom.navAnchors.forEach((a) => a.classList.toggle("is-active", a.getAttribute("href") === `#${id}`));
-        },
-        { rootMargin: "-35% 0px -60% 0px", threshold: [0.1, 0.2, 0.3] }
-      );
+      dom.settingsTheme?.addEventListener("change", () => {
+        state.settings.theme = dom.settingsTheme.value;
+        applyTheme(state.settings.theme);
+      });
 
-      sections.forEach((s) => obs.observe(s));
+      dom.settingsDefaultMode?.addEventListener("change", () => {
+        if (MODES[dom.settingsDefaultMode.value]) {
+          state.settings.defaultMode = dom.settingsDefaultMode.value;
+        }
+      });
     },
 
     render() {
@@ -389,20 +489,19 @@
         chatRefs.log.innerHTML = "";
         const msgs = limit ? state.messages.slice(-limit) : state.messages;
 
-        for (const msg of msgs) {
-          chatRefs.log.appendChild(renderMessage(msg));
-        }
+        msgs.forEach((msg) => chatRefs.log.appendChild(renderMessage(msg)));
 
-        // Título contextual por modo
-        const modeMeta = MODES[state.mode];
+        const modeMeta = MODES[state.mode] || MODES.general || { label: "Kyrbi", tone: "" };
         const subtitle = chatRefs.root.querySelector(".chat__subtitle");
-        if (subtitle) subtitle.textContent = `${modeMeta.label} • ${modeMeta.tone}`;
-
+        if (subtitle) subtitle.textContent = `${modeMeta.label}${modeMeta.tone ? ` · ${modeMeta.tone}` : ""}`;
         scrollToBottom(chatRefs.log);
       };
 
       renderInto(this.hero, 5);
       renderInto(this.app, null);
+      this.syncModeTabs();
+      this.syncSettingsForm();
+      this.renderHistory();
     },
   };
 
@@ -412,7 +511,7 @@
 
     const avatar = document.createElement("div");
     avatar.className = "msg__avatar";
-    avatar.textContent = msg.role === "user" ? "Tú" : "K";
+    avatar.textContent = msg.role === "user" ? "Tu" : "K";
 
     const bubble = document.createElement("div");
     bubble.className = "msg__bubble";
@@ -429,104 +528,40 @@
 
     const tag = document.createElement("span");
     tag.className = "msg__tag";
-    tag.textContent = msg.role === "user" ? "Tu mensaje" : MODES[msg.mode || state.mode]?.label || "Kyrbi";
+    tag.textContent = msg.role === "user" ? "Tu mensaje" : (MODES[msg.mode || state.mode]?.label || "Kyrbi");
 
     meta.appendChild(tag);
     meta.appendChild(time);
-
     bubble.appendChild(text);
     bubble.appendChild(meta);
-
     wrap.appendChild(avatar);
     wrap.appendChild(bubble);
     return wrap;
   }
 
-  /* ---------------------------
-   * Acciones (control de estado)
-   * ------------------------- */
-
   const actions = {
-    async loadRemoteSession() {
-      if (!window.KyrbiAPI || !window.KyrbiAPI.token) return;
-      try {
-        const history = await window.KyrbiAPI.getHistory();
-        if (history && history.length > 0) {
-          // Cargar la última conversación
-          const lastConv = history[0];
-          const fullConv = await window.KyrbiAPI.getConversation(lastConv.id);
-          
-          if (fullConv) {
-            state.conversationId = fullConv.id;
-            state.mode = fullConv.mode || "general";
-            // Mapear mensajes de BD a formato local
-            state.messages = (fullConv.Messages || []).map(msg => ({
-              id: msg.id,
-              role: msg.role,
-              text: msg.content,
-              time: new Date(msg.createdAt).toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" }),
-              mode: state.mode
-            }));
-            
-            // Actualizar UI
-            ui.render();
-            
-            // Actualizar tabs visualmente sin re-anunciar
-            dom.modeTabs.forEach((b) => {
-                const active = b.dataset.mode === state.mode;
-                b.classList.toggle("is-active", active);
-                b.setAttribute("aria-selected", active ? "true" : "false");
-            });
-          }
-        }
-      } catch (e) {
-        console.error("Error loading remote session", e);
-      }
-    },
-
-    boot() {
-      if (dom.appMount) {
-        this.restoreSession();
-        this.loadRemoteSession(); // Intentar cargar del backend
-      } else {
-        this.resetConversation({ keepMode: true });
-      }
-      ui.render();
-    },
-
     ensureAssistantVisible(scroll = false) {
-      // Cierra menú móvil si está abierto
       if (dom.navLinks?.classList.contains("is-open")) {
         dom.navLinks.classList.remove("is-open");
         dom.navToggle?.classList.remove("is-active");
         dom.navToggle?.setAttribute("aria-expanded", "false");
         document.body.classList.remove("nav-open");
       }
-      if (scroll) {
-        document.getElementById("asistente")?.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
+      if (scroll) document.getElementById("asistente")?.scrollIntoView({ behavior: "smooth", block: "start" });
     },
 
     setMode(mode, opts = {}) {
       if (!MODES[mode]) return;
       const prev = state.mode;
       state.mode = mode;
-
-      // Tabs UI
-      dom.modeTabs.forEach((b) => {
-        const active = b.dataset.mode === mode;
-        b.classList.toggle("is-active", active);
-        b.setAttribute("aria-selected", active ? "true" : "false");
-      });
+      ui.syncModeTabs();
 
       if (opts.announce && prev !== mode) {
-        // Mensaje de cambio de modo
         const modeMeta = MODES[mode];
-        const switchMessage = `He cambiado a modo ${modeMeta?.label || mode}.\n${modeMeta?.tone || ''} Dime qué te gustaría mejorar y te haré preguntas cortas para guiarte.`;
+        const switchMessage = `He cambiado a modo ${modeMeta?.label || mode}. ${modeMeta?.tone || ""}`.trim();
         this.addAssistantMessage(switchMessage, { mode });
-        // Añade 1 pregunta inicial si la conversación está “fría”
         if (state.messages.filter((m) => m.role === "user").length === 0) {
-          const intro = MODES[mode].intro?.[1];
+          const intro = MODES[mode]?.intro?.[1];
           if (intro) this.addAssistantMessage(intro, { mode });
         }
       }
@@ -537,69 +572,17 @@
 
     resetConversation(opts = {}) {
       const keepMode = Boolean(opts.keepMode);
-      const mode = keepMode ? state.mode : "general";
-      state.mode = mode;
+      const nextMode = keepMode ? state.mode : state.settings.defaultMode || "general";
+      state.mode = MODES[nextMode] ? nextMode : "general";
       state.messages = [];
       state.typing = false;
+      state.conversationId = null;
 
-      const intro = MODES[mode].intro || [];
-      for (const line of intro) {
-        this.addAssistantMessage(line, { mode, silent: true });
-      }
-
+      (MODES[state.mode]?.intro || []).forEach((line) => this.addAssistantMessage(line, { mode: state.mode }));
       if (dom.appMount) this.persistSession();
       ui.render();
-    },
-
-    async sendUserMessage(text, opts = {}) {
-      const clean = sanitizeUserText(text);
-      if (!clean) return;
-
-      this.addUserMessage(clean);
-      ui.render();
-
-      // Indicador de "Kyrbi está pensando..."
-      state.typing = true;
-      ui.hero?.chipText && (ui.hero.chipText.textContent = "Kyrbi está pensando…");
-      ui.app?.chipText && (ui.app.chipText.textContent = "Kyrbi está pensando…");
-
-      try {
-        // Llamar al backend real
-        const response = await window.KyrbiAPI.sendMessage(
-          clean,
-          state.mode,
-          state.conversationId
-        );
-
-        if (response.conversationId) {
-          state.conversationId = response.conversationId;
-        }
-
-        state.typing = false;
-        ui.hero?.chipText && (ui.hero.chipText.textContent = "Disponible");
-        ui.app?.chipText && (ui.app.chipText.textContent = "Disponible");
-
-        this.addAssistantMessage(response.text, { mode: response.mode || state.mode });
-        if (dom.appMount) this.persistSession();
-        ui.render();
-
-        if (opts.focusAfterSend && ui.app?.input) ui.app.input.focus();
-      } catch (error) {
-        state.typing = false;
-        ui.hero?.chipText && (ui.hero.chipText.textContent = "Error");
-        ui.app?.chipText && (ui.app.chipText.textContent = "Error");
-
-        // Mostrar mensaje de error amigable
-        const errorMessage = error.message || 'Ocurrió un error al comunicarse con Kyrbi. Por favor, intenta de nuevo.';
-        this.addAssistantMessage(
-          `Lo siento, ${errorMessage.toLowerCase()}\n\nPor favor, verifica que el servidor backend esté ejecutándose.`,
-          { mode: state.mode }
-        );
-        if (dom.appMount) this.persistSession();
-        ui.render();
-
-        console.error('Error al enviar mensaje:', error);
-      }
+      this.refreshHistory().catch(() => {});
+      this.refreshMemory().catch(() => {});
     },
 
     addUserMessage(text) {
@@ -617,7 +600,7 @@
       state.messages.push({
         id: makeId(),
         role: "assistant",
-        text: String(text || "").replace(/\*\*(.+?)\*\*/g, "$1"), // evita markdown visible
+        text: String(text || "").replace(/\*\*(.+?)\*\*/g, "$1"),
         time: nowTime(),
         mode: opts.mode || state.mode,
       });
@@ -625,47 +608,241 @@
     },
 
     persistSession() {
-      if (!CONFIG.storage?.enabled) return;
-      if (!dom.appMount) return; // solo en vista dedicada
+      if (!CONFIG.storage?.enabled || !dom.appMount || !state.settings.autoSave) return;
       const payload = {
         mode: state.mode,
-        messages: state.messages.slice(-40), // memoria corta
+        conversationId: state.conversationId,
+        messages: state.messages.slice(-50),
       };
       try {
-        window.sessionStorage.setItem(CONFIG.storage.key, JSON.stringify(payload));
-      } catch {
-        /* storage opcional */
-      }
+        window.sessionStorage.setItem(STORAGE_KEYS.session, JSON.stringify(payload));
+      } catch {}
     },
 
     restoreSession() {
-      if (!CONFIG.storage?.enabled) {
-        this.resetConversation({ keepMode: true });
+      if (!CONFIG.storage?.enabled) return;
+      const raw = window.sessionStorage.getItem(STORAGE_KEYS.session);
+      if (!raw) return;
+      const data = parseJSON(raw, null);
+      if (!data) return;
+      if (data.mode && MODES[data.mode]) state.mode = data.mode;
+      if (data.conversationId) state.conversationId = data.conversationId;
+      if (Array.isArray(data.messages) && data.messages.length) {
+        state.messages = data.messages.filter((m) => m && (m.role === "user" || m.role === "assistant"));
+      }
+    },
+
+    async loadSettings() {
+      state.settings = { ...DEFAULT_SETTINGS, ...getSettingsFromStorage() };
+      applyTheme(state.settings.theme);
+
+      if (!window.KyrbiAPI?.isAuthenticated?.()) return;
+
+      try {
+        const me = await window.KyrbiAPI.getMe();
+        const remote = me?.preferences?.chatSettings;
+        if (remote && typeof remote === "object") {
+          state.settings = {
+            autoSave: remote.autoSave !== false,
+            defaultMode: MODES[remote.defaultMode] ? remote.defaultMode : state.settings.defaultMode,
+            theme: ["system", "light", "dark"].includes(remote.theme) ? remote.theme : state.settings.theme,
+          };
+          localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify(state.settings));
+          applyTheme(state.settings.theme);
+        }
+      } catch (error) {
+        console.warn("No se pudieron cargar preferencias remotas:", error?.message || error);
+      }
+    },
+
+    async saveSettings(opts = {}) {
+      const syncRemote = opts.syncRemote !== false;
+      try {
+        localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify(state.settings));
+      } catch {}
+
+      applyTheme(state.settings.theme);
+
+      if (!syncRemote || !window.KyrbiAPI?.isAuthenticated?.()) {
+        ui.setHistoryStatus("Configuracion guardada localmente.");
+        return;
+      }
+
+      try {
+        await window.KyrbiAPI.updatePreferences({ chatSettings: state.settings });
+        ui.setHistoryStatus("Configuracion guardada en tu cuenta.");
+      } catch (error) {
+        ui.setHistoryStatus(`Configuracion local guardada. Sincronizacion pendiente: ${error.message || "error"}`);
+      }
+    },
+
+    async refreshHistory() {
+      if (!dom.historyList || !window.KyrbiAPI) return;
+      try {
+        const history = await window.KyrbiAPI.getHistory();
+        state.history = Array.isArray(history) ? history : [];
+        ui.renderHistory();
+        ui.setHistoryStatus(state.history.length ? `Conversaciones: ${state.history.length}` : "Sin conversaciones guardadas");
+      } catch (error) {
+        state.history = [];
+        ui.renderHistory();
+        ui.setHistoryStatus(`No se pudo cargar historial: ${error.message || "error"}`);
+      }
+    },
+
+    async refreshMemory() {
+      if (!dom.memorySummary) return;
+      if (!state.conversationId) {
+        ui.renderMemory(buildLocalMemory(state.messages));
+        return;
+      }
+
+      const isAuth = window.KyrbiAPI?.isAuthenticated?.();
+      if (!isAuth) {
+        const memoryMap = getMemoryMap();
+        if (!memoryMap[state.conversationId]) {
+          memoryMap[state.conversationId] = buildLocalMemory(state.messages);
+          setMemoryMap(memoryMap);
+        }
+        ui.renderMemory(memoryMap[state.conversationId], nowTime());
+        return;
+      }
+
+      try {
+        const data = await window.KyrbiAPI.getConversationMemory(state.conversationId);
+        const summary = data?.summary?.trim() || buildLocalMemory(state.messages);
+        ui.renderMemory(summary, nowTime());
+      } catch {
+        ui.renderMemory(buildLocalMemory(state.messages), nowTime());
+      }
+    },
+
+    toLocalMessages(messages, mode) {
+      const safeMode = MODES[mode] ? mode : "general";
+      if (!Array.isArray(messages)) return [];
+      return messages.map((msg) => ({
+        id: msg.id || makeId(),
+        role: msg.role,
+        text: msg.content || msg.text || "",
+        time: msg.createdAt
+          ? new Date(msg.createdAt).toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })
+          : nowTime(),
+        mode: safeMode,
+      }));
+    },
+
+    async loadConversation(conversationId) {
+      if (!window.KyrbiAPI || !conversationId) return;
+      try {
+        const conversation = await window.KyrbiAPI.getConversation(conversationId);
+        const mappedMode = mapModeFromApi(conversation?.mode);
+        state.mode = MODES[mappedMode] ? mappedMode : "general";
+        state.conversationId = conversation?.id || conversationId;
+        state.messages = this.toLocalMessages(conversation?.Messages || [], state.mode);
+        if (!state.messages.length) this.resetConversation({ keepMode: true });
+        this.persistSession();
+        ui.render();
+        await this.refreshMemory();
+      } catch (error) {
+        console.error("No se pudo abrir la conversacion:", error);
+      }
+    },
+
+    async loadInitialConversation() {
+      if (!window.KyrbiAPI) return;
+      const fromQuery = getConversationIdFromUrl();
+      if (fromQuery) {
+        await this.loadConversation(fromQuery);
         return;
       }
       try {
-        const raw = window.sessionStorage.getItem(CONFIG.storage.key);
-        if (!raw) {
-          this.resetConversation({ keepMode: true });
-          return;
+        const history = await window.KyrbiAPI.getHistory();
+        const first = Array.isArray(history) && history.length ? history[0] : null;
+        if (first?.id) {
+          await this.loadConversation(first.id);
         }
-        const data = JSON.parse(raw);
-        if (data?.mode && MODES[data.mode]) state.mode = data.mode;
-        if (Array.isArray(data?.messages)) state.messages = data.messages;
-        if (state.messages.length === 0) this.resetConversation({ keepMode: true });
-      } catch {
+      } catch {}
+    },
+
+    async sendUserMessage(text, opts = {}) {
+      const clean = sanitizeUserText(text);
+      if (!clean) return;
+
+      this.addUserMessage(clean);
+      ui.render();
+
+      state.typing = true;
+      if (ui.hero?.chipText) ui.hero.chipText.textContent = "Kyrbi esta pensando...";
+      if (ui.app?.chipText) ui.app.chipText.textContent = "Kyrbi esta pensando...";
+
+      if (!window.KyrbiAPI) {
+        state.typing = false;
+        this.addAssistantMessage("No se pudo conectar al backend.");
+        ui.render();
+        return;
+      }
+
+      try {
+        const response = await window.KyrbiAPI.sendMessage(clean, mapModeToApi(state.mode), state.conversationId);
+        if (response.conversationId) state.conversationId = response.conversationId;
+
+        const serverMode = mapModeFromApi(response.mode);
+        if (MODES[serverMode]) state.mode = serverMode;
+
+        state.typing = false;
+        if (ui.hero?.chipText) ui.hero.chipText.textContent = "Disponible";
+        if (ui.app?.chipText) ui.app.chipText.textContent = "Disponible";
+
+        this.addAssistantMessage(response.text, { mode: state.mode });
+        if (dom.appMount) this.persistSession();
+        ui.render();
+
+        await this.refreshHistory();
+        await this.refreshMemory();
+
+        if (opts.focusAfterSend && ui.app?.input) ui.app.input.focus();
+      } catch (error) {
+        state.typing = false;
+        if (ui.hero?.chipText) ui.hero.chipText.textContent = "Error";
+        if (ui.app?.chipText) ui.app.chipText.textContent = "Error";
+
+        const errorMessage = error.message || "error al comunicarse con Kyrbi.";
+        this.addAssistantMessage(`Lo siento, ${errorMessage.toLowerCase()}`);
+        if (dom.appMount) this.persistSession();
+        ui.render();
+        console.error("Error al enviar mensaje:", error);
+      }
+    },
+
+    async boot() {
+      await this.loadSettings();
+
+      const requestedMode = getModeFromUrl();
+      if (requestedMode && MODES[requestedMode]) {
+        state.mode = requestedMode;
+      } else if (MODES[state.settings.defaultMode]) {
+        state.mode = state.settings.defaultMode;
+      }
+
+      if (dom.appMount) {
+        this.restoreSession();
+        if (!state.messages.length) {
+          this.resetConversation({ keepMode: true });
+        }
+        await this.loadInitialConversation();
+        await this.refreshHistory();
+        await this.refreshMemory();
+      } else {
         this.resetConversation({ keepMode: true });
       }
+
+      ui.render();
     },
   };
 
-  /* ---------------------------
-   * Arranque
-   * ------------------------- */
-
-  document.addEventListener("DOMContentLoaded", () => {
+  document.addEventListener("DOMContentLoaded", async () => {
     ui.init();
-    actions.boot();
+    await actions.boot();
   });
 })();
 
@@ -674,6 +851,16 @@ function getModeFromUrl() {
     const params = new URLSearchParams(window.location.search);
     const mode = (params.get("mode") || "").toLowerCase();
     return mode || null;
+  } catch {
+    return null;
+  }
+}
+
+function getConversationIdFromUrl() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const id = (params.get("id") || "").trim();
+    return id || null;
   } catch {
     return null;
   }
@@ -690,4 +877,3 @@ function getActiveNavKey() {
   if (file === "seguridad.html") return "seguridad";
   return null;
 }
-

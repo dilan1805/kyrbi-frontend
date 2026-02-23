@@ -13,8 +13,11 @@ if (!window.API_CONFIG) {
       chatPublic: '/api/chat/public',
       history: '/api/chat/history',
       historyPublic: '/api/chat/public/history',
+      memory: '/api/chat/memory',
       login: '/api/auth/login',
       register: '/api/auth/register',
+      me: '/api/auth/me',
+      preferences: '/api/auth/preferences',
       csrfToken: '/api/auth/csrf-token',
       verifyEmail: '/api/auth/verify-email',
       resendVerify: '/api/auth/verify-email/resend',
@@ -41,6 +44,10 @@ if (!window.KyrbiAPI) {
         this.sessionId = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
         localStorage.setItem('kyrbi_session', this.sessionId);
       }
+    }
+
+    isAuthenticated() {
+      return Boolean(this.token);
     }
 
     getHeaders() {
@@ -71,7 +78,9 @@ if (!window.KyrbiAPI) {
 
     async request(endpoint, method, body = null) {
       try {
-        const url = `${window.API_CONFIG.baseURL}${endpoint}`;
+        const base = String(window.API_CONFIG.baseURL || '').replace(/\/+$/, '');
+        const path = String(endpoint || '').startsWith('/') ? endpoint : `/${String(endpoint || '')}`;
+        const url = `${base}${path}`;
         const options = {
           method,
           headers: this.getHeaders(),
@@ -82,9 +91,10 @@ if (!window.KyrbiAPI) {
         }
 
         const response = await fetch(url, options);
+        const payload = await response.json().catch(() => ({}));
 
         if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
+          const errorData = payload || {};
           if (response.status === 401) {
               // Token expirado o inválido
               if (!window.location.pathname.includes('login.html') && 
@@ -95,7 +105,7 @@ if (!window.KyrbiAPI) {
           throw new Error(errorData.error || `Error del servidor: ${response.status}`);
         }
 
-        return await response.json();
+        return payload;
       } catch (error) {
         console.error('API Request Error:', error);
         throw error;
@@ -178,6 +188,21 @@ if (!window.KyrbiAPI) {
         return await this.request(url, 'GET');
       }
       return await this.request(`${window.API_CONFIG.endpoints.history}/${id}`, 'GET');
+    }
+
+    async getConversationMemory(id) {
+      if (!this.token || !id) return { summary: '' };
+      return await this.request(`${window.API_CONFIG.endpoints.memory}/${id}`, 'GET');
+    }
+
+    async getMe() {
+      if (!this.token) return null;
+      return await this.request(window.API_CONFIG.endpoints.me, 'GET');
+    }
+
+    async updatePreferences(preferences = {}) {
+      if (!this.token) return null;
+      return await this.request(window.API_CONFIG.endpoints.preferences, 'PUT', { preferences });
     }
 
     async sendMessage(message, mode = 'general', conversationId = null) {
