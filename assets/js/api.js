@@ -161,7 +161,7 @@ if (!window.KyrbiAPI) {
     }
     
     async verify2FA(email, code) {
-      return await this.request(window.API_CONFIG.endpoints.verify2FA, 'POST', { email, code });
+      return await this.request(window.API_CONFIG.endpoints.verify2FA, 'POST', { email, token: code, code });
     }
 
     async getHistory() {

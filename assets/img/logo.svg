@@ -1,25 +1,46 @@
-<svg width="300" height="200" viewBox="0 0 300 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="lotus-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#e12d8a" />
-      <stop offset="100%" stop-color="#1a7c85" />
+    <linearGradient id="logo-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0ea5e9" />
+      <stop offset="100%" stop-color="#2dd4bf" />
     </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="2" />
+      <feOffset dx="0" dy="1" />
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.2" />
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
   </defs>
-  
-  <!-- Lotus Petals (Simplified Representation) -->
-  <path d="M150 20C150 20 130 50 130 70C130 90 150 110 150 110C150 110 170 90 170 70C170 50 150 20 150 20Z" fill="url(#lotus-gradient)" />
-  <path d="M150 110C150 110 110 100 90 85C70 70 70 50 70 50C70 50 80 80 110 100C130 115 150 110 150 110Z" fill="url(#lotus-gradient)" opacity="0.8" />
-  <path d="M150 110C150 110 190 100 210 85C230 70 230 50 230 50C230 50 220 80 190 100C170 115 150 110 150 110Z" fill="url(#lotus-gradient)" opacity="0.8" />
-  <path d="M150 110C150 110 100 120 80 130C60 140 50 160 50 160C50 160 70 155 100 140C130 125 150 110 150 110Z" fill="url(#lotus-gradient)" opacity="0.6" />
-  <path d="M150 110C150 110 200 120 220 130C240 140 250 160 250 160C250 160 230 155 200 140C170 125 150 110 150 110Z" fill="url(#lotus-gradient)" opacity="0.6" />
 
-  <!-- Meditation Figure -->
-  <circle cx="150" cy="65" r="8" fill="#1a7c85" />
-  <path d="M150 75C140 75 135 85 135 95C135 105 140 110 150 110C160 110 165 105 165 95C165 85 160 75 150 75Z" fill="#1a7c85" />
-  <path d="M135 90C125 90 115 100 115 105C115 110 125 110 135 110" stroke="#1a7c85" stroke-width="4" stroke-linecap="round" />
-  <path d="M165 90C175 90 185 100 185 105C185 110 175 110 165 110" stroke="#1a7c85" stroke-width="4" stroke-linecap="round" />
+  <!-- Background Glow -->
+  <circle cx="50" cy="50" r="40" fill="url(#logo-grad)" opacity="0.1" />
 
-  <!-- Text -->
-  <text x="150" y="155" font-family="Arial, sans-serif" font-size="22" font-weight="bold" fill="#1a7c85" text-anchor="middle" letter-spacing="2">CIENCIAS PARA</text>
-  <text x="150" y="180" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#e12d8a" text-anchor="middle" letter-spacing="4">VIVIR MEJOR</text>
+  <!-- Lotus Petals (Modern Fluid Style) -->
+  <g filter="url(#shadow)">
+    <!-- Central Petal -->
+    <path d="M50 20C50 20 42 35 42 45C42 55 50 65 50 65C50 65 58 55 58 45C58 35 50 20 50 20Z" fill="url(#logo-grad)" />
+    
+    <!-- Left Petals -->
+    <path d="M48 62C48 62 30 58 22 48C14 38 15 25 15 25C15 25 22 45 35 55C42 60 48 62 48 62Z" fill="url(#logo-grad)" opacity="0.8" />
+    <path d="M48 62C48 62 25 68 15 75C5 82 8 95 8 95C8 95 18 90 35 80C45 72 48 62 48 62Z" fill="url(#logo-grad)" opacity="0.6" />
+    
+    <!-- Right Petals -->
+    <path d="M52 62C52 62 70 58 78 48C86 38 85 25 85 25C85 25 78 45 65 55C58 60 52 62 52 62Z" fill="url(#logo-grad)" opacity="0.8" />
+    <path d="M52 62C52 62 75 68 85 75C95 82 92 95 92 95C92 95 82 90 65 80C55 72 52 62 52 62Z" fill="url(#logo-grad)" opacity="0.6" />
+  </g>
+
+  <!-- Meditation Figure (Abstract Minimalist) -->
+  <g fill="white">
+    <!-- Head -->
+    <circle cx="50" cy="42" r="5" />
+    <!-- Body -->
+    <path d="M50 48C45 48 42 53 42 58C42 63 45 65 50 65C55 65 58 63 58 58C58 53 55 48 50 48Z" />
+    <!-- Legs (Lotus position) -->
+    <path d="M42 62C38 62 32 68 32 72C32 75 35 75 40 73L50 65L60 73C65 75 68 75 68 72C68 68 62 62 58 62" stroke="white" stroke-width="2" stroke-linecap="round" />
+  </g>
 </svg>
