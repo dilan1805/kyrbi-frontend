@@ -90,6 +90,7 @@
   --shadow-xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
   
   --header-height: 80px;
+  --nav-offset: 80px;
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -244,6 +245,7 @@ a {
   display: flex;
   gap: var(--space-xs);
   align-items: center;
+  min-width: 0;
 }
 
 .nav__toggle {
@@ -251,6 +253,8 @@ a {
 }
 
 .nav__link {
+  display: inline-flex;
+  align-items: center;
   font-weight: 600;
   font-size: var(--text-sm);
   color: var(--text-muted);
@@ -302,21 +306,24 @@ a {
 
   .nav__links {
     position: fixed;
-    top: var(--header-height);
+    top: var(--nav-offset, var(--header-height));
     right: 0;
-    bottom: 0;
+    bottom: auto;
     left: auto;
+    max-height: calc(100dvh - var(--nav-offset, var(--header-height)));
     width: min(92vw, 420px);
     background: color-mix(in srgb, var(--surface) 92%, transparent);
     border-left: 1px solid var(--stroke);
     flex-direction: column;
     align-items: stretch;
     gap: var(--space-xs);
-    padding: var(--space-lg);
+    padding: calc(var(--space-md) + env(safe-area-inset-top)) var(--space-md)
+      calc(var(--space-lg) + env(safe-area-inset-bottom));
     transform: translate3d(110%, 0, 0);
     transition: var(--transition);
     z-index: 999;
     overflow-y: auto;
+    overflow-x: hidden;
     overscroll-behavior: contain;
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
@@ -337,6 +344,13 @@ a {
 
   .nav__auth .button {
     width: 100%;
+  }
+
+  .nav__link {
+    width: 100%;
+    justify-content: flex-start;
+    white-space: normal;
+    overflow-wrap: anywhere;
   }
   
   .nav__toggle {
@@ -362,6 +376,10 @@ a {
   .nav__toggle.is-active .nav__toggle-lines:nth-child(1) { transform: translateY(8px) rotate(45deg); }
   .nav__toggle.is-active .nav__toggle-lines:nth-child(2) { opacity: 0; }
   .nav__toggle.is-active .nav__toggle-lines:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+}
+
+body.nav-open {
+  overflow: hidden;
 }
 
 /* ==========================================================================
@@ -1089,7 +1107,7 @@ html.reveal-ready .reveal--up { transform: translateY(50px); }
 
 @media (max-width: 640px) {
   .container { padding: 0 1rem; }
-  .nav__links { gap: 1rem; }
+  .nav__links { gap: 0.75rem; }
   .section { padding: 1.5rem 0; }
   .section__title { font-size: clamp(1.5rem, 6vw, 2rem); }
   .grid-cards { gap: 1rem; }
@@ -1680,6 +1698,11 @@ html.reveal-ready .reveal--up { transform: translateY(50px); }
 
   .container {
     width: min(100% - 1rem, 100%);
+  }
+
+  .nav__links {
+    width: 100vw;
+    border-left: 0;
   }
 
   .hero__title {
