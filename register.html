@@ -28,15 +28,15 @@
             <div id="error-message" class="auth-error" style="display: none;"></div>
 
             <div class="social-login reveal reveal--up" style="transition-delay: 0.2s;">
-                <button type="button" class="button button--social social-google" onclick="window.location.href='/api/auth/google'">
+                <button type="button" class="button button--social social-google" data-oauth-provider="google" onclick="window.location.href='/api/auth/google'">
                     <i class="fab fa-google"></i>
                     Registrarse con Google
                 </button>
-                <button type="button" class="button button--social social-google" onclick="window.location.href='/api/auth/gmail'">
+                <button type="button" class="button button--social social-google" data-oauth-provider="gmail" onclick="window.location.href='/api/auth/gmail'">
                     <i class="fas fa-envelope"></i>
                     Registrarse con Gmail
                 </button>
-                <button type="button" class="button button--social social-facebook" onclick="window.location.href='/api/auth/facebook'">
+                <button type="button" class="button button--social social-facebook" data-oauth-provider="facebook" onclick="window.location.href='/api/auth/facebook'">
                     <i class="fab fa-facebook-f"></i>
                     Registrarse con Facebook
                 </button>

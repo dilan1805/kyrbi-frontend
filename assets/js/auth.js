@@ -94,6 +94,36 @@ document.addEventListener("DOMContentLoaded", () => {
     window.KyrbiAPI.getCsrfToken().catch(() => {});
   }
 
+  const syncOAuthButtons = async () => {
+    const oauthButtons = Array.from(document.querySelectorAll("[data-oauth-provider]"));
+    if (!oauthButtons.length || !window.KyrbiAPI?.request) return;
+
+    try {
+      const providers = await window.KyrbiAPI.request("/api/auth/providers", "GET");
+      let disabledCount = 0;
+
+      oauthButtons.forEach((btn) => {
+        const provider = String(btn.dataset.oauthProvider || "").toLowerCase();
+        const enabled = Boolean(providers?.[provider]);
+        if (enabled) return;
+
+        btn.disabled = true;
+        btn.setAttribute("aria-disabled", "true");
+        btn.classList.add("button--disabled");
+        btn.title = `Inicio con ${provider} no disponible en este momento`;
+        disabledCount += 1;
+      });
+
+      if (disabledCount === oauthButtons.length) {
+        showToast("Inicio social no disponible en este momento. Usa correo y contrasena.", "info");
+      }
+    } catch {
+      // Si falla este endpoint, dejamos botones activos para no bloquear UX.
+    }
+  };
+
+  syncOAuthButtons();
+
   const token = params.get("token");
   const username = params.get("username");
   const id = params.get("id");

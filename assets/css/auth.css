@@ -90,6 +90,14 @@
   transform: translateY(-2px);
 }
 
+.button--social:disabled,
+.button--social.button--disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
 .button--social i {
   font-size: 1.2rem;
 }
