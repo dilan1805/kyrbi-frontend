@@ -1,8 +1,10 @@
+/* ==========================================================================
+   Dashboard Extras (responsive-safe helpers)
+   ========================================================================== */
 
-/* Linked Accounts Grid */
 .linked-accounts-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 1rem;
   margin-top: 1rem;
 }
@@ -11,36 +13,40 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 0.75rem;
   padding: 1rem;
   background: var(--surface-2);
   border: 1px solid var(--stroke);
   border-radius: var(--radius-sm);
-  transition: all 0.2s;
+  transition: var(--transition);
 }
 
 .account-card.linked {
-  border-color: var(--accent);
-  background: rgba(22, 163, 74, 0.05);
+  border-color: color-mix(in srgb, var(--accent) 56%, var(--stroke));
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface-2));
 }
 
 .account-info {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.65rem;
   font-weight: 600;
   color: var(--text);
+  min-width: 0;
 }
 
 .account-info i {
-  font-size: 1.25rem;
+  font-size: 1.15rem;
+  flex: 0 0 auto;
 }
 
 .account-status {
-  font-size: 0.85rem;
-  padding: 0.25rem 0.5rem;
+  font-size: 0.8rem;
+  padding: 0.25rem 0.55rem;
   border-radius: 999px;
   background: var(--muted);
-  color: white;
+  color: #fff;
+  white-space: nowrap;
 }
 
 .account-card.linked .account-status {
@@ -55,8 +61,110 @@
   border-radius: var(--radius-sm);
   background: var(--surface);
   color: var(--text);
+  transition: var(--transition);
+  white-space: nowrap;
 }
 
 .btn-link:hover {
   background: var(--surface-hover);
+}
+
+.activity-item--empty {
+  justify-content: center;
+  color: var(--muted);
+}
+
+.activity-details--fill {
+  flex: 1;
+  min-width: 0;
+}
+
+.modal-inline {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.68);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.modal-inline__content {
+  background-color: var(--surface);
+  color: var(--text);
+  margin: 2vh auto;
+  padding: 1.25rem;
+  border: 1px solid var(--stroke);
+  width: min(100%, 460px);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+}
+
+.modal-inline__close {
+  float: right;
+  cursor: pointer;
+  font-size: 24px;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+}
+
+.modal-inline__qr-wrap {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.modal-inline__qr {
+  max-width: 200px;
+  border: 1px solid var(--stroke);
+  padding: 10px;
+  background: #fff;
+}
+
+.modal-inline__secret {
+  font-family: monospace;
+  font-size: 1.1em;
+}
+
+.modal-inline__input {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.modal-inline__button {
+  width: 100%;
+  margin-top: 16px;
+}
+
+@media (max-width: 768px) {
+  .linked-accounts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .account-card {
+    flex-wrap: wrap;
+  }
+
+  .btn-link {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-inline {
+    padding: 0.7rem;
+  }
+
+  .modal-inline__content {
+    padding: 1rem;
+  }
+
+  .modal-inline__qr {
+    max-width: 170px;
+  }
 }

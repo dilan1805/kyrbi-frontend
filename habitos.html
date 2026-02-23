@@ -12,6 +12,12 @@
     />
 
     <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="assets/css/styles.css" />
   </head>
 
@@ -22,7 +28,7 @@
       <nav class="nav" aria-label="Navegación principal">
         <div class="nav__inner">
           <a class="brand" href="index.html" aria-label="Ir al inicio">
-            <img src="assets/img/logo.svg" alt="Logo Ciencias para vivir mejor">
+            <img src="assets/img/logo.svg" alt="Logo Ciencias para vivir mejor" width="40" height="40">
             <span class="brand__text sr-only">Ciencias para vivir mejor</span>
           </a>
 
@@ -48,9 +54,9 @@
     </header>
 
     <main class="app-main" id="contenido">
-      <section class="section habits" aria-label="Hábitos Saludables">
+      <section class="section habits reveal reveal--up" aria-label="Hábitos Saludables">
         <div class="container">
-          <div class="section__head">
+          <div class="section__head reveal reveal--left">
             <h1 class="section__title">Hábitos saludables</h1>
             <p class="section__lead">
               No es solo información: cada pilar se conecta con Kyrbi para convertirlo en un plan real y personalizable.
@@ -58,7 +64,7 @@
           </div>
 
           <div class="grid-cards">
-            <article class="card">
+            <article class="card reveal reveal--up" style="transition-delay: 0.1s;">
               <div class="card__icon" aria-hidden="true">🍽️</div>
               <h2 class="card__title">Alimentación</h2>
               <p class="card__text">
@@ -69,7 +75,7 @@
               </a>
             </article>
 
-            <article class="card">
+            <article class="card reveal reveal--up" style="transition-delay: 0.2s;">
               <div class="card__icon" aria-hidden="true">🏃‍♂️</div>
               <h2 class="card__title">Actividad física</h2>
               <p class="card__text">
@@ -80,7 +86,7 @@
               </a>
             </article>
 
-            <article class="card">
+            <article class="card reveal reveal--up" style="transition-delay: 0.3s;">
               <div class="card__icon" aria-hidden="true">🌙</div>
               <h2 class="card__title">Descanso</h2>
               <p class="card__text">
@@ -92,7 +98,7 @@
             </article>
           </div>
 
-          <div class="habits__cta">
+          <div class="habits__cta reveal reveal--up" style="transition-delay: 0.4s;">
             <div class="card card--soft habits__cta-card">
               <h2 class="card__title">¿No sabes por dónde empezar?</h2>
               <p class="card__text">
@@ -110,19 +116,19 @@
         <div class="footer__block">
           <h3 class="footer__title">Seguridad y privacidad</h3>
           <ul class="footer__list">
-            <li><a href="seguridad.html" style="color: inherit;">No se recopilan datos personales.</a></li>
-            <li><a href="seguridad.html" style="color: inherit;">No se guardan conversaciones.</a></li>
-            <li><a href="seguridad.html" style="color: inherit;">Uso educativo y general.</a></li>
-            <li><a href="seguridad.html" style="color: inherit;">El asistente no sustituye a un médico.</a></li>
+            <li><a href="seguridad.html" class="footer__link">No se recopilan datos personales.</a></li>
+            <li><a href="seguridad.html" class="footer__link">No se guardan conversaciones.</a></li>
+            <li><a href="seguridad.html" class="footer__link">Uso educativo y general.</a></li>
+            <li><a href="seguridad.html" class="footer__link">El asistente no sustituye a un médico.</a></li>
           </ul>
         </div>
 
         <div class="footer__block">
           <h3 class="footer__title">Evaluación del proyecto</h3>
           <ul class="footer__list">
-            <li><a href="evaluacion.html" style="color: inherit;">Facilidad de uso</a></li>
-            <li><a href="evaluacion.html" style="color: inherit;">Claridad de la información</a></li>
-            <li><a href="evaluacion.html" style="color: inherit;">Experiencia del usuario</a></li>
+            <li><a href="evaluacion.html" class="footer__link">Facilidad de uso</a></li>
+            <li><a href="evaluacion.html" class="footer__link">Claridad de la información</a></li>
+            <li><a href="evaluacion.html" class="footer__link">Experiencia del usuario</a></li>
           </ul>
         </div>
 
@@ -137,6 +143,7 @@
     <script src="assets/js/config.js" defer></script>
     <script src="assets/js/api.js" defer></script>
     <script src="assets/js/app.js" defer></script>
+    <script src="assets/js/ui-enhancements.js" defer></script>
   </body>
 </html>
 

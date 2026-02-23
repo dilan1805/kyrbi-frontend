@@ -8,6 +8,12 @@
     <title>Dashboard — Kyrbi | Ciencias para vivir mejor</title>
     
     <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="assets/css/styles.css" />
     <link rel="stylesheet" href="assets/css/auth.css" />
     <link rel="stylesheet" href="assets/css/dashboard-extras.css" />
@@ -20,7 +26,7 @@
       <nav class="nav" aria-label="Navegación principal">
         <div class="nav__inner">
           <a class="brand" href="index.html" aria-label="Ir al inicio">
-            <img src="assets/img/logo.svg" alt="Logo Ciencias para vivir mejor">
+            <img src="assets/img/logo.svg" alt="Logo Ciencias para vivir mejor" width="40" height="40">
             <span class="brand__text sr-only">Ciencias para vivir mejor</span>
           </a>
 
@@ -47,30 +53,30 @@
     <main class="app-main">
       <div class="container">
         
-        <div class="dashboard-header">
-            <div class="welcome-text">
+        <div class="dashboard-header reveal reveal--up">
+            <div class="welcome-text reveal reveal--left">
                 <h1 id="welcomeMsg">Hola, Estudiante</h1>
                 <p>Bienvenido de nuevo a tu espacio de crecimiento personal.</p>
             </div>
-            <a href="assistant.html" class="button button--primary">Continuar Chat</a>
+            <a href="assistant.html" class="button button--primary reveal reveal--right">Continuar Chat</a>
         </div>
 
         <div class="dashboard-grid">
             <!-- Stats -->
-            <div class="stat-card">
+            <div class="stat-card reveal reveal--up" style="transition-delay: 0.1s;">
                 <h3>🔥 Racha</h3>
                 <div class="value">3 días</div>
                 <div class="desc">Manteniendo hábitos saludables</div>
             </div>
             
-            <div class="stat-card">
+            <div class="stat-card reveal reveal--up" style="transition-delay: 0.2s;">
                 <h3>💬 Conversaciones</h3>
                 <div class="value" id="conversationsCount">0</div>
                 <div class="desc">Interacciones con Kyrbi</div>
             </div>
 
             <!-- Linked Accounts -->
-            <div class="card" style="grid-column: span 2;">
+            <div class="card reveal reveal--up dashboard-span-2" style="transition-delay: 0.3s;">
               <h3>🔗 Redes Sociales Conectadas</h3>
               <p class="desc">Vincula tus cuentas para iniciar sesión más rápido.</p>
               <div id="linkedAccounts" class="linked-accounts-grid">
@@ -80,34 +86,34 @@
             </div>
 
             <!-- Settings -->
-            <div class="card" style="grid-column: span 2;">
+            <div class="card reveal reveal--up dashboard-span-2" style="transition-delay: 0.4s;">
               <h3>⚙️ Seguridad de la cuenta</h3>
               <p class="desc">Configura verificación de correo y autenticación de dos factores (2FA).</p>
-              <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:12px;">
+              <div class="dashboard-security-actions">
                 <button id="resendVerifyBtn" class="button button--secondary">Reenviar verificación de correo</button>
                 <button id="toggle2faBtn" class="button button--ghost">Activar 2FA</button>
               </div>
-              <p id="securityStatus" style="color: var(--muted); margin-top: 8px;"></p>
+              <p id="securityStatus" class="dashboard-security-status"></p>
             </div>
 
             <!-- Quick Actions -->
-            <a href="assistant.html?mode=general" class="action-card">
+            <a href="assistant.html?mode=general" class="action-card reveal reveal--up" style="transition-delay: 0.5s;">
                 <div class="action-icon">✨</div>
                 <h3>Nuevo Chat General</h3>
                 <p class="desc">Explora cualquier tema de bienestar</p>
             </a>
 
-            <a href="assistant.html?mode=chef" class="action-card">
+            <a href="assistant.html?mode=chef" class="action-card reveal reveal--up" style="transition-delay: 0.6s;">
                 <div class="action-icon">🥗</div>
                 <h3>Modo Chef</h3>
                 <p class="desc">Planifica comidas saludables</p>
             </a>
         </div>
 
-        <div class="recent-activity">
-            <h2 style="margin-top: 0; margin-bottom: 1.5rem; font-size: 1.25rem;">Historial Reciente</h2>
+        <div class="recent-activity reveal reveal--up" style="transition-delay: 0.7s;">
+            <h2 class="dashboard-title-inline">Historial Reciente</h2>
             <div id="activityList">
-                <div class="activity-item" style="justify-content: center; color: var(--muted);">
+                <div class="activity-item activity-item--empty">
                     Cargando actividad...
                 </div>
             </div>
@@ -120,5 +126,6 @@
     <script src="assets/js/config.js"></script>
     <script src="assets/js/app.js"></script>
     <script src="assets/js/dashboard.js"></script>
+    <script src="assets/js/ui-enhancements.js" defer></script>
   </body>
 </html>

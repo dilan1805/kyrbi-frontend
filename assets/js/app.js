@@ -251,7 +251,29 @@
       if (dom.navToggle && dom.navLinks) {
         dom.navToggle.addEventListener("click", () => {
           const open = dom.navLinks.classList.toggle("is-open");
+          dom.navToggle.classList.toggle("is-active", open);
           dom.navToggle.setAttribute("aria-expanded", open ? "true" : "false");
+        });
+
+        document.addEventListener("click", (event) => {
+          const isOpen = dom.navLinks.classList.contains("is-open");
+          if (!isOpen) return;
+          const target = event.target;
+          if (!(target instanceof Element)) return;
+          const clickInsideMenu = dom.navLinks.contains(target) || dom.navToggle.contains(target);
+          if (!clickInsideMenu) {
+            dom.navLinks.classList.remove("is-open");
+            dom.navToggle.classList.remove("is-active");
+            dom.navToggle.setAttribute("aria-expanded", "false");
+          }
+        });
+
+        document.addEventListener("keydown", (event) => {
+          if (event.key !== "Escape") return;
+          if (!dom.navLinks.classList.contains("is-open")) return;
+          dom.navLinks.classList.remove("is-open");
+          dom.navToggle.classList.remove("is-active");
+          dom.navToggle.setAttribute("aria-expanded", "false");
         });
       }
 
@@ -262,6 +284,7 @@
         a.addEventListener("click", () => {
           if (dom.navLinks?.classList.contains("is-open")) {
             dom.navLinks.classList.remove("is-open");
+            dom.navToggle?.classList.remove("is-active");
             dom.navToggle?.setAttribute("aria-expanded", "false");
           }
         });
@@ -463,6 +486,7 @@
       // Cierra menú móvil si está abierto
       if (dom.navLinks?.classList.contains("is-open")) {
         dom.navLinks.classList.remove("is-open");
+        dom.navToggle?.classList.remove("is-active");
         dom.navToggle?.setAttribute("aria-expanded", "false");
       }
       if (scroll) {

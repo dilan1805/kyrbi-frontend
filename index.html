@@ -12,6 +12,12 @@
     />
 
     <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="assets/css/styles.css" />
   </head>
 
@@ -22,7 +28,7 @@
       <nav class="nav" aria-label="Navegación principal">
         <div class="nav__inner">
           <a class="brand" href="index.html" aria-label="Ir al inicio">
-            <img src="assets/img/logo.svg" alt="Logo Ciencias para vivir mejor">
+            <img src="assets/img/logo.svg" alt="Logo Ciencias para vivir mejor" width="40" height="40">
             <span class="brand__text sr-only">Ciencias para vivir mejor</span>
           </a>
 
@@ -49,24 +55,24 @@
 
     <main class="app-main">
       <!-- Inicio (Hero) -->
-      <section class="section hero" id="inicio" aria-label="Inicio">
+      <section class="section hero reveal reveal--up" id="inicio" aria-label="Inicio">
         <div class="container hero__grid">
           <div class="hero__copy">
-            <p class="eyebrow">Educación digital • Bienestar adolescente</p>
-            <h1 class="hero__title">Ciencias para vivir mejor</h1>
-            <p class="hero__subtitle">
+            <p class="eyebrow reveal reveal--left">Educación digital • Bienestar adolescente</p>
+            <h1 class="hero__title reveal reveal--left" style="transition-delay: 0.1s;">Ciencias para vivir mejor</h1>
+            <p class="hero__subtitle reveal reveal--left" style="transition-delay: 0.2s;">
               Una plataforma moderna para aprender hábitos saludables con acompañamiento conversacional.
               Diseñada para estudiantes de 13 a 15 años.
             </p>
 
-            <div class="hero__actions">
+            <div class="hero__actions reveal reveal--up" style="transition-delay: 0.3s;">
               <a class="button button--primary" href="assistant.html" data-action="start-kyrbi">
                 Comenzar con Kyrbi
               </a>
               <a class="button button--secondary" href="habitos.html">Explorar hábitos</a>
             </div>
 
-            <div class="hero__trust">
+            <div class="hero__trust reveal reveal--up" style="transition-delay: 0.4s;">
               <div class="trust-pill">
                 <span class="trust-pill__dot" aria-hidden="true"></span>
                 <span>Sin datos personales</span>
@@ -78,8 +84,8 @@
             </div>
           </div>
 
-          <div class="hero__assistant">
-            <div class="panel">
+          <div class="hero__assistant reveal reveal--right" style="transition-delay: 0.2s;">
+            <div class="panel float">
               <div class="panel__head">
                 <div class="panel__title">
                   <span class="badge">Kyrbi</span>
@@ -106,19 +112,19 @@
         <div class="footer__block">
           <h3 class="footer__title">Seguridad y privacidad</h3>
           <ul class="footer__list">
-            <li><a href="seguridad.html" style="color: inherit;">No se recopilan datos personales.</a></li>
-            <li><a href="seguridad.html" style="color: inherit;">No se guardan conversaciones.</a></li>
-            <li><a href="seguridad.html" style="color: inherit;">Uso educativo y general.</a></li>
-            <li><a href="seguridad.html" style="color: inherit;">El asistente no sustituye a un médico.</a></li>
+            <li><a href="seguridad.html" class="footer__link">No se recopilan datos personales.</a></li>
+            <li><a href="seguridad.html" class="footer__link">No se guardan conversaciones.</a></li>
+            <li><a href="seguridad.html" class="footer__link">Uso educativo y general.</a></li>
+            <li><a href="seguridad.html" class="footer__link">El asistente no sustituye a un médico.</a></li>
           </ul>
         </div>
 
         <div class="footer__block">
           <h3 class="footer__title">Evaluación del proyecto</h3>
           <ul class="footer__list">
-            <li><a href="evaluacion.html" style="color: inherit;">Facilidad de uso</a></li>
-            <li><a href="evaluacion.html" style="color: inherit;">Claridad de la información</a></li>
-            <li><a href="evaluacion.html" style="color: inherit;">Experiencia del usuario</a></li>
+            <li><a href="evaluacion.html" class="footer__link">Facilidad de uso</a></li>
+            <li><a href="evaluacion.html" class="footer__link">Claridad de la información</a></li>
+            <li><a href="evaluacion.html" class="footer__link">Experiencia del usuario</a></li>
           </ul>
         </div>
 
@@ -135,6 +141,7 @@
     <script src="assets/js/config.js" defer></script>
     <script src="assets/js/api.js" defer></script>
     <script src="assets/js/app.js" defer></script>
+    <script src="assets/js/ui-enhancements.js" defer></script>
     <script>
       document.addEventListener('DOMContentLoaded', () => {
         const root = document.documentElement;
