@@ -78,10 +78,30 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  const validateEmail = (email) =>
-    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
-      String(email || "").toLowerCase()
+  const validateEmail = (email) => {
+    const normalized = String(email || "").trim().toLowerCase();
+    if (!normalized || normalized.length > 254) return false;
+
+    const firstAt = normalized.indexOf("@");
+    const lastAt = normalized.lastIndexOf("@");
+    if (firstAt <= 0 || firstAt !== lastAt) return false;
+
+    const localPart = normalized.slice(0, firstAt);
+    const domainPart = normalized.slice(firstAt + 1);
+
+    if (!localPart || !domainPart) return false;
+    if (localPart.length > 64 || domainPart.length > 253) return false;
+    if (localPart.startsWith(".") || localPart.endsWith(".")) return false;
+    if (localPart.includes("..") || domainPart.includes("..")) return false;
+    if (domainPart.startsWith(".") || domainPart.endsWith(".")) return false;
+    if (!/^[a-z0-9.!#$%&'*+/=?^_`{|}~-]+$/i.test(localPart)) return false;
+    if (!/^[a-z0-9.-]+$/i.test(domainPart)) return false;
+
+    const labels = domainPart.split(".");
+    return labels.every(
+      (label) => label && label.length <= 63 && /^[a-z0-9-]+$/i.test(label) && !label.startsWith("-") && !label.endsWith("-")
     );
+  };
 
   const setBusy = (button, busyText, idleText, busy) => {
     if (!button) return;
