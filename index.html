@@ -3,36 +3,37 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="color-scheme" content="light" />
-
-    <title>Ciencias para vivir mejor</title>
+    <meta name="color-scheme" content="light dark" />
+    <title>Kyrbi | Ciencias para vivir mejor</title>
     <meta
       name="description"
-      content="Plataforma educativa para promover hábitos saludables en adolescentes con el asistente Kyrbi."
+      content="Plataforma educativa para fortalecer hábitos saludables con una experiencia conversacional moderna, segura y continua."
     />
 
     <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
-    
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
-    
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
     <link rel="stylesheet" href="assets/css/styles.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
   </head>
 
   <body>
-    <a class="skip-link" href="#inicio">Saltar al contenido</a>
+    <a class="skip-link" href="#contenido">Saltar al contenido</a>
 
     <header class="app-header" id="top">
       <nav class="nav" aria-label="Navegación principal">
         <div class="nav__inner">
           <a class="brand" href="index.html" aria-label="Ir al inicio">
-            <img src="assets/img/logo.svg" alt="Logo Ciencias para vivir mejor" width="40" height="40">
-            <span class="brand__text sr-only">Ciencias para vivir mejor</span>
+            <img src="assets/img/logo.svg" alt="Logo de Kyrbi" width="40" height="40" />
+            <span class="brand__text sr-only">Kyrbi</span>
           </a>
 
-          <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Menu">
+          <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Menú">
             <span class="nav__toggle-lines" aria-hidden="true"></span>
             <span class="nav__toggle-lines" aria-hidden="true"></span>
             <span class="nav__toggle-lines" aria-hidden="true"></span>
@@ -43,65 +44,86 @@
             <a class="nav__link" href="assistant.html" data-nav="assistant">Kyrbi IA</a>
             <a class="nav__link" href="habitos.html" data-nav="habitos">Hábitos</a>
             <a class="nav__link" href="equipo.html" data-nav="equipo">Equipo</a>
-            
+            <a class="nav__link" href="evaluacion.html" data-nav="evaluacion">Evaluación</a>
+            <a class="nav__link" href="seguridad.html" data-nav="seguridad">Seguridad</a>
+            <a class="nav__link" href="pricing.html">Pricing</a>
+
             <div class="nav__auth" id="nav-auth">
               <a href="login.html" class="button button--ghost button--sm">Entrar</a>
-              <a href="register.html" class="button button--primary button--sm">Registro</a>
+              <a href="register.html" class="button button--primary button--sm">Crear cuenta</a>
             </div>
           </div>
         </div>
       </nav>
     </header>
 
-    <main class="app-main">
-      <!-- Inicio (Hero) -->
-      <section class="section hero reveal reveal--up" id="inicio" aria-label="Inicio">
+    <main class="app-main" id="contenido">
+      <section class="section hero reveal reveal--up">
         <div class="container hero__grid">
           <div class="hero__copy">
             <p class="eyebrow reveal reveal--left">Educación digital • Bienestar adolescente</p>
-            <h1 class="hero__title reveal reveal--left" style="transition-delay: 0.1s;">Ciencias para vivir mejor</h1>
-            <p class="hero__subtitle reveal reveal--left" style="transition-delay: 0.2s;">
-              Una plataforma moderna para aprender hábitos saludables con acompañamiento conversacional.
-              Diseñada para estudiantes de 13 a 15 años.
+            <h1 class="hero__title reveal reveal--up">Una experiencia educativa con calidad de producto real</h1>
+            <p class="hero__subtitle reveal reveal--up">
+              Kyrbi guía a estudiantes con conversaciones claras, historial continuo y herramientas para convertir objetivos
+              saludables en hábitos sostenibles.
             </p>
-
-            <div class="hero__actions reveal reveal--up" style="transition-delay: 0.3s;">
-              <a class="button button--primary" href="assistant.html" data-action="start-kyrbi">
-                Comenzar con Kyrbi
-              </a>
+            <div class="hero__actions reveal reveal--up">
+              <a class="button button--primary" href="assistant.html">Abrir Kyrbi IA</a>
               <a class="button button--secondary" href="habitos.html">Explorar hábitos</a>
+              <button class="button button--ghost" type="button" data-action="start-kyrbi">Probar en esta página</button>
             </div>
-
-            <div class="hero__trust reveal reveal--up" style="transition-delay: 0.4s;">
-              <div class="trust-pill">
-                <span class="trust-pill__dot" aria-hidden="true"></span>
-                <span>Sin datos personales</span>
-              </div>
-              <div class="trust-pill">
+            <div class="hero__trust reveal reveal--up">
+              <span class="trust-pill">
                 <span class="trust-pill__dot trust-pill__dot--green" aria-hidden="true"></span>
-                <span>Contenido educativo, no médico</span>
-              </div>
+                Arquitectura lista para escalar
+              </span>
+              <span class="trust-pill">
+                <span class="trust-pill__dot" aria-hidden="true"></span>
+                Historial y memoria con cuenta
+              </span>
+              <span class="trust-pill">
+                <span class="trust-pill__dot" aria-hidden="true"></span>
+                Enfoque educativo y responsable
+              </span>
             </div>
           </div>
 
-          <div class="hero__assistant reveal reveal--right" style="transition-delay: 0.2s;">
-            <div class="panel float">
-              <div class="panel__head">
-                <div class="panel__title">
-                  <span class="badge">Kyrbi</span>
-                  <span class="panel__title-text">Asistente educativo</span>
-                </div>
-                <div class="panel__status" aria-live="polite">
-                  <span class="status-dot" aria-hidden="true"></span>
-                  <span class="status-text">Listo</span>
-                </div>
-              </div>
+          <div class="hero__assistant">
+            <article class="panel reveal reveal--right">
+              <header class="panel__head">
+                <h2>Vista rápida de Kyrbi</h2>
+                <a class="link-inline" href="assistant.html">Abrir versión completa</a>
+              </header>
+              <div class="panel__body" id="kyrbi-hero" aria-label="Chat rápido con Kyrbi"></div>
+            </article>
+          </div>
+        </div>
+      </section>
 
-              <div class="panel__body" id="kyrbi-hero" aria-label="Chat con Kyrbi (vista rápida)"></div>
-            </div>
-            <div class="panel__footer">
-              <a class="link-inline" href="assistant.html">Ver conversación completa</a>
-            </div>
+      <section class="section reveal reveal--up">
+        <div class="container">
+          <div class="section__head">
+            <h2 class="section__title">Qué hace sólida a la plataforma</h2>
+            <p class="section__lead">
+              El objetivo no es solo informar: es acompañar con una experiencia consistente, usable y técnicamente confiable.
+            </p>
+          </div>
+          <div class="grid-cards">
+            <article class="card reveal reveal--up">
+              <div class="card__icon" aria-hidden="true"><i class="fa-solid fa-layer-group"></i></div>
+              <h3 class="card__title">Sistema visual consistente</h3>
+              <p class="card__text">Componentes unificados, lectura clara y navegación adaptable de 360px a escritorio.</p>
+            </article>
+            <article class="card reveal reveal--up">
+              <div class="card__icon" aria-hidden="true"><i class="fa-solid fa-comments"></i></div>
+              <h3 class="card__title">Conversación con continuidad</h3>
+              <p class="card__text">Historial, memoria y modo contextual para mantener progreso entre sesiones.</p>
+            </article>
+            <article class="card reveal reveal--up">
+              <div class="card__icon" aria-hidden="true"><i class="fa-solid fa-shield-heart"></i></div>
+              <h3 class="card__title">Seguridad y control</h3>
+              <p class="card__text">Autenticación, límites de uso, trazabilidad y base preparada para operación real.</p>
+            </article>
           </div>
         </div>
       </section>
@@ -110,51 +132,36 @@
     <footer class="footer" aria-label="Pie de página">
       <div class="container footer__grid">
         <div class="footer__block">
-          <h3 class="footer__title">Seguridad y privacidad</h3>
+          <h3 class="footer__title">Producto</h3>
           <ul class="footer__list">
-            <li><a href="seguridad.html" class="footer__link">No se recopilan datos personales.</a></li>
-            <li><a href="seguridad.html" class="footer__link">Las conversaciones de cuenta se guardan para continuidad.</a></li>
-            <li><a href="seguridad.html" class="footer__link">Uso educativo y general.</a></li>
-            <li><a href="seguridad.html" class="footer__link">El asistente no sustituye a un médico.</a></li>
+            <li><a href="assistant.html" class="footer__link">Asistente Kyrbi</a></li>
+            <li><a href="dashboard.html" class="footer__link">Dashboard</a></li>
+            <li><a href="pricing.html" class="footer__link">Pricing</a></li>
+            <li><a href="roadmap.html" class="footer__link">Roadmap</a></li>
+            <li><a href="changelog.html" class="footer__link">Changelog</a></li>
           </ul>
         </div>
 
         <div class="footer__block">
-          <h3 class="footer__title">Evaluación del proyecto</h3>
+          <h3 class="footer__title">Confianza</h3>
           <ul class="footer__list">
-            <li><a href="evaluacion.html" class="footer__link">Facilidad de uso</a></li>
-            <li><a href="evaluacion.html" class="footer__link">Claridad de la información</a></li>
-            <li><a href="evaluacion.html" class="footer__link">Experiencia del usuario</a></li>
+            <li><a href="seguridad.html" class="footer__link">Security</a></li>
+            <li><a href="privacy.html" class="footer__link">Privacy</a></li>
+            <li><a href="terms.html" class="footer__link">Terms</a></li>
+            <li><a href="status.html" class="footer__link">Status</a></li>
+            <li><a href="contact.html" class="footer__link">Contacto</a></li>
           </ul>
         </div>
 
         <div class="footer__bottom">
-          <p class="footer__fineprint">
-            © <span id="year"></span> Ciencias para vivir mejor — Proyecto educativo.
-          </p>
+          <p class="footer__fineprint">© <span id="year"></span> Kyrbi · Proyecto educativo con estándares de producto profesional.</p>
         </div>
       </div>
     </footer>
-
-    <div class="toast-container" id="toast-container" aria-live="polite" aria-atomic="true"></div>
 
     <script src="assets/js/config.js" defer></script>
     <script src="assets/js/api.js" defer></script>
     <script src="assets/js/app.js" defer></script>
     <script src="assets/js/ui-enhancements.js" defer></script>
-    <script>
-      document.addEventListener('DOMContentLoaded', () => {
-        const root = document.documentElement;
-        const toggle = document.getElementById('theme-toggle');
-        const saved = localStorage.getItem('theme');
-        if (saved) root.setAttribute('data-theme', saved);
-        toggle?.addEventListener('click', () => {
-          const current = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
-          root.setAttribute('data-theme', current);
-          localStorage.setItem('theme', current);
-        });
-      });
-    </script>
-</body>
+  </body>
 </html>
-

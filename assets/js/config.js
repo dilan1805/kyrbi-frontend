@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Configuración central de Kyrbi (modes, límites, copy)
+   Configuración central de Kyrbi (modes, límites y copy)
    ========================================================================== */
 window.KYRBI_CONFIG = {
   typing: {
@@ -22,7 +22,7 @@ window.KYRBI_CONFIG = {
       dotColor: "green",
       intro: [
         "Hola, soy Kyrbi. Estoy aquí para ayudarte a construir hábitos saludables de forma clara y práctica.",
-        "Esto es orientación educativa (no médica). ¿Qué te gustaría mejorar primero: alimentación, actividad física o descanso?"
+        "Esto es orientación educativa (no médica). ¿Qué te gustaría mejorar primero: alimentación, actividad física o descanso?",
       ],
     },
     chef: {
@@ -31,7 +31,7 @@ window.KYRBI_CONFIG = {
       dotColor: "green",
       intro: [
         "Modo Chef activado. Vamos a mejorar tu alimentación con ideas simples y realistas.",
-        "Para ayudarte mejor: ¿cómo son tus desayunos en un día normal y a qué hora sueles comer?"
+        "Para ayudarte mejor: ¿cómo son tus desayunos en un día normal y a qué hora sueles comer?",
       ],
     },
     coach: {
@@ -40,7 +40,7 @@ window.KYRBI_CONFIG = {
       dotColor: "green",
       intro: [
         "Modo Coach activado. Vamos a movernos más sin complicarnos.",
-        "Pregunta rápida: ¿cuántos días a la semana te mueves (caminar, deporte, ejercicios) y cuánto tiempo?"
+        "Pregunta rápida: ¿cuántos días a la semana te mueves (caminar, deporte o ejercicios) y cuánto tiempo?",
       ],
     },
     descanso: {
@@ -49,9 +49,8 @@ window.KYRBI_CONFIG = {
       dotColor: "green",
       intro: [
         "Modo Descanso activado. Vamos a cuidar tu sueño y tu energía.",
-        "Para empezar: ¿a qué hora te duermes y a qué hora te levantas en días de escuela?"
+        "Para empezar: ¿a qué hora te duermes y a qué hora te levantas en días de escuela?",
       ],
     },
   },
 };
-

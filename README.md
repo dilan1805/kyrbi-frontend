@@ -6,7 +6,7 @@ Aplicación web educativa (HTML + CSS + JavaScript) para promover hábitos salud
 
 - `index.html`: inicio (hero + vista rápida de Kyrbi).
 - `assistant.html`: vista dedicada del asistente Kyrbi con modos (Guía general, Chef, Coach, Descanso).
-- `habitos.html`: hábitos saludables conectados con Kyrbi (links con `?mode=`).
+- `habitos.html`: hábitos saludables conectados con Kyrbi (links con `mode=`).
 - `equipo.html`: equipo del proyecto.
 - `evaluacion.html`: criterios de evaluación del proyecto.
 - `seguridad.html`: política de seguridad y privacidad.

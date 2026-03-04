@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Changelog | Kyrbi</title>
+    <meta name="description" content="Historial de cambios y notas de versión de Kyrbi." />
+    <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="assets/css/styles.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <nav class="nav" aria-label="Navegación principal">
+        <div class="nav__inner">
+          <a class="brand" href="index.html"><img src="assets/img/logo.svg" alt="Kyrbi" width="40" height="40" /><span class="sr-only">Kyrbi</span></a>
+          <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Menú">
+            <span class="nav__toggle-lines" aria-hidden="true"></span><span class="nav__toggle-lines" aria-hidden="true"></span><span class="nav__toggle-lines" aria-hidden="true"></span>
+          </button>
+          <div class="nav__links" id="nav-links">
+            <a class="nav__link" href="index.html">Inicio</a>
+            <a class="nav__link" href="changelog.html">Changelog</a>
+            <a class="nav__link" href="roadmap.html">Roadmap</a>
+            <a class="nav__link" href="status.html">Status</a>
+            <div class="nav__auth" id="nav-auth">
+              <a href="login.html" class="button button--ghost button--sm">Entrar</a>
+              <a href="register.html" class="button button--primary button--sm">Crear cuenta</a>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="app-main">
+      <section class="section">
+        <div class="container">
+          <div class="section__head">
+            <h1 class="section__title">Changelog</h1>
+            <p class="section__lead">Historial público de cambios y mejoras de la plataforma.</p>
+          </div>
+          <div class="grid-cards">
+            <article class="card">
+              <h2 class="card__title">v1.0.0 · 2026-03-03</h2>
+              <ul class="card__text">
+                <li>Refactor responsive completo para 360px+.</li>
+                <li>Chat autenticado con historial renombrable y eliminable.</li>
+                <li>Nuevas páginas corporativas: Pricing, Status, Roadmap, Contact, Privacy y Terms.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h2 class="card__title">v0.9.0 · 2026-02-20</h2>
+              <ul class="card__text">
+                <li>Integración inicial de OAuth social y 2FA.</li>
+                <li>Persistencia de conversaciones y memoria por cuenta.</li>
+                <li>Hardening base de seguridad en backend.</li>
+              </ul>
+            </article>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="container footer__grid">
+        <div class="footer__bottom"><p class="footer__fineprint">© <span id="year"></span> Kyrbi.</p></div>
+      </div>
+    </footer>
+
+    <script src="assets/js/config.js" defer></script>
+    <script src="assets/js/api.js" defer></script>
+    <script src="assets/js/app.js" defer></script>
+    <script src="assets/js/ui-enhancements.js" defer></script>
+  </body>
+</html>

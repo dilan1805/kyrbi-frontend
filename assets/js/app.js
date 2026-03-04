@@ -1,4 +1,4 @@
-/* ==========================================================================
+﻿/* ==========================================================================
    Kyrbi frontend app
    - Navigation behavior
    - Chat UI render
@@ -31,6 +31,7 @@
     session: CONFIG.storage?.key || "kyrbi_session_v1",
     settings: "kyrbi_preferences_v1",
     publicMemory: "kyrbi_public_memory_v1",
+    onboarding: "kyrbi_onboarding_v1",
   };
 
   const DEFAULT_SETTINGS = {
@@ -45,6 +46,8 @@
     typing: false,
     conversationId: null,
     history: [],
+    historyQuery: "",
+    networkOnline: typeof navigator === "undefined" ? true : navigator.onLine,
     settings: { ...DEFAULT_SETTINGS },
   };
 
@@ -60,6 +63,7 @@
 
     historyList: document.getElementById("conversation-history"),
     historyStatus: document.getElementById("history-status"),
+    historySearch: document.getElementById("history-search"),
     newChatBtn: document.getElementById("new-chat-btn"),
 
     memorySummary: document.getElementById("memory-summary"),
@@ -70,7 +74,13 @@
     settingsTheme: document.getElementById("setting-theme"),
     settingsDefaultMode: document.getElementById("setting-default-mode"),
     settingsSave: document.getElementById("settings-save"),
+    onboardingReset: document.getElementById("onboarding-reset"),
+    onboardingBanner: document.getElementById("onboarding-banner"),
+    onboardingDismiss: document.getElementById("onboarding-dismiss"),
   };
+
+  const LOCKED_CHAT_MESSAGE = "Para escribir en Kyrbi debes iniciar sesión o crear una cuenta.";
+  const isUserAuthenticated = () => Boolean(window.KyrbiAPI?.isAuthenticated?.());
 
   const nowTime = () => {
     const d = new Date();
@@ -216,6 +226,7 @@
     input.type = "text";
     input.inputMode = "text";
     input.placeholder = opts.variant === "hero" ? "Escribe algo..." : "Escribe tu mensaje...";
+    input.dataset.defaultPlaceholder = input.placeholder;
     input.maxLength = opts.variant === "hero" ? (CONFIG.limits?.userText || 140) : (CONFIG.limits?.userTextApp || 260);
     input.setAttribute("aria-label", "Escribir mensaje");
 
@@ -259,8 +270,20 @@
     helper.appendChild(hint);
     helper.appendChild(actions);
 
+    const gateNotice = document.createElement("div");
+    gateNotice.className = "chat-gate";
+    gateNotice.hidden = true;
+    gateNotice.innerHTML = `
+      <p class="chat-gate__text">Para usar Kyrbi necesitas una cuenta activa.</p>
+      <div class="chat-gate__actions">
+        <a class="button button--primary button--sm" href="register.html">Crear cuenta</a>
+        <a class="button button--ghost button--sm" href="login.html">Iniciar sesión</a>
+      </div>
+    `;
+
     composerWrap.appendChild(form);
     composerWrap.appendChild(helper);
+    composerWrap.appendChild(gateNotice);
 
     root.appendChild(top);
     root.appendChild(log);
@@ -268,7 +291,7 @@
 
     mount.appendChild(root);
 
-    return { root, log, input, form, resetBtn, quick1, quick2, chipText };
+    return { root, log, input, form, send, resetBtn, quick1, quick2, chipText, gateNotice };
   }
 
   const ui = {
@@ -277,39 +300,52 @@
 
     updateNavigation() {
       const user = localStorage.getItem("kyrbi_user");
-      const navLinks = document.getElementById("nav-links");
-      if (!navLinks) return;
+      const navAuth = document.getElementById("nav-auth");
+      const logoutBtn = document.getElementById("logout-btn");
 
-      const authLinks = navLinks.querySelectorAll(".nav-auth-link");
-      authLinks.forEach((el) => el.remove());
+      if (logoutBtn) {
+        logoutBtn.addEventListener("click", (event) => {
+          event.preventDefault();
+          window.KyrbiAPI?.logout?.();
+        });
+      }
+
+      if (!navAuth) return;
+
+      navAuth.innerHTML = "";
 
       if (user) {
         const dashboardLink = document.createElement("a");
-        dashboardLink.className = "nav__link nav-auth-link";
         dashboardLink.href = "dashboard.html";
+        dashboardLink.className = "button button--ghost button--sm";
         dashboardLink.textContent = "Dashboard";
-        if (window.location.pathname.includes("dashboard.html")) {
-          dashboardLink.classList.add("is-active");
-        }
 
         const logoutLink = document.createElement("a");
-        logoutLink.className = "nav__link nav-auth-link";
         logoutLink.href = "#";
-        logoutLink.textContent = "Cerrar sesion";
-        logoutLink.addEventListener("click", (e) => {
-          e.preventDefault();
+        logoutLink.className = "button button--primary button--sm";
+        logoutLink.textContent = "Cerrar sesión";
+        logoutLink.addEventListener("click", (event) => {
+          event.preventDefault();
           window.KyrbiAPI?.logout?.();
         });
 
-        navLinks.appendChild(dashboardLink);
-        navLinks.appendChild(logoutLink);
-      } else {
-        const loginLink = document.createElement("a");
-        loginLink.className = "nav__link nav-auth-link";
-        loginLink.href = "login.html";
-        loginLink.textContent = "Iniciar sesion";
-        navLinks.appendChild(loginLink);
+        navAuth.appendChild(dashboardLink);
+        navAuth.appendChild(logoutLink);
+        return;
       }
+
+      const loginLink = document.createElement("a");
+      loginLink.href = "login.html";
+      loginLink.className = "button button--ghost button--sm";
+      loginLink.textContent = "Entrar";
+
+      const registerLink = document.createElement("a");
+      registerLink.href = "register.html";
+      registerLink.className = "button button--primary button--sm";
+      registerLink.textContent = "Crear cuenta";
+
+      navAuth.appendChild(loginLink);
+      navAuth.appendChild(registerLink);
     },
 
     syncModeTabs() {
@@ -330,19 +366,36 @@
       if (!dom.historyList) return;
       dom.historyList.innerHTML = "";
 
-      if (!state.history.length) {
-        dom.historyList.innerHTML = '<li class="history-item history-item--empty">Aun no hay conversaciones guardadas.</li>';
+      const list = state.history.filter((conv) => {
+        if (!state.historyQuery) return true;
+        const text = `${conv?.title || ""} ${conv?.mode || ""}`.toLowerCase();
+        return text.includes(state.historyQuery.toLowerCase());
+      });
+
+      if (!list.length) {
+        const message = state.historyQuery ? "No hay resultados para la búsqueda." : "Aún no hay conversaciones guardadas.";
+        dom.historyList.innerHTML = `<li class="history-item history-item--empty">${message}</li>`;
         return;
       }
 
-      state.history.slice(0, 20).forEach((conv) => {
+      list.slice(0, 30).forEach((conv) => {
         const li = document.createElement("li");
         li.className = `history-item ${state.conversationId === conv.id ? "is-active" : ""}`;
         li.innerHTML = `
-          <button type="button" class="history-item__button" data-conversation-id="${conv.id}">
-            <span class="history-item__title">${conv.title || "Conversacion sin titulo"}</span>
-            <span class="history-item__meta">${formatDate(conv.updatedAt)} · ${mapModeFromApi(conv.mode)}</span>
-          </button>
+          <div class="history-item__row">
+            <button type="button" class="history-item__button" data-conversation-id="${conv.id}">
+              <span class="history-item__title">${conv.title || "Conversación sin título"}</span>
+              <span class="history-item__meta">${formatDate(conv.updatedAt)} · Modo ${mapModeFromApi(conv.mode)}</span>
+            </button>
+            <div class="history-item__actions">
+              <button type="button" class="icon-btn icon-btn--tiny" data-action="rename" data-id="${conv.id}" aria-label="Renombrar conversación">
+                <i class="fa-solid fa-pen" aria-hidden="true"></i>
+              </button>
+              <button type="button" class="icon-btn icon-btn--tiny" data-action="delete" data-id="${conv.id}" aria-label="Eliminar conversación">
+                <i class="fa-solid fa-trash" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
         `;
         dom.historyList.appendChild(li);
       });
@@ -355,6 +408,48 @@
 
     setHistoryStatus(text) {
       if (dom.historyStatus) dom.historyStatus.textContent = text || "";
+    },
+
+    setConnectionChip(text) {
+      if (this.hero?.chipText) this.hero.chipText.textContent = text;
+      if (this.app?.chipText) this.app.chipText.textContent = text;
+    },
+
+    syncChatAccess() {
+      const authLocked = !isUserAuthenticated();
+      const networkLocked = !state.networkOnline;
+
+      const applyState = (chatRefs) => {
+        if (!chatRefs) return;
+        const shouldDisableInput = authLocked || networkLocked;
+        const placeholder = authLocked
+          ? "Inicia sesión para escribir en Kyrbi"
+          : (networkLocked ? "Sin conexión temporal. Reintentando..." : chatRefs.input.dataset.defaultPlaceholder || "Escribe tu mensaje...");
+
+        chatRefs.input.disabled = shouldDisableInput;
+        chatRefs.input.placeholder = placeholder;
+        chatRefs.send.disabled = shouldDisableInput;
+        chatRefs.quick1.disabled = shouldDisableInput;
+        chatRefs.quick2.disabled = shouldDisableInput;
+        chatRefs.root.classList.toggle("chat--locked", authLocked);
+
+        if (chatRefs.gateNotice) {
+          chatRefs.gateNotice.hidden = !authLocked;
+          chatRefs.gateNotice.setAttribute("aria-hidden", authLocked ? "false" : "true");
+        }
+      };
+
+      applyState(this.hero);
+      applyState(this.app);
+
+      if (dom.newChatBtn) dom.newChatBtn.disabled = authLocked;
+      if (dom.settingsAutoSave) dom.settingsAutoSave.disabled = authLocked;
+      if (dom.settingsTheme) dom.settingsTheme.disabled = authLocked;
+      if (dom.settingsDefaultMode) dom.settingsDefaultMode.disabled = authLocked;
+      if (dom.settingsSave) {
+        dom.settingsSave.disabled = authLocked;
+        dom.settingsSave.textContent = authLocked ? "Inicia sesión para guardar" : "Guardar configuración";
+      }
     },
 
     init() {
@@ -436,6 +531,7 @@
 
       bindChat(this.hero, false);
       bindChat(this.app, true);
+      this.syncChatAccess();
 
       dom.modeTabs.forEach((btn) => {
         btn.addEventListener("click", () => {
@@ -457,10 +553,26 @@
       dom.historyList?.addEventListener("click", (event) => {
         const target = event.target;
         if (!(target instanceof Element)) return;
+
+        const actionBtn = target.closest("[data-action]");
+        if (actionBtn) {
+          const action = actionBtn.getAttribute("data-action");
+          const id = actionBtn.getAttribute("data-id");
+          if (!id) return;
+          if (action === "rename") actions.renameConversation(id);
+          if (action === "delete") actions.deleteConversation(id);
+          return;
+        }
+
         const button = target.closest("[data-conversation-id]");
         const id = button?.getAttribute("data-conversation-id");
         if (!id) return;
         actions.loadConversation(id);
+      });
+
+      dom.historySearch?.addEventListener("input", () => {
+        state.historyQuery = String(dom.historySearch.value || "").trim();
+        this.renderHistory();
       });
 
       dom.settingsSave?.addEventListener("click", async () => {
@@ -481,6 +593,14 @@
           state.settings.defaultMode = dom.settingsDefaultMode.value;
         }
       });
+
+      dom.onboardingReset?.addEventListener("click", () => {
+        localStorage.removeItem(STORAGE_KEYS.onboarding);
+        actions.showOnboarding(true);
+      });
+
+      window.addEventListener("online", () => actions.setNetworkStatus(true));
+      window.addEventListener("offline", () => actions.setNetworkStatus(false));
     },
 
     render() {
@@ -502,6 +622,7 @@
       this.syncModeTabs();
       this.syncSettingsForm();
       this.renderHistory();
+      this.syncChatAccess();
     },
   };
 
@@ -548,6 +669,19 @@
         document.body.classList.remove("nav-open");
       }
       if (scroll) document.getElementById("asistente")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    },
+
+    setNetworkStatus(online) {
+      state.networkOnline = Boolean(online);
+      if (!state.networkOnline) {
+        ui.setConnectionChip("Sin conexión");
+        ui.setHistoryStatus("Sin conexión. Reintentaremos al recuperar red.");
+      } else {
+        ui.setConnectionChip("Disponible");
+        this.refreshHistory().catch(() => {});
+        this.refreshMemory().catch(() => {});
+      }
+      ui.syncChatAccess();
     },
 
     setMode(mode, opts = {}) {
@@ -678,6 +812,12 @@
 
     async refreshHistory() {
       if (!dom.historyList || !window.KyrbiAPI) return;
+      if (!isUserAuthenticated()) {
+        state.history = [];
+        ui.renderHistory();
+        ui.setHistoryStatus("Inicia sesión para desbloquear historial.");
+        return;
+      }
       try {
         const history = await window.KyrbiAPI.getHistory();
         state.history = Array.isArray(history) ? history : [];
@@ -690,21 +830,63 @@
       }
     },
 
+    async renameConversation(conversationId) {
+      if (!window.KyrbiAPI || !conversationId || !isUserAuthenticated()) return;
+      const current = state.history.find((conv) => String(conv.id) === String(conversationId));
+      const currentTitle = String(current?.title || "Conversación");
+      const nextTitle = window.prompt("Nuevo nombre de la conversación:", currentTitle);
+      const cleanTitle = sanitizeUserText(nextTitle);
+      if (!cleanTitle || cleanTitle === currentTitle) return;
+      try {
+        await window.KyrbiAPI.updateConversation(conversationId, { title: cleanTitle.slice(0, 120) });
+        await this.refreshHistory();
+        ui.setHistoryStatus("Título actualizado.");
+      } catch (error) {
+        ui.setHistoryStatus(`No se pudo renombrar: ${error.message || "error"}`);
+      }
+    },
+
+    async deleteConversation(conversationId) {
+      if (!window.KyrbiAPI || !conversationId || !isUserAuthenticated()) return;
+      const ok = window.confirm("¿Eliminar esta conversación? Esta acción no se puede deshacer.");
+      if (!ok) return;
+      try {
+        await window.KyrbiAPI.deleteConversation(conversationId);
+        if (String(state.conversationId) === String(conversationId)) {
+          state.conversationId = null;
+          this.resetConversation({ keepMode: true });
+        }
+        await this.refreshHistory();
+        await this.refreshMemory();
+        ui.setHistoryStatus("Conversación eliminada.");
+      } catch (error) {
+        ui.setHistoryStatus(`No se pudo eliminar: ${error.message || "error"}`);
+      }
+    },
+
+    showOnboarding(force = false) {
+      if (!dom.onboardingBanner) return;
+      const alreadySeen = localStorage.getItem(STORAGE_KEYS.onboarding) === "done";
+      const shouldShow = force || !alreadySeen;
+      dom.onboardingBanner.hidden = !shouldShow;
+      if (!shouldShow) return;
+      dom.onboardingBanner.setAttribute("aria-hidden", "false");
+      const complete = () => {
+        localStorage.setItem(STORAGE_KEYS.onboarding, "done");
+        dom.onboardingBanner.hidden = true;
+        dom.onboardingBanner.setAttribute("aria-hidden", "true");
+      };
+      dom.onboardingDismiss?.addEventListener("click", complete, { once: true });
+    },
+
     async refreshMemory() {
       if (!dom.memorySummary) return;
-      if (!state.conversationId) {
-        ui.renderMemory(buildLocalMemory(state.messages));
+      if (!isUserAuthenticated()) {
+        ui.renderMemory("Inicia sesión para desbloquear memoria persistente.");
         return;
       }
-
-      const isAuth = window.KyrbiAPI?.isAuthenticated?.();
-      if (!isAuth) {
-        const memoryMap = getMemoryMap();
-        if (!memoryMap[state.conversationId]) {
-          memoryMap[state.conversationId] = buildLocalMemory(state.messages);
-          setMemoryMap(memoryMap);
-        }
-        ui.renderMemory(memoryMap[state.conversationId], nowTime());
+      if (!state.conversationId) {
+        ui.renderMemory("Sin memoria disponible.");
         return;
       }
 
@@ -732,7 +914,7 @@
     },
 
     async loadConversation(conversationId) {
-      if (!window.KyrbiAPI || !conversationId) return;
+      if (!window.KyrbiAPI || !conversationId || !isUserAuthenticated()) return;
       try {
         const conversation = await window.KyrbiAPI.getConversation(conversationId);
         const mappedMode = mapModeFromApi(conversation?.mode);
@@ -749,7 +931,7 @@
     },
 
     async loadInitialConversation() {
-      if (!window.KyrbiAPI) return;
+      if (!window.KyrbiAPI || !isUserAuthenticated()) return;
       const fromQuery = getConversationIdFromUrl();
       if (fromQuery) {
         await this.loadConversation(fromQuery);
@@ -768,12 +950,25 @@
       const clean = sanitizeUserText(text);
       if (!clean) return;
 
+      if (!isUserAuthenticated()) {
+        const last = state.messages[state.messages.length - 1];
+        const alreadyWarned = last?.role === "assistant" && String(last?.text || "").includes("iniciar sesión");
+        if (!alreadyWarned) this.addAssistantMessage(LOCKED_CHAT_MESSAGE, { mode: state.mode });
+        ui.render();
+        return;
+      }
+
+      if (!state.networkOnline) {
+        this.addAssistantMessage("No hay conexión a internet en este momento. Intenta de nuevo cuando vuelva la red.");
+        ui.render();
+        return;
+      }
+
       this.addUserMessage(clean);
       ui.render();
 
       state.typing = true;
-      if (ui.hero?.chipText) ui.hero.chipText.textContent = "Kyrbi esta pensando...";
-      if (ui.app?.chipText) ui.app.chipText.textContent = "Kyrbi esta pensando...";
+      ui.setConnectionChip("Kyrbi está pensando...");
 
       if (!window.KyrbiAPI) {
         state.typing = false;
@@ -790,8 +985,7 @@
         if (MODES[serverMode]) state.mode = serverMode;
 
         state.typing = false;
-        if (ui.hero?.chipText) ui.hero.chipText.textContent = "Disponible";
-        if (ui.app?.chipText) ui.app.chipText.textContent = "Disponible";
+        ui.setConnectionChip("Disponible");
 
         this.addAssistantMessage(response.text, { mode: state.mode });
         if (dom.appMount) this.persistSession();
@@ -803,8 +997,7 @@
         if (opts.focusAfterSend && ui.app?.input) ui.app.input.focus();
       } catch (error) {
         state.typing = false;
-        if (ui.hero?.chipText) ui.hero.chipText.textContent = "Error";
-        if (ui.app?.chipText) ui.app.chipText.textContent = "Error";
+        ui.setConnectionChip("Error");
 
         const errorMessage = error.message || "error al comunicarse con Kyrbi.";
         this.addAssistantMessage(`Lo siento, ${errorMessage.toLowerCase()}`);
@@ -816,6 +1009,7 @@
 
     async boot() {
       await this.loadSettings();
+      const isAuth = isUserAuthenticated();
 
       const requestedMode = getModeFromUrl();
       if (requestedMode && MODES[requestedMode]) {
@@ -829,14 +1023,27 @@
         if (!state.messages.length) {
           this.resetConversation({ keepMode: true });
         }
-        await this.loadInitialConversation();
-        await this.refreshHistory();
-        await this.refreshMemory();
+        if (isAuth) {
+          await this.loadInitialConversation();
+          await this.refreshHistory();
+          await this.refreshMemory();
+          this.showOnboarding(false);
+        } else {
+          state.history = [];
+          ui.renderHistory();
+          ui.setHistoryStatus("Inicia sesión para desbloquear historial.");
+          ui.renderMemory("Inicia sesión para desbloquear memoria persistente.");
+          if (dom.onboardingBanner) {
+            dom.onboardingBanner.hidden = true;
+            dom.onboardingBanner.setAttribute("aria-hidden", "true");
+          }
+        }
       } else {
         this.resetConversation({ keepMode: true });
       }
 
       ui.render();
+      this.setNetworkStatus(state.networkOnline);
     },
   };
 

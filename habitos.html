@@ -3,36 +3,35 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="color-scheme" content="light" />
-
-    <title>Hábitos saludables | Ciencias para vivir mejor</title>
+    <meta name="color-scheme" content="light dark" />
+    <title>Hábitos saludables | Kyrbi</title>
     <meta
       name="description"
-      content="Hábitos saludables: alimentación, actividad física y descanso. Conecta cada hábito con Kyrbi."
+      content="Guía educativa de hábitos saludables en alimentación, actividad física y descanso, conectada al asistente Kyrbi."
     />
 
     <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
-    
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
-    
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
     <link rel="stylesheet" href="assets/css/styles.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
   </head>
 
   <body>
-    <a class="skip-link" href="#contenido">Saltar al contenido</a>
-
     <header class="app-header" id="top">
       <nav class="nav" aria-label="Navegación principal">
         <div class="nav__inner">
           <a class="brand" href="index.html" aria-label="Ir al inicio">
-            <img src="assets/img/logo.svg" alt="Logo Ciencias para vivir mejor" width="40" height="40">
-            <span class="brand__text sr-only">Ciencias para vivir mejor</span>
+            <img src="assets/img/logo.svg" alt="Logo de Kyrbi" width="40" height="40" />
+            <span class="brand__text sr-only">Kyrbi</span>
           </a>
 
-          <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Menu">
+          <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Menú">
             <span class="nav__toggle-lines" aria-hidden="true"></span>
             <span class="nav__toggle-lines" aria-hidden="true"></span>
             <span class="nav__toggle-lines" aria-hidden="true"></span>
@@ -43,69 +42,62 @@
             <a class="nav__link" href="assistant.html" data-nav="assistant">Kyrbi IA</a>
             <a class="nav__link" href="habitos.html" data-nav="habitos">Hábitos</a>
             <a class="nav__link" href="equipo.html" data-nav="equipo">Equipo</a>
-            
+            <a class="nav__link" href="pricing.html">Pricing</a>
             <div class="nav__auth" id="nav-auth">
               <a href="login.html" class="button button--ghost button--sm">Entrar</a>
-              <a href="register.html" class="button button--primary button--sm">Registro</a>
+              <a href="register.html" class="button button--primary button--sm">Crear cuenta</a>
             </div>
           </div>
         </div>
       </nav>
     </header>
 
-    <main class="app-main" id="contenido">
-      <section class="section habits reveal reveal--up" aria-label="Hábitos Saludables">
+    <main class="app-main">
+      <section class="section habits reveal reveal--up" aria-label="Hábitos saludables">
         <div class="container">
-          <div class="section__head reveal reveal--left">
+          <div class="section__head">
             <h1 class="section__title">Hábitos saludables</h1>
             <p class="section__lead">
-              No es solo información: cada pilar se conecta con Kyrbi para convertirlo en un plan real y personalizable.
+              Cada pilar conecta con Kyrbi para transformar información en un plan práctico, medible y sostenible.
             </p>
           </div>
 
           <div class="grid-cards">
-            <article class="card reveal reveal--up" style="transition-delay: 0.1s;">
-              <div class="card__icon" aria-hidden="true">🍽️</div>
+            <article class="card reveal reveal--up">
+              <div class="card__icon" aria-hidden="true"><i class="fa-solid fa-apple-whole"></i></div>
               <h2 class="card__title">Alimentación</h2>
               <p class="card__text">
-                Energía estable para clases: desayunos simples, meriendas inteligentes y equilibrio sin extremos.
+                Enfoque en equilibrio: desayunos simples, colaciones inteligentes y decisiones sostenibles para mantener energía.
               </p>
-              <a class="button button--secondary" href="assistant.html?mode=chef">
-                Hablar con Kyrbi sobre esto
-              </a>
+              <a class="button button--secondary" href="assistant.html?mode=chef">Ir a modo Chef</a>
             </article>
 
-            <article class="card reveal reveal--up" style="transition-delay: 0.2s;">
-              <div class="card__icon" aria-hidden="true">🏃‍♂️</div>
+            <article class="card reveal reveal--up">
+              <div class="card__icon" aria-hidden="true"><i class="fa-solid fa-person-running"></i></div>
               <h2 class="card__title">Actividad física</h2>
               <p class="card__text">
-                Movimiento práctico: rutinas cortas, metas realistas y constancia sin depender de “motivación”.
+                Rutinas cortas y metas realistas para construir constancia, reducir sedentarismo y mejorar enfoque diario.
               </p>
-              <a class="button button--secondary" href="assistant.html?mode=coach">
-                Hablar con Kyrbi sobre esto
-              </a>
+              <a class="button button--secondary" href="assistant.html?mode=coach">Ir a modo Coach</a>
             </article>
 
-            <article class="card reveal reveal--up" style="transition-delay: 0.3s;">
-              <div class="card__icon" aria-hidden="true">🌙</div>
+            <article class="card reveal reveal--up">
+              <div class="card__icon" aria-hidden="true"><i class="fa-solid fa-moon"></i></div>
               <h2 class="card__title">Descanso</h2>
               <p class="card__text">
-                Sueño y bienestar: rutina nocturna, manejo de pantallas y estrategias para despertar con más energía.
+                Rutina nocturna, higiene del sueño y estrategias para despertar con más claridad y estabilidad emocional.
               </p>
-              <a class="button button--secondary" href="assistant.html?mode=descanso">
-                Hablar con Kyrbi sobre esto
-              </a>
+              <a class="button button--secondary" href="assistant.html?mode=descanso">Ir a modo Descanso</a>
             </article>
-          </div>
 
-          <div class="habits__cta reveal reveal--up" style="transition-delay: 0.4s;">
-            <div class="card card--soft habits__cta-card">
+            <article class="card reveal reveal--up">
+              <div class="card__icon" aria-hidden="true"><i class="fa-solid fa-lightbulb"></i></div>
               <h2 class="card__title">¿No sabes por dónde empezar?</h2>
               <p class="card__text">
-                Entra a Kyrbi en modo Guía general y responde 2 preguntas: te propone un plan simple para esta semana.
+                Abre Kyrbi en modo general, responde dos preguntas clave y obtén un plan semanal base.
               </p>
-              <a class="button button--primary" href="assistant.html?mode=general">Ir con Kyrbi</a>
-            </div>
+              <a class="button button--primary" href="assistant.html?mode=general">Empezar con Kyrbi</a>
+            </article>
           </div>
         </div>
       </section>
@@ -114,28 +106,23 @@
     <footer class="footer" aria-label="Pie de página">
       <div class="container footer__grid">
         <div class="footer__block">
-          <h3 class="footer__title">Seguridad y privacidad</h3>
+          <h3 class="footer__title">Producto</h3>
           <ul class="footer__list">
-            <li><a href="seguridad.html" class="footer__link">No se recopilan datos personales.</a></li>
-            <li><a href="seguridad.html" class="footer__link">Las conversaciones de cuenta se guardan para continuidad.</a></li>
-            <li><a href="seguridad.html" class="footer__link">Uso educativo y general.</a></li>
-            <li><a href="seguridad.html" class="footer__link">El asistente no sustituye a un médico.</a></li>
+            <li><a href="assistant.html" class="footer__link">Asistente</a></li>
+            <li><a href="dashboard.html" class="footer__link">Dashboard</a></li>
+            <li><a href="pricing.html" class="footer__link">Pricing</a></li>
           </ul>
         </div>
-
         <div class="footer__block">
-          <h3 class="footer__title">Evaluación del proyecto</h3>
+          <h3 class="footer__title">Confianza</h3>
           <ul class="footer__list">
-            <li><a href="evaluacion.html" class="footer__link">Facilidad de uso</a></li>
-            <li><a href="evaluacion.html" class="footer__link">Claridad de la información</a></li>
-            <li><a href="evaluacion.html" class="footer__link">Experiencia del usuario</a></li>
+            <li><a href="seguridad.html" class="footer__link">Security</a></li>
+            <li><a href="privacy.html" class="footer__link">Privacy</a></li>
+            <li><a href="terms.html" class="footer__link">Terms</a></li>
           </ul>
         </div>
-
         <div class="footer__bottom">
-          <p class="footer__fineprint">
-            © <span id="year"></span> Ciencias para vivir mejor — Proyecto educativo.
-          </p>
+          <p class="footer__fineprint">© <span id="year"></span> Kyrbi · Proyecto educativo.</p>
         </div>
       </div>
     </footer>
@@ -146,4 +133,3 @@
     <script src="assets/js/ui-enhancements.js" defer></script>
   </body>
 </html>
-

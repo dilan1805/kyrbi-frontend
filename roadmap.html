@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Roadmap | Kyrbi</title>
+    <meta name="description" content="Ruta pública de evolución de producto de Kyrbi." />
+    <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="assets/css/styles.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <nav class="nav" aria-label="Navegación principal">
+        <div class="nav__inner">
+          <a class="brand" href="index.html"><img src="assets/img/logo.svg" alt="Kyrbi" width="40" height="40" /><span class="sr-only">Kyrbi</span></a>
+          <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Menú">
+            <span class="nav__toggle-lines" aria-hidden="true"></span><span class="nav__toggle-lines" aria-hidden="true"></span><span class="nav__toggle-lines" aria-hidden="true"></span>
+          </button>
+          <div class="nav__links" id="nav-links">
+            <a class="nav__link" href="index.html">Inicio</a>
+            <a class="nav__link" href="roadmap.html">Roadmap</a>
+            <a class="nav__link" href="changelog.html">Changelog</a>
+            <a class="nav__link" href="contact.html">Contacto</a>
+            <div class="nav__auth" id="nav-auth">
+              <a href="login.html" class="button button--ghost button--sm">Entrar</a>
+              <a href="register.html" class="button button--primary button--sm">Crear cuenta</a>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="app-main">
+      <section class="section">
+        <div class="container">
+          <div class="section__head">
+            <h1 class="section__title">Roadmap</h1>
+            <p class="section__lead">Plan público de evolución del producto para 2026.</p>
+          </div>
+          <div class="grid-cards">
+            <article class="card">
+              <h2 class="card__title">Q2 2026</h2>
+              <ul class="card__text">
+                <li>Dashboard de progreso por objetivos semanales.</li>
+                <li>Exportación de historial de conversaciones.</li>
+                <li>Mejoras de rendimiento móvil (Core Web Vitals).</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h2 class="card__title">Q3 2026</h2>
+              <ul class="card__text">
+                <li>Espacios de trabajo para equipos educativos.</li>
+                <li>Analítica de adopción de hábitos por cohortes.</li>
+                <li>Controles avanzados de seguridad institucional.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h2 class="card__title">Q4 2026</h2>
+              <ul class="card__text">
+                <li>Biblioteca de planes educativos reutilizables.</li>
+                <li>Integraciones con sistemas escolares.</li>
+                <li>Panel de administración con monitoreo ampliado.</li>
+              </ul>
+            </article>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="container footer__grid">
+        <div class="footer__bottom"><p class="footer__fineprint">© <span id="year"></span> Kyrbi.</p></div>
+      </div>
+    </footer>
+
+    <script src="assets/js/config.js" defer></script>
+    <script src="assets/js/api.js" defer></script>
+    <script src="assets/js/app.js" defer></script>
+    <script src="assets/js/ui-enhancements.js" defer></script>
+  </body>
+</html>

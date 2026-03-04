@@ -3,38 +3,37 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="color-scheme" content="light" />
-
-    <title>Asistente IA - Kyrbi | Ciencias para vivir mejor</title>
+    <meta name="color-scheme" content="light dark" />
+    <title>Kyrbi IA | Asistente con continuidad</title>
     <meta
       name="description"
-      content="Vista dedicada del asistente Kyrbi con historial, memoria y configuracion guardada."
+      content="Asistente conversacional de Kyrbi con historial, memoria, configuración persistente y acceso autenticado."
     />
 
     <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
-
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap"
       rel="stylesheet"
     />
 
     <link rel="stylesheet" href="assets/css/styles.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
   </head>
 
   <body>
     <a class="skip-link" href="#contenido">Saltar al contenido</a>
 
     <header class="app-header" id="top">
-      <nav class="nav" aria-label="Navegacion principal">
+      <nav class="nav" aria-label="Navegación principal">
         <div class="nav__inner">
           <a class="brand" href="index.html" aria-label="Ir al inicio">
-            <img src="assets/img/logo.svg" alt="Logo Ciencias para vivir mejor" width="40" height="40" />
-            <span class="brand__text sr-only">Ciencias para vivir mejor</span>
+            <img src="assets/img/logo.svg" alt="Logo de Kyrbi" width="40" height="40" />
+            <span class="brand__text sr-only">Kyrbi</span>
           </a>
 
-          <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Menu">
+          <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Menú">
             <span class="nav__toggle-lines" aria-hidden="true"></span>
             <span class="nav__toggle-lines" aria-hidden="true"></span>
             <span class="nav__toggle-lines" aria-hidden="true"></span>
@@ -43,12 +42,13 @@
           <div class="nav__links" id="nav-links">
             <a class="nav__link" href="index.html" data-nav="index">Inicio</a>
             <a class="nav__link" href="assistant.html" data-nav="assistant">Kyrbi IA</a>
-            <a class="nav__link" href="habitos.html" data-nav="habitos">Habitos</a>
+            <a class="nav__link" href="habitos.html" data-nav="habitos">Hábitos</a>
             <a class="nav__link" href="equipo.html" data-nav="equipo">Equipo</a>
+            <a class="nav__link" href="pricing.html">Pricing</a>
 
             <div class="nav__auth" id="nav-auth">
               <a href="login.html" class="button button--ghost button--sm">Entrar</a>
-              <a href="register.html" class="button button--primary button--sm">Registro</a>
+              <a href="register.html" class="button button--primary button--sm">Crear cuenta</a>
             </div>
           </div>
         </div>
@@ -59,32 +59,26 @@
       <section class="section assistant reveal reveal--up" aria-label="Asistente IA">
         <div class="container">
           <div class="section__head reveal reveal--left">
-            <h1 class="section__title">Asistente IA: Kyrbi</h1>
+            <h1 class="section__title">Asistente Kyrbi IA</h1>
             <p class="section__lead">
-              Conversacion fluida, modos claros y continuidad real: historial de chats, memoria y configuracion guardada.
+              Conversación educativa con continuidad real: historial, memoria y preferencias sincronizadas por cuenta.
             </p>
           </div>
 
           <div class="assistant__layout">
-            <aside class="assistant__aside reveal reveal--left" style="transition-delay: 0.1s;" aria-label="Panel de control del asistente">
+            <aside class="assistant__aside reveal reveal--left" aria-label="Panel lateral de control">
               <div class="card card--soft">
-                <h2 class="card__title">Modos</h2>
-                <p class="card__text">
-                  Cambia el enfoque de la conversacion. Kyrbi ajusta preguntas y recomendaciones segun el modo.
-                </p>
-
+                <h2 class="card__title">Modos de conversación</h2>
+                <p class="card__text">Selecciona un enfoque según el objetivo de la sesión.</p>
                 <div class="mode-tabs" role="tablist" aria-label="Modos de Kyrbi">
-                  <button class="mode-tab is-active" type="button" role="tab" aria-selected="true" data-mode="general">Guia general</button>
+                  <button class="mode-tab is-active" type="button" role="tab" aria-selected="true" data-mode="general">
+                    Guía general
+                  </button>
                   <button class="mode-tab" type="button" role="tab" aria-selected="false" data-mode="chef">Chef</button>
                   <button class="mode-tab" type="button" role="tab" aria-selected="false" data-mode="coach">Coach</button>
-                  <button class="mode-tab" type="button" role="tab" aria-selected="false" data-mode="descanso">Descanso</button>
-                </div>
-
-                <div class="aside__note">
-                  <p class="aside__note-title">Aviso importante</p>
-                  <p class="aside__note-text">
-                    Kyrbi ofrece orientacion general para aprender. No sustituye a un profesional de la salud.
-                  </p>
+                  <button class="mode-tab" type="button" role="tab" aria-selected="false" data-mode="descanso">
+                    Descanso
+                  </button>
                 </div>
               </div>
 
@@ -93,19 +87,30 @@
                   <h3 class="card__title">Tus conversaciones</h3>
                   <button id="new-chat-btn" type="button" class="button button--ghost button--sm">Nuevo chat</button>
                 </div>
+
+                <div class="history-toolbar">
+                  <input
+                    id="history-search"
+                    class="history-search"
+                    type="search"
+                    placeholder="Buscar conversaciones..."
+                    aria-label="Buscar en historial"
+                  />
+                </div>
+
                 <p class="card__text" id="history-status">Cargando historial...</p>
                 <ul id="conversation-history" class="history-list" aria-label="Historial de conversaciones"></ul>
               </div>
 
               <div class="card card--soft assistant-panel">
                 <h3 class="card__title">Memoria guardada</h3>
-                <p class="card__text">Resumen persistente para continuidad de tus chats.</p>
+                <p class="card__text">Resumen persistente para continuidad entre sesiones.</p>
                 <pre id="memory-summary" class="memory-box">Sin memoria disponible.</pre>
                 <p class="memory-meta" id="memory-meta"></p>
               </div>
 
               <div class="card card--soft assistant-panel">
-                <h3 class="card__title">Configuracion</h3>
+                <h3 class="card__title">Configuración</h3>
                 <form id="chat-settings" class="settings-form" onsubmit="return false;">
                   <label class="settings-row">
                     <span>Auto-guardar chat</span>
@@ -115,7 +120,7 @@
                   <label class="settings-row">
                     <span>Modo por defecto</span>
                     <select id="setting-default-mode">
-                      <option value="general">Guia general</option>
+                      <option value="general">Guía general</option>
                       <option value="chef">Chef</option>
                       <option value="coach">Coach</option>
                       <option value="descanso">Descanso</option>
@@ -132,13 +137,25 @@
                   </label>
 
                   <button id="settings-save" type="button" class="button button--primary button--sm button--full">
-                    Guardar configuracion
+                    Guardar configuración
+                  </button>
+                  <button id="onboarding-reset" type="button" class="button button--ghost button--sm button--full">
+                    Reiniciar onboarding
                   </button>
                 </form>
               </div>
             </aside>
 
-            <div class="assistant__chat reveal reveal--right" style="transition-delay: 0.2s;">
+            <div class="assistant__chat reveal reveal--right">
+              <div class="onboarding-banner" id="onboarding-banner" aria-hidden="true" hidden>
+                <p class="onboarding-banner__title">Bienvenido a Kyrbi</p>
+                <p class="onboarding-banner__text">
+                  1) Elige modo, 2) escribe tu objetivo, 3) guarda conversaciones para dar seguimiento.
+                </p>
+                <div class="onboarding-banner__actions">
+                  <button id="onboarding-dismiss" type="button" class="button button--primary button--sm">Entendido</button>
+                </div>
+              </div>
               <div class="chat-shell" id="kyrbi-app" aria-label="Chat principal con Kyrbi"></div>
             </div>
           </div>
@@ -146,36 +163,31 @@
       </section>
     </main>
 
-    <footer class="footer" aria-label="Pie de pagina">
+    <footer class="footer" aria-label="Pie de página">
       <div class="container footer__grid">
         <div class="footer__block">
-          <h3 class="footer__title">Seguridad y privacidad</h3>
+          <h3 class="footer__title">Producto</h3>
           <ul class="footer__list">
-            <li><a href="seguridad.html" class="footer__link">No se recopilan datos sensibles sin permiso.</a></li>
-            <li><a href="seguridad.html" class="footer__link">Conversaciones de cuenta se guardan para continuidad.</a></li>
-            <li><a href="seguridad.html" class="footer__link">Uso educativo y general.</a></li>
-            <li><a href="seguridad.html" class="footer__link">El asistente no sustituye a un medico.</a></li>
+            <li><a href="dashboard.html" class="footer__link">Dashboard</a></li>
+            <li><a href="pricing.html" class="footer__link">Pricing</a></li>
+            <li><a href="roadmap.html" class="footer__link">Roadmap</a></li>
+            <li><a href="changelog.html" class="footer__link">Changelog</a></li>
           </ul>
         </div>
-
         <div class="footer__block">
-          <h3 class="footer__title">Evaluacion del proyecto</h3>
+          <h3 class="footer__title">Confianza</h3>
           <ul class="footer__list">
-            <li><a href="evaluacion.html" class="footer__link">Facilidad de uso</a></li>
-            <li><a href="evaluacion.html" class="footer__link">Claridad de la informacion</a></li>
-            <li><a href="evaluacion.html" class="footer__link">Experiencia del usuario</a></li>
+            <li><a href="seguridad.html" class="footer__link">Security</a></li>
+            <li><a href="privacy.html" class="footer__link">Privacy</a></li>
+            <li><a href="terms.html" class="footer__link">Terms</a></li>
+            <li><a href="status.html" class="footer__link">Status</a></li>
           </ul>
         </div>
-
         <div class="footer__bottom">
-          <p class="footer__fineprint">
-            © <span id="year"></span> Ciencias para vivir mejor - Proyecto educativo.
-          </p>
+          <p class="footer__fineprint">© <span id="year"></span> Kyrbi · Proyecto educativo con estándares de producto profesional.</p>
         </div>
       </div>
     </footer>
-
-    <div class="toast-container" id="toast-container" aria-live="polite" aria-atomic="true"></div>
 
     <script src="assets/js/config.js" defer></script>
     <script src="assets/js/api.js" defer></script>

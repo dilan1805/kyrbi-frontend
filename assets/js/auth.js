@@ -2,39 +2,49 @@ document.addEventListener("DOMContentLoaded", () => {
   const loginForm = document.getElementById("login-form");
   const registerForm = document.getElementById("register-form");
   const errorContainer = document.getElementById("error-message");
-  const params = new URLSearchParams(window.location.search);
   const toastContainer = document.getElementById("toast-container") || createToastContainer();
+  const params = new URLSearchParams(window.location.search);
 
   if (!window.KyrbiAPI) {
-    showError("No se pudo cargar el sistema de autenticacion. Recarga la pagina.");
+    showError("No se pudo cargar el sistema de autenticación. Recarga la página.");
     return;
   }
 
+  const validateEmail = (email) =>
+    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
+      String(email || "").toLowerCase()
+    );
+
+  const setBusy = (button, busyText, idleText, busy) => {
+    if (!button) return;
+    button.disabled = Boolean(busy);
+    button.textContent = busy ? busyText : idleText;
+  };
+
   const showToast = (text, type = "info") => {
     if (!toastContainer) return;
+    const icon = type === "success" ? "✓" : type === "error" ? "!" : "i";
     const el = document.createElement("div");
     el.className = `toast toast--${type}`;
-    const icon = type === "success" ? "OK" : type === "error" ? "!" : "i";
     el.innerHTML = `
       <span class="toast__icon">${icon}</span>
       <div class="toast__text">${text}</div>
-      <button class="toast__close" aria-label="Cerrar">x</button>
+      <button class="toast__close" aria-label="Cerrar">×</button>
     `;
     const close = () => el.remove();
     el.querySelector(".toast__close")?.addEventListener("click", close);
     toastContainer.appendChild(el);
-    setTimeout(close, 4500);
+    window.setTimeout(close, 4200);
   };
 
-  const showError = (message) => {
-    if (errorContainer) {
-      errorContainer.textContent = message;
-      errorContainer.style.display = "block";
-      errorContainer.scrollIntoView({ behavior: "smooth", block: "center" });
+  function showError(message) {
+    if (!errorContainer) {
+      showToast(message, "error");
       return;
     }
-    showToast(message, "error");
-  };
+    errorContainer.textContent = message;
+    errorContainer.style.display = "block";
+  }
 
   const clearError = () => {
     if (!errorContainer) return;
@@ -42,33 +52,27 @@ document.addEventListener("DOMContentLoaded", () => {
     errorContainer.textContent = "";
   };
 
-  const validateEmail = (email) =>
-    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
-      String(email).toLowerCase()
-    );
-
   const cleanUrlParam = (key) => {
     const url = new URL(window.location.href);
     url.searchParams.delete(key);
-    history.replaceState({}, "", url.toString());
+    window.history.replaceState({}, "", url.toString());
   };
 
-  let recaptchaLoaded = false;
+  let recaptchaReady = false;
   const siteKeyMeta = document.querySelector('meta[name="recaptcha-sitekey"]');
-  if (siteKeyMeta && siteKeyMeta.content) {
-    window.RECAPTCHA_SITE_KEY = siteKeyMeta.content;
-  }
+  if (siteKeyMeta?.content) window.RECAPTCHA_SITE_KEY = siteKeyMeta.content;
 
   const ensureRecaptcha = () =>
     new Promise((resolve) => {
       const key = window.RECAPTCHA_SITE_KEY;
       if (!key) return resolve(false);
-      if (recaptchaLoaded && window.grecaptcha) return resolve(true);
+      if (recaptchaReady && window.grecaptcha) return resolve(true);
       const script = document.createElement("script");
       script.src = `https://www.google.com/recaptcha/api.js?render=${encodeURIComponent(key)}`;
       script.async = true;
+      script.defer = true;
       script.onload = () => {
-        recaptchaLoaded = true;
+        recaptchaReady = true;
         resolve(true);
       };
       script.onerror = () => resolve(false);
@@ -78,8 +82,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const getCaptchaToken = async (action) => {
     const key = window.RECAPTCHA_SITE_KEY;
     if (!key) return null;
-    const ok = await ensureRecaptcha();
-    if (!ok || !window.grecaptcha) return null;
+    const loaded = await ensureRecaptcha();
+    if (!loaded || !window.grecaptcha) return null;
     return new Promise((resolve) => {
       window.grecaptcha.ready(() => {
         window.grecaptcha
@@ -90,106 +94,93 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   };
 
-  if (window.KyrbiAPI?.getCsrfToken) {
-    window.KyrbiAPI.getCsrfToken().catch(() => {});
-  }
+  const handleOAuthCallback = () => {
+    const token = params.get("token");
+    const username = params.get("username");
+    const id = params.get("id");
+    const hasSocialPayload = Boolean(token && (username || id));
+    if (!hasSocialPayload) return false;
+
+    const socialUser = {
+      id: id || null,
+      username: username || "Usuario",
+      emailVerified: true,
+    };
+    localStorage.setItem("kyrbi_token", token);
+    localStorage.setItem("kyrbi_user", JSON.stringify(socialUser));
+    sessionStorage.removeItem("kyrbi_token");
+    window.KyrbiAPI.token = token;
+    window.history.replaceState({}, document.title, window.location.pathname);
+    showToast(`Bienvenido, ${socialUser.username}.`, "success");
+    window.setTimeout(() => {
+      window.location.href = "dashboard.html";
+    }, 620);
+    return true;
+  };
 
   const syncOAuthButtons = async () => {
     const oauthButtons = Array.from(document.querySelectorAll("[data-oauth-provider]"));
     if (!oauthButtons.length || !window.KyrbiAPI?.request) return;
 
+    oauthButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const provider = String(button.getAttribute("data-oauth-provider") || "").trim().toLowerCase();
+        if (!provider) return;
+        const token = localStorage.getItem("kyrbi_token") || sessionStorage.getItem("kyrbi_token");
+        const linkToken = token ? `?token=${encodeURIComponent(token)}` : "";
+        const baseURL = String(window.API_CONFIG?.baseURL || window.location.origin).replace(/\/+$/, "");
+        window.location.href = `${baseURL}/api/auth/${provider}${linkToken}`;
+      });
+    });
+
     try {
       const providers = await window.KyrbiAPI.request("/api/auth/providers", "GET");
-      let disabledCount = 0;
-
-      oauthButtons.forEach((btn) => {
-        const provider = String(btn.dataset.oauthProvider || "").toLowerCase();
+      let disabled = 0;
+      oauthButtons.forEach((button) => {
+        const provider = String(button.getAttribute("data-oauth-provider") || "").toLowerCase();
         const enabled = Boolean(providers?.[provider]);
         if (enabled) return;
-
-        btn.disabled = true;
-        btn.setAttribute("aria-disabled", "true");
-        btn.classList.add("button--disabled");
-        btn.title = `Inicio con ${provider} no disponible en este momento`;
-        disabledCount += 1;
+        button.disabled = true;
+        button.classList.add("button--disabled");
+        button.setAttribute("aria-disabled", "true");
+        button.title = `Inicio con ${provider} no disponible actualmente`;
+        disabled += 1;
       });
-
-      if (disabledCount === oauthButtons.length) {
-        showToast("Inicio social no disponible en este momento. Usa correo y contrasena.", "info");
+      if (disabled === oauthButtons.length && disabled > 0) {
+        showToast("Inicio social no disponible en este momento. Usa correo y contraseña.", "info");
       }
     } catch {
-      // Si falla este endpoint, dejamos botones activos para no bloquear UX.
+      // Fallback: mantener botones activos.
     }
   };
 
-  syncOAuthButtons();
+  const initLogin = () => {
+    if (!loginForm) return;
 
-  const token = params.get("token");
-  const username = params.get("username");
-  const id = params.get("id");
-  const isSocialCallback = Boolean(token && (username || id));
-
-  if (isSocialCallback) {
-    const socialUser = { id: id || null, username: username || "Usuario", emailVerified: true };
-    localStorage.setItem("kyrbi_token", token);
-    localStorage.setItem("kyrbi_user", JSON.stringify(socialUser));
-    sessionStorage.removeItem("kyrbi_token");
-    if (window.KyrbiAPI) window.KyrbiAPI.token = token;
-    history.replaceState({}, document.title, window.location.pathname);
-    showToast(`Bienvenido ${socialUser.username}`, "success");
-    setTimeout(() => {
-      window.location.href = "dashboard.html";
-    }, 700);
-    return;
-  }
-
-  const oauthError = params.get("error");
-  if (oauthError) {
-    showError(decodeURIComponent(oauthError));
-    cleanUrlParam("error");
-  }
-
-  if (params.get("verified") === "1") {
-    showToast("Correo verificado correctamente", "success");
-    cleanUrlParam("verified");
-  }
-
-  const resetToken = params.get("token");
-  if (resetToken && loginForm && !isSocialCallback) {
-    const newPass = prompt("Ingresa tu nueva contrasena");
-    if (newPass && newPass.length >= 6) {
-      window.KyrbiAPI
-        .confirmPasswordReset(resetToken, newPass)
-        .then(() => showToast("Contrasena actualizada. Puedes iniciar sesion.", "success"))
-        .catch(() => showToast("No se pudo actualizar la contrasena", "error"))
-        .finally(() => cleanUrlParam("token"));
-    }
-  }
-
-  if (loginForm) {
-    loginForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
+    loginForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
       clearError();
 
-      const email = document.getElementById("email")?.value.trim().toLowerCase();
-      const password = document.getElementById("password")?.value || "";
-      const remember = document.getElementById("remember")?.checked;
-      const submitBtn = loginForm.querySelector('button[type="submit"]');
+      const emailInput = document.getElementById("email");
+      const passwordInput = document.getElementById("password");
+      const rememberInput = document.getElementById("remember");
+      const submitButton = loginForm.querySelector('button[type="submit"]');
+
+      const email = String(emailInput?.value || "").trim().toLowerCase();
+      const password = String(passwordInput?.value || "");
+      const remember = Boolean(rememberInput?.checked);
 
       if (!email || !password) {
-        showError("Por favor, completa todos los campos.");
+        showError("Completa correo y contraseña.");
         return;
       }
-
       if (!validateEmail(email)) {
-        showError("Por favor, ingresa un correo electronico valido.");
+        showError("Ingresa un correo electrónico válido.");
         return;
       }
 
       try {
-        submitBtn.disabled = true;
-        submitBtn.textContent = "Iniciando sesion...";
-
+        setBusy(submitButton, "Iniciando sesión...", "Iniciar sesión", true);
         const captchaToken = await getCaptchaToken("login");
         const loginData = await window.KyrbiAPI.login(email, password, captchaToken);
 
@@ -197,22 +188,18 @@ document.addEventListener("DOMContentLoaded", () => {
         let authUser = loginData?.user || null;
 
         if (loginData?.require2FA) {
-          submitBtn.disabled = false;
-          submitBtn.textContent = "Iniciar Sesion";
-          const code = prompt("Ingresa el codigo de 6 digitos de tu app de autenticacion (2FA).");
-          if (!code) return;
-          const twoFaResult = await window.KyrbiAPI.verify2FA(email, code.trim());
-          authToken = twoFaResult?.token || null;
-          authUser = twoFaResult?.user || authUser;
+          const code = window.prompt("Ingresa el código de 6 dígitos de tu app de autenticación:");
+          if (!code) throw new Error("Código 2FA cancelado.");
+          const twoFaData = await window.KyrbiAPI.verify2FA(email, String(code).trim());
+          authToken = twoFaData?.token || null;
+          authUser = twoFaData?.user || authUser;
         }
 
-        if (!authToken) {
-          throw new Error("No se pudo completar la autenticacion.");
-        }
+        if (!authToken) throw new Error("No se pudo completar la autenticación.");
 
         if (authUser) {
           localStorage.setItem("kyrbi_user", JSON.stringify(authUser));
-          if (authUser.preferences?.chatSettings) {
+          if (authUser?.preferences?.chatSettings) {
             localStorage.setItem("kyrbi_preferences_v1", JSON.stringify(authUser.preferences.chatSettings));
           }
         }
@@ -225,125 +212,138 @@ document.addEventListener("DOMContentLoaded", () => {
           localStorage.removeItem("kyrbi_token");
         }
 
-        if (window.KyrbiAPI) window.KyrbiAPI.token = authToken;
+        window.KyrbiAPI.token = authToken;
         sessionStorage.removeItem("kyrbi_chat_v1");
         sessionStorage.removeItem("kyrbi_session_v1");
-
-        showToast("Inicio de sesion exitoso.", "success");
+        showToast("Inicio de sesión exitoso.", "success");
         window.location.href = "dashboard.html";
       } catch (error) {
-        showError(error.message || "Error al iniciar sesion.");
-        showToast("No se pudo iniciar sesion.", "error");
+        showError(error?.message || "No se pudo iniciar sesión.");
+        showToast("No se pudo iniciar sesión.", "error");
       } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = "Iniciar Sesion";
+        setBusy(submitButton, "Iniciando sesión...", "Iniciar sesión", false);
       }
     });
 
     const forgotLink = document.getElementById("forgot-link");
-    forgotLink?.addEventListener("click", async (e) => {
-      e.preventDefault();
-      const email = prompt("Ingresa tu correo para recuperar la contrasena");
+    forgotLink?.addEventListener("click", async (event) => {
+      event.preventDefault();
+      const email = window.prompt("Ingresa tu correo para recuperación de contraseña:");
       if (!email) return;
       if (!validateEmail(email)) {
-        showError("Correo electronico invalido.");
+        showError("Correo electrónico inválido.");
         return;
       }
       try {
-        await window.KyrbiAPI.requestPasswordReset(email.trim());
-        showToast("Si el correo existe, se envio un enlace.", "success");
+        await window.KyrbiAPI.requestPasswordReset(String(email).trim().toLowerCase());
+        showToast("Si el correo existe, se envió un enlace de recuperación.", "success");
       } catch {
-        showToast("No se pudo iniciar la recuperacion.", "error");
+        showToast("No se pudo iniciar la recuperación.", "error");
       }
     });
-  }
+  };
 
-  if (registerForm) {
-    const emailEl = document.getElementById("email");
-    const passEl = document.getElementById("password");
-    const confirmEl = document.getElementById("confirm-password");
+  const initRegister = () => {
+    if (!registerForm) return;
 
-    emailEl?.addEventListener("input", () => {
-      emailEl.setCustomValidity(validateEmail(emailEl.value) ? "" : "Correo no valido");
+    const emailField = document.getElementById("email");
+    const passwordField = document.getElementById("password");
+    const confirmField = document.getElementById("confirm-password");
+
+    emailField?.addEventListener("input", () => {
+      emailField.setCustomValidity(validateEmail(emailField.value) ? "" : "Correo no válido");
+    });
+    confirmField?.addEventListener("input", () => {
+      confirmField.setCustomValidity(confirmField.value === passwordField?.value ? "" : "Las contraseñas no coinciden");
     });
 
-    confirmEl?.addEventListener("input", () => {
-      confirmEl.setCustomValidity(confirmEl.value === passEl.value ? "" : "Las contrasenas no coinciden");
-    });
-
-    registerForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
+    registerForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
       clearError();
 
-      const usernameField = document.getElementById("username");
-      const emailField = document.getElementById("email");
-      const passwordField = document.getElementById("password");
-      const confirmField = document.getElementById("confirm-password");
-      const submitBtn = registerForm.querySelector('button[type="submit"]');
+      const usernameInput = document.getElementById("username");
+      const submitButton = registerForm.querySelector('button[type="submit"]');
+      const username = String(usernameInput?.value || "")
+        .trim()
+        .replace(/\s+/g, " ");
+      const email = String(emailField?.value || "").trim().toLowerCase();
+      const password = String(passwordField?.value || "");
+      const confirm = String(confirmField?.value || "");
 
-      const usernameValue = (usernameField?.value || "").trim().replace(/\s+/g, " ");
-      const emailValue = (emailField?.value || "").trim().toLowerCase();
-      const passwordValue = passwordField?.value || "";
-      const confirmValue = confirmField?.value || "";
-
-      if (!usernameValue || !emailValue || !passwordValue || !confirmValue) {
-        showError("Por favor, completa todos los campos obligatorios.");
+      if (!username || !email || !password || !confirm) {
+        showError("Completa todos los campos obligatorios.");
         return;
       }
-
-      if (!validateEmail(emailValue)) {
-        showError("El correo electronico no es valido.");
+      if (!validateEmail(email)) {
+        showError("El correo electrónico no es válido.");
         return;
       }
-
-      if (usernameValue.length < 3) {
+      if (username.length < 3) {
         showError("El nombre de usuario debe tener al menos 3 caracteres.");
         return;
       }
-
-      if (passwordValue.length < 6) {
-        showError("La contrasena debe tener al menos 6 caracteres.");
+      if (password.length < 6) {
+        showError("La contraseña debe tener al menos 6 caracteres.");
         return;
       }
-
-      if (passwordValue !== confirmValue) {
-        showError("Las contrasenas no coinciden.");
+      if (password !== confirm) {
+        showError("Las contraseñas no coinciden.");
         return;
       }
 
       try {
-        submitBtn.disabled = true;
-        submitBtn.textContent = "Creando cuenta...";
-
+        setBusy(submitButton, "Creando cuenta...", "Crear cuenta", true);
         const captchaToken = await getCaptchaToken("register");
-        const registerData = await window.KyrbiAPI.register(
-          usernameValue,
-          emailValue,
-          passwordValue,
-          captchaToken
-        );
-
-        if (registerData?.token && window.KyrbiAPI) {
-          window.KyrbiAPI.token = registerData.token;
-        }
+        const registerData = await window.KyrbiAPI.register(username, email, password, captchaToken);
+        if (registerData?.token) window.KyrbiAPI.token = registerData.token;
         if (registerData?.user?.preferences?.chatSettings) {
           localStorage.setItem("kyrbi_preferences_v1", JSON.stringify(registerData.user.preferences.chatSettings));
         }
-
         sessionStorage.removeItem("kyrbi_chat_v1");
         sessionStorage.removeItem("kyrbi_session_v1");
-
         showToast("Cuenta creada correctamente.", "success");
         window.location.href = "dashboard.html";
       } catch (error) {
-        showError(error.message || "Error al registrarse.");
+        showError(error?.message || "No se pudo crear la cuenta.");
         showToast("No se pudo crear la cuenta.", "error");
       } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = "Crear cuenta";
+        setBusy(submitButton, "Creando cuenta...", "Crear cuenta", false);
       }
     });
+  };
+
+  const oauthError = params.get("error");
+  if (oauthError) {
+    showError(decodeURIComponent(oauthError));
+    cleanUrlParam("error");
   }
+
+  if (params.get("verified") === "1") {
+    showToast("Correo verificado correctamente.", "success");
+    cleanUrlParam("verified");
+  }
+
+  if (handleOAuthCallback()) return;
+
+  const resetToken = params.get("token");
+  if (resetToken && loginForm) {
+    const newPassword = window.prompt("Ingresa tu nueva contraseña:");
+    if (newPassword && newPassword.length >= 6) {
+      window.KyrbiAPI
+        .confirmPasswordReset(resetToken, newPassword)
+        .then(() => showToast("Contraseña actualizada. Ya puedes iniciar sesión.", "success"))
+        .catch(() => showToast("No se pudo actualizar la contraseña.", "error"))
+        .finally(() => cleanUrlParam("token"));
+    }
+  }
+
+  if (window.KyrbiAPI.getCsrfToken) {
+    window.KyrbiAPI.getCsrfToken().catch(() => {});
+  }
+
+  syncOAuthButtons();
+  initLogin();
+  initRegister();
 
   function createToastContainer() {
     const el = document.createElement("div");

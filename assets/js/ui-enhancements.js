@@ -57,11 +57,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const sectionHeight = current.offsetHeight;
             const sectionTop = current.offsetTop - 100;
             const sectionId = current.getAttribute('id');
+            const navLink = document.querySelector('.nav__link[href*=' + sectionId + ']');
+            if (!navLink) return;
 
             if (scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
-                document.querySelector('.nav__link[href*=' + sectionId + ']')?.classList.add('is-active');
+                navLink.classList.add('is-active');
             } else {
-                document.querySelector('.nav__link[href*=' + sectionId + ']')?.classList.remove('is-active');
+                navLink.classList.remove('is-active');
             }
         });
     };
@@ -70,8 +72,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // 4. Smooth scroll for internal links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
+            const href = this.getAttribute('href');
+            if (!href || href === '#') return;
+            const target = document.querySelector(href);
+            if (!target) return;
             e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
             if (target) {
                 target.scrollIntoView({
                     behavior: 'smooth'

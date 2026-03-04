@@ -1,81 +1,92 @@
 <!doctype html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crear Cuenta - Kyrbi</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Crear cuenta | Kyrbi</title>
     <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
 
     <link rel="stylesheet" href="assets/css/styles.css" />
     <link rel="stylesheet" href="assets/css/auth.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-<body class="auth-page">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  </head>
+  <body class="auth-page">
     <div class="auth-container reveal reveal--up">
-        <div class="auth-card panel float">
-            <div class="auth-header reveal reveal--up" style="transition-delay: 0.1s;">
-                <a href="index.html" class="auth-logo" aria-label="Volver al inicio">
-                    <img src="assets/img/logo.svg" alt="Kyrbi Logo" width="60" height="60">
-                </a>
-                <h1>Crea tu cuenta</h1>
-                <p>Empieza tu camino hacia habitos mas saludables</p>
-            </div>
-
-            <div id="error-message" class="auth-error" style="display: none;"></div>
-
-            <div class="social-login reveal reveal--up" style="transition-delay: 0.2s;">
-                <button type="button" class="button button--social social-google" data-oauth-provider="google" onclick="window.location.href='/api/auth/google'">
-                    <i class="fab fa-google"></i>
-                    Registrarse con Google
-                </button>
-                <button type="button" class="button button--social social-google" data-oauth-provider="gmail" onclick="window.location.href='/api/auth/gmail'">
-                    <i class="fas fa-envelope"></i>
-                    Registrarse con Gmail
-                </button>
-                <button type="button" class="button button--social social-facebook" data-oauth-provider="facebook" onclick="window.location.href='/api/auth/facebook'">
-                    <i class="fab fa-facebook-f"></i>
-                    Registrarse con Facebook
-                </button>
-            </div>
-
-            <div class="divider reveal reveal--up" style="transition-delay: 0.3s;">
-                <span>o con tu correo</span>
-            </div>
-
-            <form id="register-form" class="auth-form reveal reveal--up" style="transition-delay: 0.4s;">
-                <div class="form-group">
-                    <label for="username">Nombre de usuario</label>
-                    <input type="text" id="username" name="username" autocomplete="username" maxlength="40" placeholder="Como quieres que te llamemos" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="email">Correo electronico</label>
-                    <input type="email" id="email" name="email" autocomplete="email" inputmode="email" placeholder="tucorreo@ejemplo.com" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="password">Contrasena</label>
-                    <input type="password" id="password" name="password" autocomplete="new-password" placeholder="Minimo 6 caracteres" minlength="6" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="confirm-password">Confirmar contrasena</label>
-                    <input type="password" id="confirm-password" name="confirm-password" autocomplete="new-password" placeholder="Repite tu contrasena" minlength="6" required>
-                </div>
-
-                <div class="form-actions">
-                    <button type="submit" class="button button--primary button--full">Crear cuenta</button>
-                </div>
-            </form>
-
-            <div class="auth-footer reveal reveal--up" style="transition-delay: 0.5s;">
-                <p>Ya tienes cuenta? <a href="login.html">Inicia sesion</a></p>
-            </div>
+      <div class="auth-card panel float">
+        <div class="auth-header reveal reveal--up" style="transition-delay: 0.1s">
+          <a href="index.html" class="auth-logo" aria-label="Volver al inicio">
+            <img src="assets/img/logo.svg" alt="Kyrbi" width="60" height="60" />
+          </a>
+          <h1>Crea tu cuenta</h1>
+          <p>Activa historial, memoria y configuración personal en Kyrbi.</p>
         </div>
+
+        <div id="error-message" class="auth-error" style="display: none"></div>
+
+        <div class="social-login reveal reveal--up" style="transition-delay: 0.2s">
+          <button type="button" class="button button--social social-google" data-oauth-provider="google">
+            <i class="fab fa-google" aria-hidden="true"></i>
+            Registrarme con Google
+          </button>
+          <button type="button" class="button button--social social-google" data-oauth-provider="gmail">
+            <i class="fas fa-envelope" aria-hidden="true"></i>
+            Registrarme con Gmail
+          </button>
+          <button type="button" class="button button--social social-facebook" data-oauth-provider="facebook">
+            <i class="fab fa-facebook-f" aria-hidden="true"></i>
+            Registrarme con Facebook
+          </button>
+        </div>
+
+        <div class="divider reveal reveal--up" style="transition-delay: 0.3s">
+          <span>o con tu correo</span>
+        </div>
+
+        <form id="register-form" class="auth-form reveal reveal--up" style="transition-delay: 0.4s">
+          <div class="form-group">
+            <label for="username">Nombre de usuario</label>
+            <input type="text" id="username" name="username" autocomplete="username" maxlength="40" placeholder="¿Cómo quieres que te llamemos?" required />
+          </div>
+
+          <div class="form-group">
+            <label for="email">Correo electrónico</label>
+            <input type="email" id="email" name="email" autocomplete="email" inputmode="email" placeholder="tucorreo@ejemplo.com" required />
+          </div>
+
+          <div class="form-group">
+            <label for="password">Contraseña</label>
+            <input type="password" id="password" name="password" autocomplete="new-password" placeholder="Mínimo 6 caracteres" minlength="6" required />
+          </div>
+
+          <div class="form-group">
+            <label for="confirm-password">Confirmar contraseña</label>
+            <input
+              type="password"
+              id="confirm-password"
+              name="confirm-password"
+              autocomplete="new-password"
+              placeholder="Repite tu contraseña"
+              minlength="6"
+              required
+            />
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="button button--primary button--full">Crear cuenta</button>
+          </div>
+        </form>
+
+        <div class="auth-footer reveal reveal--up" style="transition-delay: 0.5s">
+          <p>¿Ya tienes cuenta? <a href="login.html">Inicia sesión</a></p>
+        </div>
+      </div>
     </div>
 
     <div class="toast-container" id="toast-container" aria-live="polite" aria-atomic="true"></div>
@@ -83,9 +94,5 @@
     <script src="assets/js/api.js"></script>
     <script src="assets/js/auth.js"></script>
     <script src="assets/js/ui-enhancements.js" defer></script>
-    <script>
-      const savedTheme = localStorage.getItem("theme") || "light";
-      document.documentElement.setAttribute("data-theme", savedTheme);
-    </script>
-</body>
+  </body>
 </html>

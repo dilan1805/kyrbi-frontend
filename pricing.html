@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pricing | Kyrbi</title>
+    <meta name="description" content="Planes de Kyrbi para uso educativo individual e institucional." />
+    <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="assets/css/styles.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <nav class="nav" aria-label="Navegación principal">
+        <div class="nav__inner">
+          <a class="brand" href="index.html"><img src="assets/img/logo.svg" alt="Kyrbi" width="40" height="40" /><span class="sr-only">Kyrbi</span></a>
+          <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Menú">
+            <span class="nav__toggle-lines" aria-hidden="true"></span><span class="nav__toggle-lines" aria-hidden="true"></span><span class="nav__toggle-lines" aria-hidden="true"></span>
+          </button>
+          <div class="nav__links" id="nav-links">
+            <a class="nav__link" href="index.html">Inicio</a>
+            <a class="nav__link" href="assistant.html">Kyrbi IA</a>
+            <a class="nav__link" href="pricing.html">Pricing</a>
+            <a class="nav__link" href="contact.html">Contacto</a>
+            <div class="nav__auth" id="nav-auth">
+              <a href="login.html" class="button button--ghost button--sm">Entrar</a>
+              <a href="register.html" class="button button--primary button--sm">Crear cuenta</a>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="app-main">
+      <section class="section">
+        <div class="container">
+          <div class="section__head">
+            <h1 class="section__title">Pricing</h1>
+            <p class="section__lead">Modelo flexible para uso educativo individual, equipos y programas institucionales.</p>
+          </div>
+          <div class="grid-cards">
+            <article class="card">
+              <h2 class="card__title">Free Educativo</h2>
+              <p class="card__text"><strong>$0 MXN</strong> / mes</p>
+              <ul class="card__text">
+                <li>Chat autenticado con historial básico.</li>
+                <li>Memoria de conversación en cuenta.</li>
+                <li>Soporte comunitario.</li>
+              </ul>
+              <a class="button button--primary button--full" href="register.html">Comenzar gratis</a>
+            </article>
+            <article class="card">
+              <h2 class="card__title">Pro Estudiantil</h2>
+              <p class="card__text"><strong>$149 MXN</strong> / mes</p>
+              <ul class="card__text">
+                <li>Historial extendido y organización avanzada.</li>
+                <li>Prioridad de respuesta y nuevas funciones tempranas.</li>
+                <li>Soporte por correo.</li>
+              </ul>
+              <a class="button button--secondary button--full" href="contact.html">Solicitar activación</a>
+            </article>
+            <article class="card">
+              <h2 class="card__title">Institucional</h2>
+              <p class="card__text"><strong>Precio bajo cotización</strong></p>
+              <ul class="card__text">
+                <li>Panel multiusuario para escuelas/programas.</li>
+                <li>Políticas de seguridad y acompañamiento técnico.</li>
+                <li>Acuerdo de servicio (SLA) personalizado.</li>
+              </ul>
+              <a class="button button--ghost button--full" href="contact.html">Hablar con ventas</a>
+            </article>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="container footer__grid">
+        <div class="footer__block">
+          <h3 class="footer__title">Recursos</h3>
+          <ul class="footer__list">
+            <li><a href="status.html" class="footer__link">Status</a></li>
+            <li><a href="roadmap.html" class="footer__link">Roadmap</a></li>
+            <li><a href="changelog.html" class="footer__link">Changelog</a></li>
+          </ul>
+        </div>
+        <div class="footer__block">
+          <h3 class="footer__title">Legal</h3>
+          <ul class="footer__list">
+            <li><a href="privacy.html" class="footer__link">Privacy</a></li>
+            <li><a href="terms.html" class="footer__link">Terms</a></li>
+            <li><a href="seguridad.html" class="footer__link">Security</a></li>
+          </ul>
+        </div>
+        <div class="footer__bottom"><p class="footer__fineprint">© <span id="year"></span> Kyrbi.</p></div>
+      </div>
+    </footer>
+
+    <script src="assets/js/config.js" defer></script>
+    <script src="assets/js/api.js" defer></script>
+    <script src="assets/js/app.js" defer></script>
+    <script src="assets/js/ui-enhancements.js" defer></script>
+  </body>
+</html>

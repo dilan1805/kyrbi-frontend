@@ -1,4 +1,4 @@
-/* ==========================================================================
+﻿/* ==========================================================================
    Cliente API para comunicarse con el backend de Kyrbi
    ========================================================================== */
 
@@ -18,9 +18,7 @@ if (!window.API_CONFIG) {
     fallbackBaseURL,
     endpoints: {
       chat: "/api/chat",
-      chatPublic: "/api/chat/public",
       history: "/api/chat/history",
-      historyPublic: "/api/chat/public/history",
       memory: "/api/chat/memory",
       login: "/api/auth/login",
       register: "/api/auth/register",
@@ -35,6 +33,8 @@ if (!window.API_CONFIG) {
       requestReset: "/api/auth/password/reset/request",
       confirmReset: "/api/auth/password/reset/confirm",
       verify2FA: "/api/auth/login/verify-2fa",
+      meta: "/api/meta",
+      health: "/health",
     },
     timeout: 30000,
   };
@@ -53,6 +53,12 @@ if (!window.KyrbiAPI) {
 
     isAuthenticated() {
       return Boolean(this.token);
+    }
+
+    requireAuth() {
+      if (!this.token) {
+        throw new Error("Debes iniciar sesión o crear una cuenta para usar Kyrbi.");
+      }
     }
 
     getHeaders() {
@@ -102,19 +108,25 @@ if (!window.KyrbiAPI) {
         const options = {
           method,
           headers: this.getHeaders(),
+          credentials: "include",
         };
         if (body) options.body = JSON.stringify(body);
 
         try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), window.API_CONFIG.timeout || 30000);
+          options.signal = controller.signal;
+
           const response = await fetch(url, options);
+          clearTimeout(timeoutId);
+
           const payload = await response.json().catch(() => ({}));
 
           if (!response.ok) {
             if (i < bases.length - 1 && this.shouldRetryStatus(response.status)) {
               continue;
             }
-            const errorData = payload || {};
-            throw new Error(errorData.error || `Error del servidor: ${response.status}`);
+            throw new Error(payload?.error || `Error del servidor: ${response.status}`);
           }
 
           if (base !== String(window.API_CONFIG.baseURL || "").replace(/\/+$/, "")) {
@@ -201,52 +213,59 @@ if (!window.KyrbiAPI) {
     }
 
     async getHistory() {
-      if (!this.token) {
-        const url = `${window.API_CONFIG.endpoints.historyPublic}?sessionId=${encodeURIComponent(this.sessionId)}`;
-        return this.request(url, "GET");
-      }
+      this.requireAuth();
       return this.request(window.API_CONFIG.endpoints.history, "GET");
     }
 
     async getConversation(id) {
-      if (!this.token) {
-        const url = `${window.API_CONFIG.endpoints.historyPublic}/${id}?sessionId=${encodeURIComponent(this.sessionId)}`;
-        return this.request(url, "GET");
-      }
+      this.requireAuth();
       return this.request(`${window.API_CONFIG.endpoints.history}/${id}`, "GET");
     }
 
+    async updateConversation(id, payload = {}) {
+      this.requireAuth();
+      return this.request(`${window.API_CONFIG.endpoints.history}/${id}`, "PATCH", payload);
+    }
+
+    async deleteConversation(id) {
+      this.requireAuth();
+      return this.request(`${window.API_CONFIG.endpoints.history}/${id}`, "DELETE");
+    }
+
     async getConversationMemory(id) {
-      if (!this.token || !id) return { summary: "" };
+      this.requireAuth();
+      if (!id) return { summary: "" };
       return this.request(`${window.API_CONFIG.endpoints.memory}/${id}`, "GET");
     }
 
     async getMe() {
-      if (!this.token) return null;
+      this.requireAuth();
       return this.request(window.API_CONFIG.endpoints.me, "GET");
     }
 
     async updatePreferences(preferences = {}) {
-      if (!this.token) return null;
+      this.requireAuth();
       return this.request(window.API_CONFIG.endpoints.preferences, "PUT", { preferences });
     }
 
+    async getMeta() {
+      return this.request(window.API_CONFIG.endpoints.meta, "GET");
+    }
+
+    async getHealth() {
+      return this.request(window.API_CONFIG.endpoints.health, "GET");
+    }
+
     async sendMessage(message, mode = "general", conversationId = null) {
+      this.requireAuth();
+
       const body = {
-        message: message.trim(),
+        message: String(message || "").trim(),
         mode,
         conversationId,
       };
 
-      let response;
-      if (this.token) {
-        response = await this.request(window.API_CONFIG.endpoints.chat, "POST", body);
-      } else {
-        response = await this.request(window.API_CONFIG.endpoints.chatPublic, "POST", {
-          ...body,
-          sessionId: this.sessionId,
-        });
-      }
+      const response = await this.request(window.API_CONFIG.endpoints.chat, "POST", body);
 
       return {
         text: response.content || response.text || "Lo siento, no pude generar una respuesta.",

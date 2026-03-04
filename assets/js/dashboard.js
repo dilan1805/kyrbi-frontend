@@ -1,50 +1,98 @@
 document.addEventListener("DOMContentLoaded", async () => {
-  const userStr = localStorage.getItem("kyrbi_user");
-  if (!userStr) {
+  const token = localStorage.getItem("kyrbi_token") || sessionStorage.getItem("kyrbi_token");
+  if (!token) {
     window.location.href = "login.html";
     return;
   }
 
-  const user = JSON.parse(userStr);
-  const welcomeMsg = document.getElementById("welcomeMsg");
-  if (welcomeMsg) welcomeMsg.textContent = `Hola, ${user.username || "Estudiante"}`;
-
+  const welcomeEl = document.getElementById("welcomeMsg");
   const statusEl = document.getElementById("securityStatus");
   const toggle2faBtn = document.getElementById("toggle2faBtn");
   const resendVerifyBtn = document.getElementById("resendVerifyBtn");
   const linkedAccountsEl = document.getElementById("linkedAccounts");
+  const conversationsCountEl = document.getElementById("conversationsCount");
+  const activityListEl = document.getElementById("activityList");
+  const kpiUsersEl = document.getElementById("kpiUsers");
+  const kpiUptimeEl = document.getElementById("kpiUptime");
+  const kpiSlaEl = document.getElementById("kpiSla");
 
-  try {
-    const freshUser = await window.KyrbiAPI.request("/api/auth/me", "GET");
-    Object.assign(user, freshUser);
-    localStorage.setItem("kyrbi_user", JSON.stringify(user));
-  } catch (e) {
-    console.error("Could not refresh user data", e);
-  }
+  const providers = [
+    { id: "google", name: "Google", icon: "fa-brands fa-google", colorClass: "account-provider--google" },
+    { id: "facebook", name: "Facebook", icon: "fa-brands fa-facebook-f", colorClass: "account-provider--facebook" },
+    { id: "github", name: "GitHub", icon: "fa-brands fa-github", colorClass: "account-provider--github" },
+    { id: "microsoft", name: "Microsoft", icon: "fa-brands fa-microsoft", colorClass: "account-provider--microsoft" },
+  ];
+
+  let user = null;
+
+  const mapModeLabel = (mode) => {
+    const normalized = String(mode || "").toLowerCase();
+    if (normalized === "guia" || normalized === "general") return "Guía general";
+    if (normalized === "chef") return "Chef";
+    if (normalized === "coach") return "Coach";
+    if (normalized === "descanso") return "Descanso";
+    return "General";
+  };
+
+  const formatDateTime = (value) => {
+    try {
+      return new Date(value).toLocaleDateString("es-MX", {
+        day: "2-digit",
+        month: "short",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    } catch {
+      return "";
+    }
+  };
+
+  const createActivityItem = (conversation) => {
+    const item = document.createElement("article");
+    item.className = "activity-item";
+    item.innerHTML = `
+      <div class="activity-icon activity-icon--chat" aria-hidden="true">
+        <i class="fa-regular fa-comment-dots"></i>
+      </div>
+      <div class="activity-details activity-details--fill">
+        <h4>${conversation.title || "Conversación sin título"}</h4>
+        <span>${formatDateTime(conversation.updatedAt)} · ${mapModeLabel(conversation.mode)}</span>
+      </div>
+      <a href="assistant.html?id=${encodeURIComponent(conversation.id)}" class="button button--ghost button--sm">Ver</a>
+    `;
+    return item;
+  };
+
+  const renderActivity = (history) => {
+    if (!activityListEl) return;
+    activityListEl.innerHTML = "";
+    if (!Array.isArray(history) || history.length === 0) {
+      activityListEl.innerHTML =
+        '<div class="activity-item activity-item--empty">Aún no hay actividad reciente. Inicia una conversación con Kyrbi.</div>';
+      return;
+    }
+    history.slice(0, 6).forEach((conversation) => {
+      activityListEl.appendChild(createActivityItem(conversation));
+    });
+  };
 
   const renderLinkedAccounts = () => {
-    if (!linkedAccountsEl) return;
-
-    const providers = [
-      { id: "google", name: "Google", icon: "fab fa-google", color: "#DB4437" },
-      { id: "facebook", name: "Facebook", icon: "fab fa-facebook-f", color: "#4267B2" },
-      { id: "github", name: "GitHub", icon: "fab fa-github", color: "#333" },
-      { id: "microsoft", name: "Microsoft", icon: "fab fa-microsoft", color: "#00A4EF" },
-    ];
-
+    if (!linkedAccountsEl || !user) return;
     linkedAccountsEl.innerHTML = providers
       .map((provider) => {
-        const isLinked = !!user[`${provider.id}Id`];
+        const linked = Boolean(user?.[`${provider.id}Id`]);
         return `
-          <div class="account-card ${isLinked ? "linked" : ""}">
+          <div class="account-card ${linked ? "is-linked" : ""}">
             <div class="account-info">
-              <i class="${provider.icon}" style="color: ${provider.color}"></i>
-              ${provider.name}
+              <span class="account-icon ${provider.colorClass}" aria-hidden="true">
+                <i class="${provider.icon}"></i>
+              </span>
+              <span>${provider.name}</span>
             </div>
             ${
-              isLinked
-                ? '<span class="account-status"><i class="fas fa-check"></i> Conectado</span>'
-                : `<button class="btn-link" onclick="linkAccount('${provider.id}')">Conectar</button>`
+              linked
+                ? '<span class="account-status"><i class="fa-solid fa-check"></i> Conectado</span>'
+                : `<button class="button button--ghost button--sm" data-link-provider="${provider.id}">Conectar</button>`
             }
           </div>
         `;
@@ -52,99 +100,120 @@ document.addEventListener("DOMContentLoaded", async () => {
       .join("");
   };
 
-  window.linkAccount = (provider) => {
-    const token = localStorage.getItem("kyrbi_token") || sessionStorage.getItem("kyrbi_token");
-    if (!token) return alert("Error de sesion");
-    window.location.href = `/api/auth/${provider}?token=${token}`;
-  };
-
-  renderLinkedAccounts();
-
   const updateSecurityStatus = () => {
-    const verified = user.emailVerified ? "verificado" : "no verificado";
-    const twofa = user.twoFactorEnabled ? "activado" : "desactivado";
-    if (statusEl) statusEl.textContent = `Correo: ${verified} • 2FA: ${twofa}`;
+    if (!user) return;
+    const emailStatus = user.emailVerified ? "verificado" : "pendiente";
+    const twoFaStatus = user.twoFactorEnabled ? "activado" : "desactivado";
+    if (statusEl) statusEl.textContent = `Correo: ${emailStatus} · 2FA: ${twoFaStatus}`;
     if (toggle2faBtn) toggle2faBtn.textContent = user.twoFactorEnabled ? "Desactivar 2FA" : "Activar 2FA";
-    if (user.emailVerified && resendVerifyBtn) resendVerifyBtn.style.display = "none";
+    if (resendVerifyBtn) resendVerifyBtn.hidden = Boolean(user.emailVerified);
   };
 
-  updateSecurityStatus();
-
-  resendVerifyBtn?.addEventListener("click", async () => {
+  const renderMetaKpis = async () => {
     try {
-      await window.KyrbiAPI.resendVerificationEmail();
-      alert("Correo de verificacion reenviado");
-    } catch (e) {
-      alert(`No se pudo reenviar el correo: ${e.message}`);
+      const [meta, health] = await Promise.all([
+        window.KyrbiAPI.getMeta?.() || Promise.resolve(null),
+        window.KyrbiAPI.getHealth?.() || Promise.resolve(null),
+      ]);
+      if (kpiUsersEl) kpiUsersEl.textContent = String(meta?.metrics?.registeredUsers ?? "N/D");
+      if (kpiUptimeEl) kpiUptimeEl.textContent = String(meta?.metrics?.uptime ?? health?.uptime ?? "99.9%");
+      if (kpiSlaEl) kpiSlaEl.textContent = String(meta?.metrics?.sla ?? "99.5%");
+    } catch {
+      if (kpiUsersEl) kpiUsersEl.textContent = "N/D";
+      if (kpiUptimeEl) kpiUptimeEl.textContent = "N/D";
+      if (kpiSlaEl) kpiSlaEl.textContent = "N/D";
     }
-  });
+  };
 
-  toggle2faBtn?.addEventListener("click", async () => {
-    if (user.twoFactorEnabled) {
-      if (confirm("Seguro que quieres desactivar 2FA?")) {
+  const bindLinkedAccounts = () => {
+    linkedAccountsEl?.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      const button = target.closest("[data-link-provider]");
+      const provider = button?.getAttribute("data-link-provider");
+      if (!provider) return;
+      const jwt = localStorage.getItem("kyrbi_token") || sessionStorage.getItem("kyrbi_token");
+      const query = jwt ? `?token=${encodeURIComponent(jwt)}` : "";
+      const baseURL = String(window.API_CONFIG?.baseURL || window.location.origin).replace(/\/+$/, "");
+      window.location.href = `${baseURL}/api/auth/${provider}${query}`;
+    });
+  };
+
+  const bindSecurityActions = () => {
+    resendVerifyBtn?.addEventListener("click", async () => {
+      try {
+        await window.KyrbiAPI.resendVerificationEmail(user?.email || null);
+        window.alert("Correo de verificación reenviado.");
+      } catch (error) {
+        window.alert(`No se pudo reenviar el correo: ${error?.message || "error"}`);
+      }
+    });
+
+    toggle2faBtn?.addEventListener("click", async () => {
+      if (!user) return;
+      if (user.twoFactorEnabled) {
+        const ok = window.confirm("¿Seguro que quieres desactivar 2FA?");
+        if (!ok) return;
         try {
           await window.KyrbiAPI.disable2FA();
           user.twoFactorEnabled = false;
           localStorage.setItem("kyrbi_user", JSON.stringify(user));
           updateSecurityStatus();
-          alert("2FA desactivado");
-        } catch (e) {
-          alert(`Error: ${e.message}`);
+          window.alert("2FA desactivado.");
+        } catch (error) {
+          window.alert(`No se pudo desactivar 2FA: ${error?.message || "error"}`);
         }
+        return;
       }
-      return;
-    }
 
-    try {
-      const data = await window.KyrbiAPI.setup2FA();
-      show2FAModal(data.qrCode, data.secret);
-    } catch (e) {
-      alert(`Error iniciando 2FA: ${e.message}`);
-    }
-  });
+      try {
+        const setup = await window.KyrbiAPI.setup2FA();
+        show2FAModal(setup?.qrCode, setup?.secret, async (code) => {
+          await window.KyrbiAPI.verify2FASetup(code);
+          user.twoFactorEnabled = true;
+          localStorage.setItem("kyrbi_user", JSON.stringify(user));
+          updateSecurityStatus();
+        });
+      } catch (error) {
+        window.alert(`No se pudo iniciar 2FA: ${error?.message || "error"}`);
+      }
+    });
+  };
+
+  try {
+    user = await window.KyrbiAPI.getMe();
+    localStorage.setItem("kyrbi_user", JSON.stringify(user));
+  } catch (error) {
+    console.error("No se pudo cargar el perfil:", error);
+    window.location.href = "login.html";
+    return;
+  }
+
+  if (welcomeEl) {
+    welcomeEl.textContent = `Hola, ${user?.username || "equipo"}`;
+  }
+
+  updateSecurityStatus();
+  renderLinkedAccounts();
+  bindLinkedAccounts();
+  bindSecurityActions();
 
   try {
     const history = await window.KyrbiAPI.getHistory();
-    const countEl = document.getElementById("conversationsCount");
-    if (countEl) countEl.textContent = history.length;
-
-    const listContainer = document.getElementById("activityList");
-    if (!listContainer) return;
-
-    listContainer.innerHTML = "";
-
-    if (history.length === 0) {
-      listContainer.innerHTML =
-        '<div class="activity-item activity-item--empty">No hay actividad reciente. Habla con Kyrbi.</div>';
-      return;
-    }
-
-    history.slice(0, 5).forEach((conv) => {
-      const date = new Date(conv.updatedAt).toLocaleDateString("es-ES", {
-        day: "numeric",
-        month: "short",
-        hour: "2-digit",
-        minute: "2-digit",
-      });
-
-      const item = document.createElement("div");
-      item.className = "activity-item";
-      item.innerHTML = `
-        <div class="activity-icon">💬</div>
-        <div class="activity-details activity-details--fill">
-          <h4>${conv.title || "Conversacion sin titulo"}</h4>
-          <span>${date} • Modo ${conv.mode}</span>
-        </div>
-        <a href="assistant.html?id=${conv.id}" class="button button--ghost button--sm">Ver</a>
-      `;
-      listContainer.appendChild(item);
-    });
+    if (conversationsCountEl) conversationsCountEl.textContent = String(history.length);
+    renderActivity(history);
   } catch (error) {
-    console.error("Error cargando historial:", error);
+    console.error("No se pudo cargar historial:", error);
+    if (activityListEl) {
+      activityListEl.innerHTML =
+        '<div class="activity-item activity-item--empty">No se pudo cargar la actividad. Intenta de nuevo.</div>';
+    }
   }
+
+  await renderMetaKpis();
 });
 
-function show2FAModal(qrUrl, secret) {
+function show2FAModal(qrUrl, secret, onConfirm) {
   let modal = document.getElementById("modal-2fa");
   if (!modal) {
     modal = document.createElement("div");
@@ -152,62 +221,64 @@ function show2FAModal(qrUrl, secret) {
     modal.className = "modal-inline";
     modal.innerHTML = `
       <div class="modal-inline__content">
-        <button type="button" class="modal-inline__close close-modal" aria-label="Cerrar">&times;</button>
-        <h2>Configurar Autenticacion de Dos Factores</h2>
-        <p>Escanea este codigo QR con tu aplicacion de autenticacion (Google Authenticator, Authy, etc.):</p>
+        <button type="button" class="modal-inline__close" aria-label="Cerrar">×</button>
+        <h2>Configurar autenticación de dos factores</h2>
+        <p>Escanea este código QR en tu app de autenticación.</p>
         <div class="modal-inline__qr-wrap">
-          <img id="qr-img" class="modal-inline__qr" src="" alt="QR Code">
-          <p>O ingresa este secreto manualmente: <br><strong id="secret-text" class="modal-inline__secret"></strong></p>
+          <img id="qr-img" class="modal-inline__qr" src="" alt="Código QR para 2FA">
+          <p>O usa esta clave manual: <strong id="secret-text" class="modal-inline__secret"></strong></p>
         </div>
         <div class="form-group">
-          <label>Ingresa el codigo de 6 digitos:</label>
+          <label for="verify-2fa-code">Código de 6 dígitos</label>
           <input type="text" id="verify-2fa-code" class="form-input modal-inline__input" placeholder="000000" maxlength="6">
         </div>
-        <button id="confirm-2fa-btn" class="button button--primary modal-inline__button">Verificar y Activar</button>
+        <button id="confirm-2fa-btn" class="button button--primary modal-inline__button">Verificar y activar</button>
       </div>
     `;
     document.body.appendChild(modal);
-
-    modal.querySelector(".close-modal").onclick = () => {
-      modal.style.display = "none";
-    };
-
-    modal.querySelector("#confirm-2fa-btn").onclick = async () => {
-      const codeInput = document.getElementById("verify-2fa-code");
-      const code = codeInput.value.trim();
-      if (!code) return;
-
-      const btn = document.getElementById("confirm-2fa-btn");
-      btn.disabled = true;
-      btn.textContent = "Verificando...";
-
-      try {
-        await window.KyrbiAPI.verify2FASetup(code);
-        const user = JSON.parse(localStorage.getItem("kyrbi_user"));
-        user.twoFactorEnabled = true;
-        localStorage.setItem("kyrbi_user", JSON.stringify(user));
-
-        document.getElementById("securityStatus").textContent = `Correo: ${
-          user.emailVerified ? "verificado" : "no verificado"
-        } • 2FA: activado`;
-        document.getElementById("toggle2faBtn").textContent = "Desactivar 2FA";
-
-        modal.style.display = "none";
-        alert("2FA activado correctamente");
-      } catch (e) {
-        alert(`Codigo incorrecto o error: ${e.message}`);
-        btn.disabled = false;
-        btn.textContent = "Verificar y Activar";
-      }
-    };
   }
 
-  document.getElementById("qr-img").src = qrUrl;
-  document.getElementById("secret-text").textContent = secret;
-  document.getElementById("verify-2fa-code").value = "";
-  const btn = document.getElementById("confirm-2fa-btn");
-  btn.disabled = false;
-  btn.textContent = "Verificar y Activar";
+  const close = () => {
+    modal.classList.remove("is-open");
+  };
 
-  modal.style.display = "block";
+  modal.querySelector(".modal-inline__close")?.addEventListener("click", close, { once: true });
+  modal.addEventListener("click", (event) => {
+    if (event.target === modal) close();
+  });
+
+  const qrImage = document.getElementById("qr-img");
+  const secretText = document.getElementById("secret-text");
+  const codeInput = document.getElementById("verify-2fa-code");
+  const confirmButton = document.getElementById("confirm-2fa-btn");
+
+  if (qrImage) qrImage.src = qrUrl || "";
+  if (secretText) secretText.textContent = secret || "";
+  if (codeInput) codeInput.value = "";
+  if (confirmButton) {
+    confirmButton.disabled = false;
+    confirmButton.textContent = "Verificar y activar";
+  }
+
+  confirmButton?.addEventListener(
+    "click",
+    async () => {
+      const code = String(codeInput?.value || "").trim();
+      if (!code) return;
+      confirmButton.disabled = true;
+      confirmButton.textContent = "Verificando...";
+      try {
+        await onConfirm(code);
+        window.alert("2FA activado correctamente.");
+        close();
+      } catch (error) {
+        window.alert(`Código inválido o error: ${error?.message || "error"}`);
+        confirmButton.disabled = false;
+        confirmButton.textContent = "Verificar y activar";
+      }
+    },
+    { once: true }
+  );
+
+  modal.classList.add("is-open");
 }

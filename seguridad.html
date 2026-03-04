@@ -3,139 +3,98 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="color-scheme" content="light" />
-
-    <title>Seguridad y privacidad | Ciencias para vivir mejor</title>
+    <meta name="color-scheme" content="light dark" />
+    <title>Seguridad | Kyrbi</title>
     <meta
       name="description"
-      content="Política de seguridad y privacidad del proyecto Ciencias para vivir mejor. Protección de datos y uso educativo."
+      content="Compromisos de seguridad y uso responsable de Kyrbi: autenticación, protección de datos y enfoque educativo."
     />
 
     <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
-    
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
-    
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
     <link rel="stylesheet" href="assets/css/styles.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
   </head>
 
   <body>
-    <a class="skip-link" href="#contenido">Saltar al contenido</a>
-
     <header class="app-header" id="top">
       <nav class="nav" aria-label="Navegación principal">
         <div class="nav__inner">
           <a class="brand" href="index.html" aria-label="Ir al inicio">
-            <img src="assets/img/logo.svg" alt="Logo Ciencias para vivir mejor" width="40" height="40">
-            <span class="brand__text sr-only">Ciencias para vivir mejor</span>
+            <img src="assets/img/logo.svg" alt="Logo de Kyrbi" width="40" height="40" />
+            <span class="brand__text sr-only">Kyrbi</span>
           </a>
-
-          <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Menu">
+          <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Menú">
             <span class="nav__toggle-lines" aria-hidden="true"></span>
             <span class="nav__toggle-lines" aria-hidden="true"></span>
             <span class="nav__toggle-lines" aria-hidden="true"></span>
           </button>
-
           <div class="nav__links" id="nav-links">
             <a class="nav__link" href="index.html" data-nav="index">Inicio</a>
             <a class="nav__link" href="assistant.html" data-nav="assistant">Kyrbi IA</a>
             <a class="nav__link" href="habitos.html" data-nav="habitos">Hábitos</a>
-            <a class="nav__link" href="equipo.html" data-nav="equipo">Equipo</a>
-            
+            <a class="nav__link" href="seguridad.html" data-nav="seguridad">Seguridad</a>
+            <a class="nav__link" href="status.html">Status</a>
             <div class="nav__auth" id="nav-auth">
               <a href="login.html" class="button button--ghost button--sm">Entrar</a>
-              <a href="register.html" class="button button--primary button--sm">Registro</a>
+              <a href="register.html" class="button button--primary button--sm">Crear cuenta</a>
             </div>
           </div>
         </div>
       </nav>
     </header>
 
-    <main class="app-main" id="contenido">
+    <main class="app-main">
       <section class="section security reveal reveal--up" aria-label="Seguridad y privacidad">
         <div class="container">
-          <div class="section__head reveal reveal--left">
-            <h1 class="section__title">Seguridad y privacidad</h1>
+          <div class="section__head">
+            <h1 class="section__title">Seguridad y uso responsable</h1>
             <p class="section__lead">
-              Compromiso con la protección de datos y uso responsable. Este proyecto es educativo y no recopila información personal.
+              Kyrbi es un proyecto educativo con prácticas de producto profesional para proteger acceso, continuidad y trazabilidad.
             </p>
           </div>
 
           <div class="grid-cards">
-            <article class="card reveal reveal--up" style="transition-delay: 0.1s;">
-              <div class="card__icon" aria-hidden="true">🔒</div>
-              <h2 class="card__title">Proteccion de datos personales</h2>
+            <article class="card reveal reveal--up">
+              <div class="card__icon" aria-hidden="true"><i class="fa-solid fa-user-lock"></i></div>
+              <h2 class="card__title">Acceso con cuenta</h2>
               <p class="card__text">
-                La aplicacion minimiza datos personales y solo usa los necesarios para autenticar cuenta y guardar continuidad de chat.
+                El chat principal requiere autenticación. Historial y memoria se habilitan solo para usuarios registrados.
               </p>
             </article>
 
-            <article class="card reveal reveal--up" style="transition-delay: 0.2s;">
-              <div class="card__icon" aria-hidden="true">💬</div>
-              <h2 class="card__title">Guardado de conversaciones</h2>
+            <article class="card reveal reveal--up">
+              <div class="card__icon" aria-hidden="true"><i class="fa-solid fa-shield-halved"></i></div>
+              <h2 class="card__title">Protección técnica</h2>
               <p class="card__text">
-                Si inicias sesion, tus conversaciones se guardan en tu cuenta para continuidad. Si usas modo invitado, se guarda solo en sesion local del navegador.
+                Implementamos rate limits, controles de seguridad HTTP, validación de payloads y monitoreo de errores.
               </p>
             </article>
 
-            <article class="card reveal reveal--up" style="transition-delay: 0.3s;">
-              <div class="card__icon" aria-hidden="true">📖</div>
-              <h2 class="card__title">Uso educativo y general</h2>
+            <article class="card reveal reveal--up">
+              <div class="card__icon" aria-hidden="true"><i class="fa-solid fa-stethoscope"></i></div>
+              <h2 class="card__title">Alcance educativo</h2>
               <p class="card__text">
-                Este proyecto está diseñado exclusivamente para fines educativos. El contenido proporcionado es orientación general sobre hábitos saludables, no constituye consejo médico profesional.
-              </p>
-            </article>
-
-            <article class="card reveal reveal--up" style="transition-delay: 0.4s;">
-              <div class="card__icon" aria-hidden="true">⚕️</div>
-              <h2 class="card__title">El asistente no sustituye a un médico</h2>
-              <p class="card__text">
-                Kyrbi ofrece información educativa sobre hábitos saludables. No realiza diagnósticos, no prescribe tratamientos y no sustituye la consulta con profesionales de la salud. Si tienes síntomas o preocupaciones médicas, consulta con un adulto responsable y un profesional.
-              </p>
-            </article>
-
-            <article class="card reveal reveal--up" style="transition-delay: 0.5s;">
-              <div class="card__icon" aria-hidden="true">🌐</div>
-              <h2 class="card__title">Tecnología utilizada</h2>
-              <p class="card__text">
-                La aplicación utiliza HTML, CSS y JavaScript estándar. No requiere conexión a internet para funcionar (excepto para cargar la página inicial). No utiliza cookies de seguimiento ni servicios de análisis de terceros.
-              </p>
-            </article>
-
-            <article class="card reveal reveal--up" style="transition-delay: 0.6s;">
-              <div class="card__icon" aria-hidden="true">👥</div>
-              <h2 class="card__title">Responsabilidad del usuario</h2>
-              <p class="card__text">
-                Los usuarios son responsables de usar la información de manera apropiada. Se recomienda consultar con padres, tutores o profesionales de la salud antes de realizar cambios significativos en hábitos alimentarios, de ejercicio o de sueño.
+                Kyrbi brinda orientación general sobre hábitos saludables y no reemplaza la consulta con profesionales de la salud.
               </p>
             </article>
           </div>
 
-          <div class="habits__cta reveal reveal--up" style="margin-top: 32px; transition-delay: 0.7s;">
-            <div class="card card--soft habits__cta-card">
-              <h2 class="card__title">Preguntas frecuentes</h2>
-              <div style="margin-top: 14px;">
-                <p class="card__text" style="margin-bottom: 12px;">
-                  <strong>¿La aplicación guarda mis conversaciones?</strong><br>
-                  No. Las conversaciones se almacenan solo en la memoria temporal del navegador (sessionStorage) y se eliminan al cerrar la sesión.
-                </p>
-                <p class="card__text" style="margin-bottom: 12px;">
-                  <strong>¿Necesito crear una cuenta?</strong><br>
-                  No. La aplicación no requiere registro ni autenticación. Funciona de forma anónima.
-                </p>
-                <p class="card__text" style="margin-bottom: 12px;">
-                  <strong>¿Puedo confiar en las recomendaciones de Kyrbi?</strong><br>
-                  Kyrbi proporciona orientación educativa general. Para decisiones importantes sobre salud, siempre consulta con un profesional.
-                </p>
-                <p class="card__text">
-                  <strong>¿La aplicación funciona sin internet?</strong><br>
-                  Una vez cargada, la aplicación puede funcionar sin conexión. Sin embargo, necesitas internet para cargar la página inicial.
-                </p>
-              </div>
-            </div>
-          </div>
+          <article class="card reveal reveal--up">
+            <h2 class="card__title">Preguntas frecuentes</h2>
+            <ul class="card__text">
+              <li><strong>¿Kyrbi sustituye atención médica?</strong> No. Es una herramienta de orientación educativa.</li>
+              <li><strong>¿Qué datos se guardan?</strong> Conversaciones de cuenta y preferencias para continuidad del servicio.</li>
+              <li><strong>¿Puedo eliminar conversaciones?</strong> Sí, desde el historial en el asistente.</li>
+              <li><strong>¿Dónde veo disponibilidad?</strong> En la página <a href="status.html">Status</a>.</li>
+            </ul>
+          </article>
         </div>
       </section>
     </main>
@@ -143,28 +102,23 @@
     <footer class="footer" aria-label="Pie de página">
       <div class="container footer__grid">
         <div class="footer__block">
-          <h3 class="footer__title">Seguridad y privacidad</h3>
+          <h3 class="footer__title">Políticas</h3>
           <ul class="footer__list">
-            <li><a href="seguridad.html" class="footer__link">No se recopilan datos personales.</a></li>
-            <li><a href="seguridad.html" class="footer__link">Las conversaciones de cuenta se guardan para continuidad.</a></li>
-            <li><a href="seguridad.html" class="footer__link">Uso educativo y general.</a></li>
-            <li><a href="seguridad.html" class="footer__link">El asistente no sustituye a un médico.</a></li>
+            <li><a href="seguridad.html" class="footer__link">Security</a></li>
+            <li><a href="privacy.html" class="footer__link">Privacy</a></li>
+            <li><a href="terms.html" class="footer__link">Terms</a></li>
           </ul>
         </div>
-
         <div class="footer__block">
-          <h3 class="footer__title">Evaluación del proyecto</h3>
+          <h3 class="footer__title">Empresa</h3>
           <ul class="footer__list">
-            <li><a href="evaluacion.html" class="footer__link">Facilidad de uso</a></li>
-            <li><a href="evaluacion.html" class="footer__link">Claridad de la información</a></li>
-            <li><a href="evaluacion.html" class="footer__link">Experiencia del usuario</a></li>
+            <li><a href="status.html" class="footer__link">Status</a></li>
+            <li><a href="roadmap.html" class="footer__link">Roadmap</a></li>
+            <li><a href="contact.html" class="footer__link">Contacto</a></li>
           </ul>
         </div>
-
         <div class="footer__bottom">
-          <p class="footer__fineprint">
-            © <span id="year"></span> Ciencias para vivir mejor — Proyecto educativo.
-          </p>
+          <p class="footer__fineprint">© <span id="year"></span> Kyrbi · Proyecto educativo.</p>
         </div>
       </div>
     </footer>

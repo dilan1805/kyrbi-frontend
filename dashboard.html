@@ -3,22 +3,21 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="color-scheme" content="dark" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Dashboard | Kyrbi</title>
 
-    <title>Dashboard — Kyrbi | Ciencias para vivir mejor</title>
-    
     <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
-    
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
-    
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
     <link rel="stylesheet" href="assets/css/styles.css" />
     <link rel="stylesheet" href="assets/css/auth.css" />
     <link rel="stylesheet" href="assets/css/dashboard-extras.css" />
-    <!-- FontAwesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
   </head>
 
   <body>
@@ -26,11 +25,11 @@
       <nav class="nav" aria-label="Navegación principal">
         <div class="nav__inner">
           <a class="brand" href="index.html" aria-label="Ir al inicio">
-            <img src="assets/img/logo.svg" alt="Logo Ciencias para vivir mejor" width="40" height="40">
-            <span class="brand__text sr-only">Ciencias para vivir mejor</span>
+            <img src="assets/img/logo.svg" alt="Logo de Kyrbi" width="40" height="40" />
+            <span class="brand__text sr-only">Kyrbi</span>
           </a>
 
-          <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Menu">
+          <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Menú">
             <span class="nav__toggle-lines" aria-hidden="true"></span>
             <span class="nav__toggle-lines" aria-hidden="true"></span>
             <span class="nav__toggle-lines" aria-hidden="true"></span>
@@ -41,9 +40,10 @@
             <a class="nav__link" href="assistant.html" data-nav="assistant">Kyrbi IA</a>
             <a class="nav__link" href="habitos.html" data-nav="habitos">Hábitos</a>
             <a class="nav__link" href="equipo.html" data-nav="equipo">Equipo</a>
-            
+            <a class="nav__link" href="status.html">Status</a>
+
             <div class="nav__auth" id="nav-auth">
-              <a href="#" class="button button--ghost button--sm" id="logout-btn">Cerrar Sesión</a>
+              <a href="#" class="button button--primary button--sm" id="logout-btn">Cerrar sesión</a>
             </div>
           </div>
         </div>
@@ -52,78 +52,79 @@
 
     <main class="app-main">
       <div class="container">
-        
         <div class="dashboard-header reveal reveal--up">
-            <div class="welcome-text reveal reveal--left">
-                <h1 id="welcomeMsg">Hola, Estudiante</h1>
-                <p>Bienvenido de nuevo a tu espacio de crecimiento personal.</p>
-            </div>
-            <a href="assistant.html" class="button button--primary reveal reveal--right">Continuar Chat</a>
+          <div class="welcome-text reveal reveal--left">
+            <h1 id="welcomeMsg">Hola, equipo</h1>
+            <p>Gestiona tu progreso, seguridad y actividad en un solo workspace.</p>
+          </div>
+          <a href="assistant.html" class="button button--primary reveal reveal--right">Continuar conversación</a>
         </div>
 
-        <div class="dashboard-grid">
-            <!-- Stats -->
-            <div class="stat-card reveal reveal--up" style="transition-delay: 0.1s;">
-                <h3>🔥 Racha</h3>
-                <div class="value">3 días</div>
-                <div class="desc">Manteniendo hábitos saludables</div>
+        <section class="dashboard-grid" aria-label="Indicadores clave">
+          <article class="stat-card reveal reveal--up">
+            <h3><i class="fa-solid fa-comment-dots" aria-hidden="true"></i> Conversaciones</h3>
+            <div class="value" id="conversationsCount">0</div>
+            <div class="desc">Historial total de tu cuenta</div>
+          </article>
+
+          <article class="stat-card reveal reveal--up">
+            <h3><i class="fa-solid fa-users" aria-hidden="true"></i> Usuarios registrados</h3>
+            <div class="value" id="kpiUsers">N/D</div>
+            <div class="desc">Métrica pública de plataforma</div>
+          </article>
+
+          <article class="stat-card reveal reveal--up">
+            <h3><i class="fa-solid fa-signal" aria-hidden="true"></i> Uptime</h3>
+            <div class="value" id="kpiUptime">N/D</div>
+            <div class="desc">Disponibilidad reportada</div>
+          </article>
+
+          <article class="stat-card reveal reveal--up">
+            <h3><i class="fa-solid fa-shield-check" aria-hidden="true"></i> SLA</h3>
+            <div class="value" id="kpiSla">N/D</div>
+            <div class="desc">Objetivo de servicio</div>
+          </article>
+
+          <article class="card reveal reveal--up dashboard-span-2">
+            <h3><i class="fa-solid fa-link" aria-hidden="true"></i> Cuentas vinculadas</h3>
+            <p class="desc">Conecta proveedores para acceso seguro y rápido.</p>
+            <div id="linkedAccounts" class="linked-accounts-grid">Cargando...</div>
+          </article>
+
+          <article class="card reveal reveal--up dashboard-span-2">
+            <h3><i class="fa-solid fa-lock" aria-hidden="true"></i> Seguridad de la cuenta</h3>
+            <p class="desc">Gestiona verificación de correo y autenticación de dos factores.</p>
+            <div class="dashboard-security-actions">
+              <button id="resendVerifyBtn" class="button button--secondary">Reenviar verificación</button>
+              <button id="toggle2faBtn" class="button button--ghost">Activar 2FA</button>
             </div>
-            
-            <div class="stat-card reveal reveal--up" style="transition-delay: 0.2s;">
-                <h3>💬 Conversaciones</h3>
-                <div class="value" id="conversationsCount">0</div>
-                <div class="desc">Interacciones con Kyrbi</div>
-            </div>
+            <p id="securityStatus" class="dashboard-security-status"></p>
+          </article>
 
-            <!-- Linked Accounts -->
-            <div class="card reveal reveal--up dashboard-span-2" style="transition-delay: 0.3s;">
-              <h3>🔗 Redes Sociales Conectadas</h3>
-              <p class="desc">Vincula tus cuentas para iniciar sesión más rápido.</p>
-              <div id="linkedAccounts" class="linked-accounts-grid">
-                 <!-- Generated by JS -->
-                 Cargando...
-              </div>
-            </div>
+          <a href="assistant.html?mode=general" class="action-card reveal reveal--up">
+            <div class="action-icon" aria-hidden="true"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+            <h3>Nuevo chat general</h3>
+            <p class="desc">Inicia una sesión de orientación completa.</p>
+          </a>
 
-            <!-- Settings -->
-            <div class="card reveal reveal--up dashboard-span-2" style="transition-delay: 0.4s;">
-              <h3>⚙️ Seguridad de la cuenta</h3>
-              <p class="desc">Configura verificación de correo y autenticación de dos factores (2FA).</p>
-              <div class="dashboard-security-actions">
-                <button id="resendVerifyBtn" class="button button--secondary">Reenviar verificación de correo</button>
-                <button id="toggle2faBtn" class="button button--ghost">Activar 2FA</button>
-              </div>
-              <p id="securityStatus" class="dashboard-security-status"></p>
-            </div>
+          <a href="assistant.html?mode=chef" class="action-card reveal reveal--up">
+            <div class="action-icon" aria-hidden="true"><i class="fa-solid fa-bowl-food"></i></div>
+            <h3>Modo Chef</h3>
+            <p class="desc">Planifica alimentación con objetivos concretos.</p>
+          </a>
+        </section>
 
-            <!-- Quick Actions -->
-            <a href="assistant.html?mode=general" class="action-card reveal reveal--up" style="transition-delay: 0.5s;">
-                <div class="action-icon">✨</div>
-                <h3>Nuevo Chat General</h3>
-                <p class="desc">Explora cualquier tema de bienestar</p>
-            </a>
-
-            <a href="assistant.html?mode=chef" class="action-card reveal reveal--up" style="transition-delay: 0.6s;">
-                <div class="action-icon">🥗</div>
-                <h3>Modo Chef</h3>
-                <p class="desc">Planifica comidas saludables</p>
-            </a>
-        </div>
-
-        <div class="recent-activity reveal reveal--up" style="transition-delay: 0.7s;">
-            <h2 class="dashboard-title-inline">Historial Reciente</h2>
-            <div id="activityList">
-                <div class="activity-item activity-item--empty">
-                    Cargando actividad...
-                </div>
-            </div>
-        </div>
-
+        <section class="recent-activity reveal reveal--up" aria-label="Actividad reciente">
+          <h2 class="dashboard-title-inline">Actividad reciente</h2>
+          <div id="activityList">
+            <div class="activity-item activity-item--empty">Cargando actividad...</div>
+          </div>
+        </section>
       </div>
     </main>
 
-    <script src="assets/js/api.js"></script>
     <script src="assets/js/config.js"></script>
+    <script src="assets/js/api.js"></script>
     <script src="assets/js/app.js"></script>
     <script src="assets/js/dashboard.js"></script>
     <script src="assets/js/ui-enhancements.js" defer></script>
