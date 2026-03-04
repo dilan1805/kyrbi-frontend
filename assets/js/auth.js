@@ -4,11 +4,79 @@ document.addEventListener("DOMContentLoaded", () => {
   const errorContainer = document.getElementById("error-message");
   const toastContainer = document.getElementById("toast-container") || createToastContainer();
   const params = new URLSearchParams(window.location.search);
+  const AUTH_REDIRECT_KEY = "kyrbi_auth_next";
+  const DEFAULT_POST_AUTH = "dashboard.html";
 
   if (!window.KyrbiAPI) {
     showError("No se pudo cargar el sistema de autenticación. Recarga la página.");
     return;
   }
+
+  const sanitizeRelativePath = (value, fallback = DEFAULT_POST_AUTH) => {
+    const raw = String(value || "").trim();
+    if (!raw) return fallback;
+
+    let normalized = raw;
+    try {
+      normalized = decodeURIComponent(raw).trim();
+    } catch {}
+
+    if (!normalized) return fallback;
+    if (/^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(normalized) || normalized.startsWith("//")) return fallback;
+
+    normalized = normalized.startsWith("/") ? normalized.slice(1) : normalized;
+    if (!normalized || normalized.startsWith("#") || /[\r\n]/.test(normalized)) return fallback;
+    if (/^(login|register)\.html(?:$|\?)/i.test(normalized)) return fallback;
+
+    return normalized;
+  };
+
+  const getStoredNextTarget = () => {
+    try {
+      return sessionStorage.getItem(AUTH_REDIRECT_KEY);
+    } catch {
+      return null;
+    }
+  };
+
+  const setStoredNextTarget = (value) => {
+    try {
+      sessionStorage.setItem(AUTH_REDIRECT_KEY, sanitizeRelativePath(value, DEFAULT_POST_AUTH));
+    } catch {}
+  };
+
+  const clearStoredNextTarget = () => {
+    try {
+      sessionStorage.removeItem(AUTH_REDIRECT_KEY);
+    } catch {}
+  };
+
+  const resolvePostAuthTarget = () => {
+    const queryNext = params.get("next");
+    const storedNext = getStoredNextTarget();
+    const candidate = queryNext || storedNext || DEFAULT_POST_AUTH;
+    return sanitizeRelativePath(candidate, DEFAULT_POST_AUTH);
+  };
+
+  const postAuthTarget = resolvePostAuthTarget();
+  if (postAuthTarget) setStoredNextTarget(postAuthTarget);
+
+  const goAfterAuth = () => {
+    clearStoredNextTarget();
+    window.location.href = postAuthTarget || DEFAULT_POST_AUTH;
+  };
+
+  const withNextParam = (path) => {
+    const safePath = String(path || "").trim();
+    if (!safePath || !postAuthTarget || postAuthTarget === DEFAULT_POST_AUTH) return safePath;
+    try {
+      const url = new URL(safePath, window.location.origin);
+      url.searchParams.set("next", postAuthTarget);
+      return `${url.pathname.split("/").pop()}${url.search}`;
+    } catch {
+      return safePath;
+    }
+  };
 
   const validateEmail = (email) =>
     /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
@@ -113,7 +181,7 @@ document.addEventListener("DOMContentLoaded", () => {
     window.history.replaceState({}, document.title, window.location.pathname);
     showToast(`Bienvenido, ${socialUser.username}.`, "success");
     window.setTimeout(() => {
-      window.location.href = "dashboard.html";
+      goAfterAuth();
     }, 620);
     return true;
   };
@@ -127,9 +195,13 @@ document.addEventListener("DOMContentLoaded", () => {
         const provider = String(button.getAttribute("data-oauth-provider") || "").trim().toLowerCase();
         if (!provider) return;
         const token = localStorage.getItem("kyrbi_token") || sessionStorage.getItem("kyrbi_token");
-        const linkToken = token ? `?token=${encodeURIComponent(token)}` : "";
         const baseURL = String(window.API_CONFIG?.baseURL || window.location.origin).replace(/\/+$/, "");
-        window.location.href = `${baseURL}/api/auth/${provider}${linkToken}`;
+        const search = new URLSearchParams();
+        if (token) search.set("token", token);
+        if (postAuthTarget && postAuthTarget !== DEFAULT_POST_AUTH) search.set("next", postAuthTarget);
+        setStoredNextTarget(postAuthTarget);
+        const suffix = search.toString();
+        window.location.href = `${baseURL}/api/auth/${provider}${suffix ? `?${suffix}` : ""}`;
       });
     });
 
@@ -216,7 +288,7 @@ document.addEventListener("DOMContentLoaded", () => {
         sessionStorage.removeItem("kyrbi_chat_v1");
         sessionStorage.removeItem("kyrbi_session_v1");
         showToast("Inicio de sesión exitoso.", "success");
-        window.location.href = "dashboard.html";
+        goAfterAuth();
       } catch (error) {
         showError(error?.message || "No se pudo iniciar sesión.");
         showToast("No se pudo iniciar sesión.", "error");
@@ -302,7 +374,7 @@ document.addEventListener("DOMContentLoaded", () => {
         sessionStorage.removeItem("kyrbi_chat_v1");
         sessionStorage.removeItem("kyrbi_session_v1");
         showToast("Cuenta creada correctamente.", "success");
-        window.location.href = "dashboard.html";
+        goAfterAuth();
       } catch (error) {
         showError(error?.message || "No se pudo crear la cuenta.");
         showToast("No se pudo crear la cuenta.", "error");
@@ -324,6 +396,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   if (handleOAuthCallback()) return;
+
+  Array.from(document.querySelectorAll('a[href="login.html"], a[href="register.html"]')).forEach((anchor) => {
+    anchor.setAttribute("href", withNextParam(anchor.getAttribute("href")));
+  });
 
   const resetToken = params.get("token");
   if (resetToken && loginForm) {

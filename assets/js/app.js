@@ -81,6 +81,48 @@
 
   const LOCKED_CHAT_MESSAGE = "Para escribir en Kyrbi debes iniciar sesión o crear una cuenta.";
   const isUserAuthenticated = () => Boolean(window.KyrbiAPI?.isAuthenticated?.());
+  const AUTH_REDIRECT_KEY = "kyrbi_auth_next";
+  const DEFAULT_POST_AUTH_ROUTE = "dashboard.html";
+  const ASSISTANT_ROUTE = "assistant.html";
+
+  const sanitizeRelativePath = (value, fallback = DEFAULT_POST_AUTH_ROUTE) => {
+    const raw = String(value || "").trim();
+    if (!raw) return fallback;
+
+    let normalized = raw;
+    try {
+      normalized = decodeURIComponent(raw).trim();
+    } catch {}
+
+    if (!normalized) return fallback;
+    if (/^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(normalized) || normalized.startsWith("//")) return fallback;
+
+    normalized = normalized.startsWith("/") ? normalized.slice(1) : normalized;
+    if (!normalized || normalized.startsWith("#") || /[\r\n]/.test(normalized)) return fallback;
+    if (/^(login|register)\.html(?:$|\?)/i.test(normalized)) return fallback;
+
+    return normalized;
+  };
+
+  const buildAuthUrl = (page, nextPath) => {
+    const safeNext = sanitizeRelativePath(nextPath, DEFAULT_POST_AUTH_ROUTE);
+    return `${page}?next=${encodeURIComponent(safeNext)}`;
+  };
+
+  const currentRelativePath = () => {
+    const path = window.location.pathname.split("/").pop() || "index.html";
+    return `${path}${window.location.search || ""}`;
+  };
+
+  const onAssistantRoute = () => getActiveNavKey() === "assistant" || Boolean(document.getElementById("kyrbi-app"));
+
+  const redirectAssistantToLogin = () => {
+    const nextPath = sanitizeRelativePath(currentRelativePath(), ASSISTANT_ROUTE);
+    try {
+      sessionStorage.setItem(AUTH_REDIRECT_KEY, nextPath);
+    } catch {}
+    window.location.replace(buildAuthUrl("login.html", nextPath));
+  };
 
   const nowTime = () => {
     const d = new Date();
@@ -152,6 +194,121 @@
       defaultMode: MODES[data.defaultMode] ? data.defaultMode : DEFAULT_SETTINGS.defaultMode,
       theme: ["system", "light", "dark"].includes(data.theme) ? data.theme : DEFAULT_SETTINGS.theme,
     };
+  };
+
+  const escapeHtmlUnsafe = (rawText) =>
+    String(rawText || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+
+  const renderInlineTokens = (target, lineText) => {
+    const text = String(lineText || "");
+    const tokenRegex = /(\*\*[^*\n]+\*\*|\*[^*\n]+\*)/g;
+    let cursor = 0;
+    let match = tokenRegex.exec(text);
+
+    while (match) {
+      if (match.index > cursor) {
+        target.appendChild(document.createTextNode(text.slice(cursor, match.index)));
+      }
+
+      const token = match[0];
+      if (token.startsWith("**") && token.endsWith("**")) {
+        const strong = document.createElement("strong");
+        strong.textContent = token.slice(2, -2);
+        target.appendChild(strong);
+      } else if (token.startsWith("*") && token.endsWith("*")) {
+        const em = document.createElement("em");
+        em.textContent = token.slice(1, -1);
+        target.appendChild(em);
+      } else {
+        target.appendChild(document.createTextNode(token));
+      }
+
+      cursor = tokenRegex.lastIndex;
+      match = tokenRegex.exec(text);
+    }
+
+    if (cursor < text.length) {
+      target.appendChild(document.createTextNode(text.slice(cursor)));
+    }
+  };
+
+  const parseSafeMarkdownToFragment = (rawText) => {
+    const source = String(rawText || "")
+      .replace(/\r\n?/g, "\n")
+      .replace(/\u0000/g, "")
+      .trim();
+    const fragment = document.createDocumentFragment();
+    if (!source) return fragment;
+
+    const lines = source.split("\n");
+    let paragraphBuffer = [];
+    let currentList = null;
+
+    const flushParagraph = () => {
+      if (!paragraphBuffer.length) return;
+      const paragraph = document.createElement("p");
+      renderInlineTokens(paragraph, paragraphBuffer.join(" "));
+      fragment.appendChild(paragraph);
+      paragraphBuffer = [];
+    };
+
+    const closeList = () => {
+      currentList = null;
+    };
+
+    lines.forEach((line) => {
+      const trimmed = line.trim();
+      if (!trimmed) {
+        flushParagraph();
+        closeList();
+        return;
+      }
+
+      if (/^###\s+/.test(trimmed)) {
+        flushParagraph();
+        closeList();
+        const heading = document.createElement("h3");
+        renderInlineTokens(heading, trimmed.replace(/^###\s+/, ""));
+        fragment.appendChild(heading);
+        return;
+      }
+
+      if (/^-\s+/.test(trimmed)) {
+        flushParagraph();
+        if (!currentList) {
+          currentList = document.createElement("ul");
+          fragment.appendChild(currentList);
+        }
+        const li = document.createElement("li");
+        renderInlineTokens(li, trimmed.replace(/^-\s+/, ""));
+        currentList.appendChild(li);
+        return;
+      }
+
+      closeList();
+      paragraphBuffer.push(trimmed);
+    });
+
+    flushParagraph();
+    return fragment;
+  };
+
+  const renderAssistantRichText = (targetNode, text) => {
+    try {
+      const fragment = parseSafeMarkdownToFragment(text);
+      if (!fragment.childNodes.length) {
+        targetNode.textContent = String(text || "");
+        return;
+      }
+      targetNode.replaceChildren(fragment);
+    } catch {
+      targetNode.innerHTML = `<p>${escapeHtmlUnsafe(String(text || "")).replace(/\n/g, "<br>")}</p>`;
+    }
   };
 
   function createChatUI(mount, opts) {
@@ -255,13 +412,13 @@
     const quick1 = document.createElement("button");
     quick1.className = "link-btn";
     quick1.type = "button";
-    quick1.textContent = "Quiero un plan";
+    quick1.textContent = "Plan semanal";
     quick1.dataset.quick = "plan";
 
     const quick2 = document.createElement("button");
     quick2.className = "link-btn";
     quick2.type = "button";
-    quick2.textContent = "Tengo poca energia";
+    quick2.textContent = "Me falta energia";
     quick2.dataset.quick = "energia";
 
     actions.appendChild(quick1);
@@ -273,11 +430,13 @@
     const gateNotice = document.createElement("div");
     gateNotice.className = "chat-gate";
     gateNotice.hidden = true;
+    const gateRegisterHref = buildAuthUrl("register.html", ASSISTANT_ROUTE);
+    const gateLoginHref = buildAuthUrl("login.html", ASSISTANT_ROUTE);
     gateNotice.innerHTML = `
       <p class="chat-gate__text">Para usar Kyrbi necesitas una cuenta activa.</p>
       <div class="chat-gate__actions">
-        <a class="button button--primary button--sm" href="register.html">Crear cuenta</a>
-        <a class="button button--ghost button--sm" href="login.html">Iniciar sesión</a>
+        <a class="button button--primary button--sm" href="${gateRegisterHref}">Crear cuenta</a>
+        <a class="button button--ghost button--sm" href="${gateLoginHref}">Iniciar sesión</a>
       </div>
     `;
 
@@ -298,10 +457,50 @@
     hero: null,
     app: null,
 
+    syncAssistantEntryPoints(isAuth = isUserAuthenticated()) {
+      const links = Array.from(document.querySelectorAll('a[href^="assistant.html"]'));
+      links.forEach((link) => {
+        const href = link.getAttribute("href") || ASSISTANT_ROUTE;
+        if (!link.dataset.originalHref) link.dataset.originalHref = href;
+        const originalHref = link.dataset.originalHref || ASSISTANT_ROUTE;
+
+        if (isAuth) {
+          link.setAttribute("href", originalHref);
+          link.classList.remove("is-assistant-locked");
+          link.removeAttribute("title");
+          return;
+        }
+
+        if (link.classList.contains("nav__link")) return;
+
+        const safeNext = sanitizeRelativePath(originalHref, ASSISTANT_ROUTE);
+        link.setAttribute("href", buildAuthUrl("register.html", safeNext));
+        link.classList.add("is-assistant-locked");
+        link.title = "Crea tu cuenta para desbloquear Kyrbi IA";
+      });
+    },
+
     updateNavigation() {
-      const user = localStorage.getItem("kyrbi_user");
+      const isAuth = isUserAuthenticated();
       const navAuth = document.getElementById("nav-auth");
       const logoutBtn = document.getElementById("logout-btn");
+      const assistantLinks = dom.navAnchors.filter((anchor) => {
+        const href = String(anchor.getAttribute("href") || "").trim().toLowerCase();
+        return anchor.dataset.nav === "assistant" || href.startsWith("assistant.html");
+      });
+
+      assistantLinks.forEach((link) => {
+        link.classList.toggle("is-auth-hidden", !isAuth);
+        link.hidden = !isAuth;
+        link.setAttribute("aria-hidden", isAuth ? "false" : "true");
+        if (!isAuth) {
+          link.setAttribute("tabindex", "-1");
+        } else {
+          link.removeAttribute("tabindex");
+        }
+      });
+
+      this.syncAssistantEntryPoints(isAuth);
 
       if (logoutBtn) {
         logoutBtn.addEventListener("click", (event) => {
@@ -314,7 +513,7 @@
 
       navAuth.innerHTML = "";
 
-      if (user) {
+      if (isAuth) {
         const dashboardLink = document.createElement("a");
         dashboardLink.href = "dashboard.html";
         dashboardLink.className = "button button--ghost button--sm";
@@ -335,12 +534,12 @@
       }
 
       const loginLink = document.createElement("a");
-      loginLink.href = "login.html";
+      loginLink.href = onAssistantRoute() ? buildAuthUrl("login.html", currentRelativePath()) : "login.html";
       loginLink.className = "button button--ghost button--sm";
       loginLink.textContent = "Entrar";
 
       const registerLink = document.createElement("a");
-      registerLink.href = "register.html";
+      registerLink.href = onAssistantRoute() ? buildAuthUrl("register.html", currentRelativePath()) : "register.html";
       registerLink.className = "button button--primary button--sm";
       registerLink.textContent = "Crear cuenta";
 
@@ -525,8 +724,18 @@
           chatRefs.input.focus();
         });
 
-        chatRefs.quick1.addEventListener("click", () => actions.sendUserMessage("Quiero un plan semanal.", { focusAfterSend }));
-        chatRefs.quick2.addEventListener("click", () => actions.sendUserMessage("Tengo poca energia en clases.", { focusAfterSend }));
+        chatRefs.quick1.addEventListener("click", () =>
+          actions.sendUserMessage(
+            "Quiero un plan semanal. Responde con resumen rapido, recomendaciones en puntos y siguiente paso.",
+            { focusAfterSend }
+          )
+        );
+        chatRefs.quick2.addEventListener("click", () =>
+          actions.sendUserMessage(
+            "Tengo poca energia en clases. Ordena tu respuesta con resumen rapido, puntos accionables y una pregunta final.",
+            { focusAfterSend }
+          )
+        );
       };
 
       bindChat(this.hero, false);
@@ -637,9 +846,13 @@
     const bubble = document.createElement("div");
     bubble.className = "msg__bubble";
 
-    const text = document.createElement("p");
-    text.className = "msg__text";
-    text.textContent = msg.text;
+    const text = document.createElement(msg.role === "assistant" ? "div" : "p");
+    text.className = msg.role === "assistant" ? "msg__text msg__rich" : "msg__text";
+    if (msg.role === "assistant") {
+      renderAssistantRichText(text, msg.text);
+    } else {
+      text.textContent = msg.text;
+    }
 
     const meta = document.createElement("div");
     meta.className = "msg__meta";
@@ -734,7 +947,7 @@
       state.messages.push({
         id: makeId(),
         role: "assistant",
-        text: String(text || "").replace(/\*\*(.+?)\*\*/g, "$1"),
+        text: String(text || ""),
         time: nowTime(),
         mode: opts.mode || state.mode,
       });
@@ -1048,6 +1261,10 @@
   };
 
   document.addEventListener("DOMContentLoaded", async () => {
+    if (onAssistantRoute() && !isUserAuthenticated()) {
+      redirectAssistantToLogin();
+      return;
+    }
     ui.init();
     await actions.boot();
   });

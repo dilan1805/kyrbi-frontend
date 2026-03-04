@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Configuración central de Kyrbi (modes, límites y copy)
+   Configuracion central de Kyrbi (modes, limites y copy)
    ========================================================================== */
 window.KYRBI_CONFIG = {
   typing: {
@@ -17,39 +17,39 @@ window.KYRBI_CONFIG = {
   },
   modes: {
     general: {
-      label: "Guía general",
+      label: "Guia general",
       tone: "Claro, cercano y estructurado",
       dotColor: "green",
       intro: [
-        "Hola, soy Kyrbi. Estoy aquí para ayudarte a construir hábitos saludables de forma clara y práctica.",
-        "Esto es orientación educativa (no médica). ¿Qué te gustaría mejorar primero: alimentación, actividad física o descanso?",
+        "### Resumen rapido\nHola, soy Kyrbi. Te ayudo a ordenar habitos de forma practica y realista.",
+        "### Recomendaciones\n- Elegimos un solo habito foco para hoy.\n- Definimos una accion pequena y medible.\n\n### Siguiente paso\n¿Quieres empezar por alimentacion, actividad fisica o descanso?",
       ],
     },
     chef: {
       label: "Chef",
-      tone: "Enfoque en alimentación (equilibrio y energía)",
+      tone: "Enfoque en alimentacion (equilibrio y energia)",
       dotColor: "green",
       intro: [
-        "Modo Chef activado. Vamos a mejorar tu alimentación con ideas simples y realistas.",
-        "Para ayudarte mejor: ¿cómo son tus desayunos en un día normal y a qué hora sueles comer?",
+        "### Resumen rapido\nModo Chef activado. Vamos a mejorar tu alimentacion sin complicarte.",
+        "### Recomendaciones\n- Ajustamos primero una comida clave del dia.\n- Buscamos opciones accesibles para horario escolar.\n\n### Siguiente paso\n¿Como suele ser tu desayuno en un dia normal?",
       ],
     },
     coach: {
       label: "Coach",
-      tone: "Enfoque en actividad física (metas y constancia)",
+      tone: "Enfoque en actividad fisica (metas y constancia)",
       dotColor: "green",
       intro: [
-        "Modo Coach activado. Vamos a movernos más sin complicarnos.",
-        "Pregunta rápida: ¿cuántos días a la semana te mueves (caminar, deporte o ejercicios) y cuánto tiempo?",
+        "### Resumen rapido\nModo Coach activado. Priorizaremos constancia sobre intensidad.",
+        "### Recomendaciones\n- Definimos bloques cortos de 10 a 20 minutos.\n- Conectamos movimiento con tu rutina real.\n\n### Siguiente paso\n¿Cuantos dias por semana te puedes mover de forma realista?",
       ],
     },
     descanso: {
       label: "Descanso",
-      tone: "Enfoque en sueño y bienestar (rutina y calma)",
+      tone: "Enfoque en sueno y bienestar (rutina y calma)",
       dotColor: "green",
       intro: [
-        "Modo Descanso activado. Vamos a cuidar tu sueño y tu energía.",
-        "Para empezar: ¿a qué hora te duermes y a qué hora te levantas en días de escuela?",
+        "### Resumen rapido\nModo Descanso activado. Vamos a mejorar sueno y energia diaria.",
+        "### Recomendaciones\n- Ajustamos una rutina nocturna corta y repetible.\n- Reducimos friccion con pantallas antes de dormir.\n\n### Siguiente paso\n¿A que hora te duermes y despiertas en dias de escuela?",
       ],
     },
   },

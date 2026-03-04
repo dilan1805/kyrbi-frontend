@@ -22,7 +22,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
   </head>
 
-  <body>
+  <body class="assistant-page">
     <a class="skip-link" href="#contenido">Saltar al contenido</a>
 
     <header class="app-header" id="top">
@@ -56,19 +56,38 @@
     </header>
 
     <main class="app-main" id="contenido">
-      <section class="section assistant reveal reveal--up" aria-label="Asistente IA">
+      <section class="section assistant assistant--premium reveal reveal--up" aria-label="Asistente IA">
         <div class="container">
           <div class="section__head reveal reveal--left">
+            <p class="assistant-kicker"><i class="fa-solid fa-gem" aria-hidden="true"></i> Workspace premium</p>
             <h1 class="section__title">Asistente Kyrbi IA</h1>
             <p class="section__lead">
               Conversación educativa con continuidad real: historial, memoria y preferencias sincronizadas por cuenta.
             </p>
           </div>
 
+          <div class="assistant-premium-strip reveal reveal--right" aria-label="Beneficios premium">
+            <article class="assistant-premium-item">
+              <p class="assistant-premium-item__label">Disponibilidad</p>
+              <p class="assistant-premium-item__value">24/7</p>
+              <p class="assistant-premium-item__meta">Asistencia activa en todo momento</p>
+            </article>
+            <article class="assistant-premium-item">
+              <p class="assistant-premium-item__label">Continuidad</p>
+              <p class="assistant-premium-item__value">Historial + Memoria</p>
+              <p class="assistant-premium-item__meta">Contexto real entre sesiones</p>
+            </article>
+            <article class="assistant-premium-item">
+              <p class="assistant-premium-item__label">Calidad de respuesta</p>
+              <p class="assistant-premium-item__value">Modo experto</p>
+              <p class="assistant-premium-item__meta">Guia, Chef, Coach y Descanso</p>
+            </article>
+          </div>
+
           <div class="assistant__layout">
             <aside class="assistant__aside reveal reveal--left" aria-label="Panel lateral de control">
               <div class="card card--soft">
-                <h2 class="card__title">Modos de conversación</h2>
+                <h2 class="card__title"><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> Modos de conversación</h2>
                 <p class="card__text">Selecciona un enfoque según el objetivo de la sesión.</p>
                 <div class="mode-tabs" role="tablist" aria-label="Modos de Kyrbi">
                   <button class="mode-tab is-active" type="button" role="tab" aria-selected="true" data-mode="general">
@@ -84,7 +103,7 @@
 
               <div class="card card--soft assistant-panel">
                 <div class="assistant-panel__head">
-                  <h3 class="card__title">Tus conversaciones</h3>
+                  <h3 class="card__title"><i class="fa-regular fa-comments" aria-hidden="true"></i> Tus conversaciones</h3>
                   <button id="new-chat-btn" type="button" class="button button--ghost button--sm">Nuevo chat</button>
                 </div>
 
@@ -103,14 +122,14 @@
               </div>
 
               <div class="card card--soft assistant-panel">
-                <h3 class="card__title">Memoria guardada</h3>
+                <h3 class="card__title"><i class="fa-solid fa-brain" aria-hidden="true"></i> Memoria guardada</h3>
                 <p class="card__text">Resumen persistente para continuidad entre sesiones.</p>
                 <pre id="memory-summary" class="memory-box">Sin memoria disponible.</pre>
                 <p class="memory-meta" id="memory-meta"></p>
               </div>
 
               <div class="card card--soft assistant-panel">
-                <h3 class="card__title">Configuración</h3>
+                <h3 class="card__title"><i class="fa-solid fa-sliders" aria-hidden="true"></i> Configuración</h3>
                 <form id="chat-settings" class="settings-form" onsubmit="return false;">
                   <label class="settings-row">
                     <span>Auto-guardar chat</span>
@@ -155,6 +174,11 @@
                 <div class="onboarding-banner__actions">
                   <button id="onboarding-dismiss" type="button" class="button button--primary button--sm">Entendido</button>
                 </div>
+              </div>
+              <div class="assistant-live-bar" aria-label="Estado del workspace premium">
+                <span class="assistant-live-bar__item"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> Cuenta protegida</span>
+                <span class="assistant-live-bar__item"><i class="fa-solid fa-database" aria-hidden="true"></i> Historial sincronizado</span>
+                <span class="assistant-live-bar__item"><i class="fa-solid fa-bolt" aria-hidden="true"></i> Respuesta en tiempo real</span>
               </div>
               <div class="chat-shell" id="kyrbi-app" aria-label="Chat principal con Kyrbi"></div>
             </div>
