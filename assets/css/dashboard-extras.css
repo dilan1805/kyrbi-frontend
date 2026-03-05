@@ -208,25 +208,28 @@
     grid-template-columns: 1fr;
   }
 
-  .account-card {
-    flex-wrap: wrap;
+  .btn-link {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
-  .btn-link {
-    width: 100%;
+  .modal-inline__content {
+    margin: 5vh auto;
+    width: 95%;
+    padding: 1rem;
   }
 }
 
 @media (max-width: 480px) {
-  .modal-inline {
-    padding: 0.7rem;
+  .account-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
   }
 
-  .modal-inline__content {
-    padding: 1rem;
-  }
-
-  .modal-inline__qr {
-    max-width: 170px;
+  .account-status {
+    align-self: flex-end;
   }
 }

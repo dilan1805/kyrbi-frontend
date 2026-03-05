@@ -91,9 +91,16 @@
   --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
   --shadow-xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
   
-  --header-height: 80px;
-  --nav-offset: 80px;
+  --header-height: 5rem;
+  --nav-offset: 5rem;
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Breakpoints */
+  --bp-sm: 640px;
+  --bp-md: 768px;
+  --bp-lg: 1024px;
+  --bp-xl: 1280px;
+  --bp-2xl: 1440px;
 }
 
 [data-theme="light"] {
@@ -3218,8 +3225,92 @@ body::after {
   }
 }
 
-@media (max-width: 360px) {
-  .assistant .chat__log {
-    padding: 0.86rem;
+/* ==========================================================================
+   Responsive Optimizations 2026 (Consolidated)
+   ========================================================================== */
+
+/* Tablet & Smaller */
+@media (max-width: 1024px) {
+  :root {
+    --header-height: 4.5rem;
+  }
+
+  .nav__links {
+    gap: var(--space-sm);
+  }
+
+  .grid-cards {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+  }
+
+  .hero__title {
+    font-size: clamp(2rem, 8vw, 3.5rem);
   }
 }
+
+/* Mobile Devices */
+@media (max-width: 768px) {
+  :root {
+    --header-height: 4rem;
+  }
+
+  .section {
+    padding-block: var(--space-lg);
+  }
+
+  .container {
+    width: min(100% - 2rem, 100%);
+  }
+
+  .button {
+    width: 100%;
+    min-height: 48px; /* Safe touch target */
+  }
+
+  .hero__actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .footer__grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .chat-shell {
+    height: calc(100vh - var(--header-height) - 2rem);
+    border-radius: 0;
+  }
+}
+
+/* Small Phones */
+@media (max-width: 480px) {
+  .hero__title {
+    font-size: 1.85rem;
+  }
+
+  .card {
+    padding: 1.25rem;
+  }
+
+  .nav__inner {
+    padding-inline: 0.5rem;
+  }
+}
+
+/* Performance & Accessibility Fixes */
+img {
+  content-visibility: auto; /* Browser optimization */
+}
+
+.button, a, input, select, textarea {
+  touch-action: manipulation; /* Faster clicks on mobile */
+}
+
+/* Prevenir CLS en el Logo */
+.brand img {
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+}
+

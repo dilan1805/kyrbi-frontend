@@ -413,7 +413,41 @@
 }
 
 @media (max-width: 640px) {
+  .auth-page {
+    padding: var(--space-md);
+    align-items: flex-start;
+    padding-top: 5vh;
+  }
+
   .auth-card {
+    padding: 1.5rem;
     border-radius: 22px;
+    border: none;
+    box-shadow: none;
+    background: transparent;
+  }
+
+  .auth-logo img {
+    height: 60px;
+  }
+
+  .auth-header h1 {
+    font-size: 1.75rem;
+  }
+
+  .auth-form input {
+    font-size: 1rem; /* Better for mobile zoom prevention */
+    min-height: 48px;
+  }
+
+  .button--social {
+    min-height: 48px;
   }
 }
+
+@media (max-width: 360px) {
+  .auth-card {
+    padding: 1rem;
+  }
+}
+
