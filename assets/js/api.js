@@ -97,6 +97,15 @@ if (!window.KyrbiAPI) {
       return statusCode === 404 || statusCode === 405 || statusCode >= 500;
     }
 
+    getCredentialsMode(base) {
+      try {
+        const targetOrigin = new URL(String(base || window.location.origin), window.location.origin).origin;
+        return targetOrigin === window.location.origin ? "same-origin" : "omit";
+      } catch {
+        return "same-origin";
+      }
+    }
+
     async request(endpoint, method, body = null) {
       const path = this.normalizePath(endpoint);
       const bases = this.getBaseCandidates();
@@ -108,7 +117,7 @@ if (!window.KyrbiAPI) {
         const options = {
           method,
           headers: this.getHeaders(),
-          credentials: "include",
+          credentials: this.getCredentialsMode(base),
         };
         if (body) options.body = JSON.stringify(body);
 
