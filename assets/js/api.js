@@ -135,7 +135,11 @@ if (!window.KyrbiAPI) {
             if (i < bases.length - 1 && this.shouldRetryStatus(response.status)) {
               continue;
             }
-            throw new Error(payload?.error || `Error del servidor: ${response.status}`);
+            const err = new Error(payload?.error || `Error del servidor: ${response.status}`);
+            err.status = response.status;
+            err.code = payload?.code || null;
+            err.payload = payload;
+            throw err;
           }
 
           if (base !== String(window.API_CONFIG.baseURL || "").replace(/\/+$/, "")) {

@@ -310,6 +310,14 @@ document.addEventListener("DOMContentLoaded", () => {
         showToast("Inicio de sesión exitoso.", "success");
         goAfterAuth();
       } catch (error) {
+        if (String(error?.code || "").toLowerCase() === "email_not_verified") {
+          try {
+            await window.KyrbiAPI.resendVerificationEmail(email);
+            showToast("Revisa tu correo. Te reenviamos el enlace de verificación.", "info");
+          } catch {}
+          showError("Debes verificar tu correo antes de iniciar sesión.");
+          return;
+        }
         showError(error?.message || "No se pudo iniciar sesión.");
         showToast("No se pudo iniciar sesión.", "error");
       } finally {
@@ -387,6 +395,20 @@ document.addEventListener("DOMContentLoaded", () => {
         setBusy(submitButton, "Creando cuenta...", "Crear cuenta", true);
         const captchaToken = await getCaptchaToken("register");
         const registerData = await window.KyrbiAPI.register(username, email, password, captchaToken);
+        const verificationRequired = Boolean(registerData?.requiresEmailVerification) || !registerData?.token;
+
+        if (verificationRequired) {
+          localStorage.removeItem("kyrbi_token");
+          sessionStorage.removeItem("kyrbi_token");
+          localStorage.removeItem("kyrbi_user");
+          window.KyrbiAPI.token = null;
+          showToast("Cuenta creada. Verifica tu correo y luego inicia sesión.", "success");
+          window.setTimeout(() => {
+            window.location.href = withNextParam("login.html");
+          }, 700);
+          return;
+        }
+
         if (registerData?.token) window.KyrbiAPI.token = registerData.token;
         if (registerData?.user?.preferences?.chatSettings) {
           localStorage.setItem("kyrbi_preferences_v1", JSON.stringify(registerData.user.preferences.chatSettings));
