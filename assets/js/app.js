@@ -34,6 +34,17 @@
     onboarding: "kyrbi_onboarding_v1",
   };
 
+  const NAV_LINK_ITEMS = [
+    { key: "index", href: "index.html", label: "Inicio" },
+    { key: "assistant", href: "assistant.html", label: "Kyrbi IA" },
+    { key: "habitos", href: "habitos.html", label: "Habitos" },
+    { key: "equipo", href: "equipo.html", label: "Equipo" },
+    { key: "evaluacion", href: "evaluacion.html", label: "Evaluacion" },
+    { key: "seguridad", href: "seguridad.html", label: "Seguridad" },
+    { key: "pricing", href: "pricing.html", label: "Pricing" },
+    { key: "status", href: "status.html", label: "Status" },
+  ];
+
   const DEFAULT_SETTINGS = {
     autoSave: true,
     defaultMode: "general",
@@ -457,6 +468,36 @@
     hero: null,
     app: null,
 
+    normalizeNavigationLinks() {
+      if (!dom.navLinks) return;
+
+      const currentNavAuth = dom.navLinks.querySelector("#nav-auth");
+      const navAuth =
+        currentNavAuth ||
+        Object.assign(document.createElement("div"), {
+          id: "nav-auth",
+          className: "nav__auth",
+        });
+
+      if (currentNavAuth) currentNavAuth.remove();
+
+      const activeKey = getActiveNavKey();
+      const fragment = document.createDocumentFragment();
+
+      NAV_LINK_ITEMS.forEach((item) => {
+        const anchor = document.createElement("a");
+        anchor.className = "nav__link";
+        anchor.href = item.href;
+        anchor.dataset.nav = item.key;
+        anchor.textContent = item.label;
+        if (activeKey && activeKey === item.key) anchor.classList.add("is-active");
+        fragment.appendChild(anchor);
+      });
+
+      dom.navLinks.replaceChildren(fragment, navAuth);
+      dom.navAnchors = Array.from(dom.navLinks.querySelectorAll(".nav__link"));
+    },
+
     syncAssistantEntryPoints(isAuth = isUserAuthenticated()) {
       const links = Array.from(document.querySelectorAll('a[href^="assistant.html"]'));
       links.forEach((link) => {
@@ -654,6 +695,7 @@
     init() {
       if (dom.year) dom.year.textContent = String(new Date().getFullYear());
       document.body.classList.add("is-ready");
+      this.normalizeNavigationLinks();
 
       const syncNavOffset = () => {
         const header = document.querySelector(".app-header");
@@ -1299,5 +1341,7 @@ function getActiveNavKey() {
   if (file === "equipo.html") return "equipo";
   if (file === "evaluacion.html") return "evaluacion";
   if (file === "seguridad.html") return "seguridad";
+  if (file === "pricing.html") return "pricing";
+  if (file === "status.html") return "status";
   return null;
 }
