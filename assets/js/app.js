@@ -995,13 +995,31 @@
         if (msgs.length === 0 && !limit) {
           chatRefs.log.innerHTML = `
             <div class="chat-empty-state">
-              <div class="empty-logo">
-                <img src="assets/img/logo.svg" alt="Kyrbi" />
+              <h1 class="empty-title">¿En qué puedo ayudarte hoy?</h1>
+              <div class="empty-suggestions">
+                <button class="suggestion-card" data-prompt="Plan de alimentación saludable">
+                  <i class="fa-solid fa-apple-whole"></i>
+                  <span>Plan de alimentación</span>
+                </button>
+                <button class="suggestion-card" data-prompt="Rutina de ejercicio para casa">
+                  <i class="fa-solid fa-person-running"></i>
+                  <span>Rutina de ejercicio</span>
+                </button>
+                <button class="suggestion-card" data-prompt="Técnicas para dormir mejor">
+                  <i class="fa-solid fa-bed"></i>
+                  <span>Mejorar sueño</span>
+                </button>
               </div>
-              <h2>¿En qué puedo ayudarte hoy?</h2>
-              <p>Elige un modo y comencemos a construir mejores hábitos juntos.</p>
             </div>
           `;
+          
+          // Re-bind suggestion clicks
+          chatRefs.log.querySelectorAll('.suggestion-card').forEach(card => {
+            card.addEventListener('click', () => {
+              const prompt = card.dataset.prompt;
+              if (prompt) actions.sendUserMessage(prompt, { focusAfterSend: true });
+            });
+          });
         } else {
           msgs.forEach((msg) => chatRefs.log.appendChild(renderMessage(msg)));
         }
@@ -1028,40 +1046,44 @@
 
   function renderMessage(msg) {
     const isAssistant = msg.role === "assistant";
-    const wrap = document.createElement("div");
-    wrap.className = `message ${isAssistant ? "message--assistant" : "message--user"}`;
+    const row = document.createElement("div");
+    row.className = `message-row ${isAssistant ? "message-row--assistant" : "message-row--user"}`;
 
-    const inner = document.createElement("div");
-    inner.className = "message__inner";
+    const content = document.createElement("div");
+    content.className = "message-content";
 
     const avatar = document.createElement("div");
-    avatar.className = "message__avatar";
+    avatar.className = `message-avatar ${isAssistant ? "message-avatar--assistant" : "message-avatar--user"}`;
     avatar.innerHTML = isAssistant 
       ? '<img src="assets/img/logo.svg" alt="K" style="width:24px;height:24px;">' 
       : '<i class="fa-solid fa-user"></i>';
 
-    const content = document.createElement("div");
-    content.className = "message__content";
-
-    const author = document.createElement("span");
-    author.className = "message__author";
-    author.textContent = isAssistant ? (MODES[msg.mode || state.mode]?.label || "Kyrbi") : "Tú";
-
     const text = document.createElement("div");
-    text.className = "message__text";
+    text.className = "message-text";
     
     if (isAssistant) {
-      renderAssistantRichText(text, msg.text);
+      // If there's a thought/thinking phase, we could add it here
+      if (msg.thought) {
+        const thoughtBox = document.createElement("div");
+        thoughtBox.className = "thinking-box";
+        thoughtBox.textContent = msg.thought;
+        text.appendChild(thoughtBox);
+      }
+      
+      const textBody = document.createElement("div");
+      textBody.className = "text-body";
+      renderAssistantRichText(textBody, msg.text);
+      text.appendChild(textBody);
     } else {
-      text.textContent = msg.text;
+      const p = document.createElement("p");
+      p.textContent = msg.text;
+      text.appendChild(p);
     }
 
-    content.appendChild(author);
+    content.appendChild(avatar);
     content.appendChild(text);
-    inner.appendChild(avatar);
-    inner.appendChild(content);
-    wrap.appendChild(inner);
-    return wrap;
+    row.appendChild(content);
+    return row;
   }
 
   const actions = {
@@ -1378,22 +1400,15 @@
       let typingEl = null;
       if (dom.appMount) {
         typingEl = document.createElement('div');
-        typingEl.className = 'message message--assistant typing-msg';
+        typingEl.className = 'message-row message-row--assistant typing-msg';
         typingEl.innerHTML = `
-          <div class="message__inner">
-            <div class="message__avatar">
+          <div class="message-content">
+            <div class="message-avatar message-avatar--assistant">
               <img src="assets/img/logo.svg" alt="K" style="width:24px;height:24px;">
             </div>
-            <div class="message__content">
-              <span class="message__author">Kyrbi</span>
-              <div class="thought-block" id="thought-block-active">
-                <div class="thought-header"><i class="fa-solid fa-chevron-down"></i> Pensando...</div>
-                <div class="thought-content">Analizando el contexto educativo...</div>
-              </div>
-              <div class="typing-indicator">
-                <span class="typing-dot"></span>
-                <span class="typing-dot"></span>
-                <span class="typing-dot"></span>
+            <div class="message-text">
+              <div class="thinking-box">
+                <i class="fa-solid fa-brain"></i> Kyrbi está pensando...
               </div>
             </div>
           </div>
@@ -1464,7 +1479,7 @@
       state.messages.push(msg);
       ui.render();
 
-      const lastMsgEl = dom.appMount?.lastElementChild?.querySelector('.message__text');
+      const lastMsgEl = dom.appMount?.lastElementChild?.querySelector('.text-body');
       if (!lastMsgEl) return;
 
       // Simulated streaming

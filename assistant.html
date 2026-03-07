@@ -25,30 +25,18 @@
   <body class="assistant-page">
     <a class="skip-link" href="#contenido">Saltar al contenido</a>
 
-    <header class="app-header" id="top">
+    <header class="app-header app-header--minimal" id="top">
       <nav class="nav" aria-label="Navegación principal">
         <div class="nav__inner">
           <a class="brand" href="index.html" aria-label="Ir al inicio">
-            <img src="assets/img/logo.svg" alt="Logo de Kyrbi" width="40" height="40" loading="lazy" />
-            <span class="brand__text sr-only">Kyrbi</span>
+            <img src="assets/img/logo.svg" alt="Logo de Kyrbi" width="32" height="32" loading="lazy" />
+            <span class="brand__text">Kyrbi IA</span>
           </a>
 
-          <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Menú">
-            <span class="nav__toggle-lines" aria-hidden="true"></span>
-            <span class="nav__toggle-lines" aria-hidden="true"></span>
-            <span class="nav__toggle-lines" aria-hidden="true"></span>
-          </button>
-
           <div class="nav__links" id="nav-links">
-            <a class="nav__link" href="index.html" data-nav="index">Inicio</a>
-            <a class="nav__link" href="assistant.html" data-nav="assistant">Kyrbi IA</a>
-            <a class="nav__link" href="habitos.html" data-nav="habitos">Hábitos</a>
-            <a class="nav__link" href="equipo.html" data-nav="equipo">Equipo</a>
-            <a class="nav__link" href="pricing.html">Pricing</a>
-
+            <a class="nav__link" href="dashboard.html">Dashboard</a>
             <div class="nav__auth" id="nav-auth">
-              <a href="login.html" class="button button--ghost button--sm">Entrar</a>
-              <a href="register.html" class="button button--primary button--sm">Crear cuenta</a>
+              <!-- Auth buttons will be injected here -->
             </div>
           </div>
         </div>
@@ -57,103 +45,115 @@
 
     <main class="app-main assistant-view" id="contenido">
       <div class="chat-container">
-        <!-- Sidebar: Estilo ChatGPT Premium -->
+        <!-- Sidebar Ultra-Premium -->
         <aside class="chat-sidebar" id="chat-sidebar">
           <div class="sidebar-header">
-            <button id="new-chat-btn" type="button" class="button button--ghost button--sm button--full">
-              <i class="fa-solid fa-plus"></i> Nuevo chat
+            <button id="new-chat-btn" type="button" class="sidebar-new-btn">
+              <i class="fa-solid fa-pen-to-square"></i>
+              <span>Nuevo chat</span>
             </button>
           </div>
 
           <div class="sidebar-content">
+            <!-- Sección: Herramientas -->
             <div class="sidebar-section">
-              <h2 class="sidebar-label">Modos de Kyrbi</h2>
-              <div class="mode-grid">
-                <button class="mode-item is-active" data-mode="general" title="Guía general">
-                  <i class="fa-solid fa-house-chimney"></i>
-                  <span>Guía</span>
-                </button>
-                <button class="mode-item" data-mode="chef" title="Chef">
-                  <i class="fa-solid fa-utensils"></i>
-                  <span>Chef</span>
-                </button>
-                <button class="mode-item" data-mode="coach" title="Coach">
-                  <i class="fa-solid fa-dumbbell"></i>
-                  <span>Coach</span>
-                </button>
-                <button class="mode-item" data-mode="descanso" title="Descanso">
-                  <i class="fa-solid fa-moon"></i>
-                  <span>Zzz</span>
-                </button>
-              </div>
+              <ul class="sidebar-nav-list">
+                <li class="sidebar-nav-item is-active" data-mode="general">
+                  <i class="fa-solid fa-house"></i> <span>Kyrbi Inicio</span>
+                </li>
+                <li class="sidebar-nav-item" data-mode="chef">
+                  <i class="fa-solid fa-utensils"></i> <span>Chef Educativo</span>
+                </li>
+                <li class="sidebar-nav-item" data-mode="coach">
+                  <i class="fa-solid fa-dumbbell"></i> <span>Coach Bienestar</span>
+                </li>
+                <li class="sidebar-nav-item" data-mode="descanso">
+                  <i class="fa-solid fa-moon"></i> <span>Modo Descanso</span>
+                </li>
+              </ul>
             </div>
 
+            <!-- Sección: Historial -->
             <div class="sidebar-section">
-              <h2 class="sidebar-label">Historial</h2>
-              <div class="history-search-container">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input id="history-search" type="search" placeholder="Buscar..." />
-              </div>
-              <ul id="conversation-history" class="sidebar-list"></ul>
-              <p id="history-status" class="sidebar-status">Cargando...</p>
-            </div>
-
-            <div class="sidebar-section">
-              <h2 class="sidebar-label">Memoria</h2>
-              <div class="sidebar-card">
-                <pre id="memory-summary">Sin memoria.</pre>
+              <h2 class="sidebar-label">Tus chats</h2>
+              <div class="sidebar-history-container">
+                <ul id="conversation-history" class="sidebar-list"></ul>
+                <p id="history-status" class="sidebar-status">Cargando...</p>
               </div>
             </div>
           </div>
 
+          <!-- Perfil de Usuario (Estilo ChatGPT) -->
           <div class="sidebar-footer">
-            <button id="sidebar-settings-btn" class="sidebar-footer-item">
-              <i class="fa-solid fa-gear"></i> Configuración
+            <button id="sidebar-settings-btn" class="sidebar-user-pill">
+              <div class="user-avatar">
+                <i class="fa-solid fa-user"></i>
+              </div>
+              <div class="user-info">
+                <span class="user-name">Mi Cuenta</span>
+                <span class="user-plan">Plan Gratuito</span>
+              </div>
+              <i class="fa-solid fa-ellipsis"></i>
             </button>
           </div>
         </aside>
 
-        <!-- Main Chat Area -->
+        <!-- Main Chat Area Centered -->
         <div class="chat-main">
-          <header class="chat-header">
-            <button id="sidebar-toggle" class="sidebar-toggle-btn" aria-label="Cerrar lateral">
-              <i class="fa-solid fa-sidebar"></i>
+          <header class="chat-header-minimal">
+            <button id="sidebar-toggle" class="icon-button" aria-label="Toggle Sidebar">
+              <i class="fa-solid fa-bars-staggered"></i>
             </button>
-            <div class="chat-header-info">
-              <span id="current-mode-badge" class="mode-badge">Guía general</span>
-              <h1 class="chat-title">Chat con Kyrbi</h1>
+            <div class="chat-header-center">
+              <span class="chat-model-selector">
+                Kyrbi 2026 <i class="fa-solid fa-chevron-down"></i>
+              </span>
             </div>
-            <div class="chat-header-actions">
-              <span class="status-indicator online"></span>
+            <div class="chat-header-right">
+              <button class="icon-button"><i class="fa-solid fa-share-nodes"></i></button>
             </div>
           </header>
 
           <div class="chat-messages-wrapper" id="kyrbi-app">
-            <!-- Los mensajes se inyectan aquí -->
+            <!-- Empty State Centered -->
             <div class="chat-empty-state">
-              <div class="empty-logo">
-                <img src="assets/img/logo.svg" alt="Kyrbi" />
+              <h1 class="empty-title">¿En qué puedo ayudarte hoy?</h1>
+              <div class="empty-suggestions">
+                <button class="suggestion-card" data-prompt="Plan de alimentación saludable">
+                  <i class="fa-solid fa-apple-whole"></i>
+                  <span>Plan de alimentación</span>
+                </button>
+                <button class="suggestion-card" data-prompt="Rutina de ejercicio para casa">
+                  <i class="fa-solid fa-person-running"></i>
+                  <span>Rutina de ejercicio</span>
+                </button>
+                <button class="suggestion-card" data-prompt="Técnicas para dormir mejor">
+                  <i class="fa-solid fa-bed"></i>
+                  <span>Mejorar sueño</span>
+                </button>
               </div>
-              <h2>¿En qué puedo ayudarte hoy?</h2>
-              <p>Elige un modo y comencemos a construir mejores hábitos juntos.</p>
             </div>
           </div>
 
+          <!-- Floating Input Container -->
           <footer class="chat-input-area">
             <div class="chat-input-container">
-              <div class="input-wrapper">
+              <div class="input-wrapper-premium">
+                <button class="input-action-btn"><i class="fa-solid fa-plus"></i></button>
                 <textarea 
                   id="chat-textarea" 
-                  placeholder="Envía un mensaje a Kyrbi..." 
+                  placeholder="Pregunta lo que quieras..." 
                   rows="1"
-                  maxlength="1200"
                 ></textarea>
-                <button id="send-message-btn" class="send-button" disabled>
-                  <i class="fa-solid fa-arrow-up"></i>
-                </button>
+                <div class="input-actions-right">
+                  <button class="input-action-btn"><i class="fa-solid fa-microphone"></i></button>
+                  <button id="send-message-btn" class="send-btn-premium" disabled>
+                    <i class="fa-solid fa-arrow-up"></i>
+                  </button>
+                </div>
               </div>
-              <p class="input-footer-text">
-                Kyrbi puede cometer errores. Verifica la información importante.
+              <p class="input-disclaimer">
+                Kyrbi puede cometer errores. Considera verificar la información importante.
               </p>
             </div>
           </footer>
@@ -256,33 +256,6 @@
         </div>
       </div>
     </main>
-
-
-    <footer class="footer" aria-label="Pie de página">
-      <div class="container footer__grid">
-        <div class="footer__block">
-          <h3 class="footer__title">Producto</h3>
-          <ul class="footer__list">
-            <li><a href="dashboard.html" class="footer__link">Dashboard</a></li>
-            <li><a href="pricing.html" class="footer__link">Pricing</a></li>
-            <li><a href="roadmap.html" class="footer__link">Roadmap</a></li>
-            <li><a href="changelog.html" class="footer__link">Changelog</a></li>
-          </ul>
-        </div>
-        <div class="footer__block">
-          <h3 class="footer__title">Confianza</h3>
-          <ul class="footer__list">
-            <li><a href="seguridad.html" class="footer__link">Security</a></li>
-            <li><a href="privacy.html" class="footer__link">Privacy</a></li>
-            <li><a href="terms.html" class="footer__link">Terms</a></li>
-            <li><a href="status.html" class="footer__link">Status</a></li>
-          </ul>
-        </div>
-        <div class="footer__bottom">
-          <p class="footer__fineprint">© <span id="year"></span> Kyrbi · Proyecto educativo con estándares de producto profesional.</p>
-        </div>
-      </div>
-    </footer>
 
     <script src="assets/js/config.js" defer></script>
     <script src="assets/js/api.js" defer></script>
