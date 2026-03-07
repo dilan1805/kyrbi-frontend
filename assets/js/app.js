@@ -1031,6 +1031,9 @@
     const wrap = document.createElement("div");
     wrap.className = `message ${isAssistant ? "message--assistant" : "message--user"}`;
 
+    const inner = document.createElement("div");
+    inner.className = "message__inner";
+
     const avatar = document.createElement("div");
     avatar.className = "message__avatar";
     avatar.innerHTML = isAssistant 
@@ -1055,8 +1058,9 @@
 
     content.appendChild(author);
     content.appendChild(text);
-    wrap.appendChild(avatar);
-    wrap.appendChild(content);
+    inner.appendChild(avatar);
+    inner.appendChild(content);
+    wrap.appendChild(inner);
     return wrap;
   }
 
@@ -1376,19 +1380,21 @@
         typingEl = document.createElement('div');
         typingEl.className = 'message message--assistant typing-msg';
         typingEl.innerHTML = `
-          <div class="message__avatar">
-            <img src="assets/img/logo.svg" alt="K" style="width:24px;height:24px;">
-          </div>
-          <div class="message__content">
-            <span class="message__author">Kyrbi</span>
-            <div class="thought-block" id="thought-block-active">
-              <div class="thought-header"><i class="fa-solid fa-chevron-down"></i> Pensando...</div>
-              <div class="thought-content">Analizando el contexto educativo...</div>
+          <div class="message__inner">
+            <div class="message__avatar">
+              <img src="assets/img/logo.svg" alt="K" style="width:24px;height:24px;">
             </div>
-            <div class="typing-indicator">
-              <span class="typing-dot"></span>
-              <span class="typing-dot"></span>
-              <span class="typing-dot"></span>
+            <div class="message__content">
+              <span class="message__author">Kyrbi</span>
+              <div class="thought-block" id="thought-block-active">
+                <div class="thought-header"><i class="fa-solid fa-chevron-down"></i> Pensando...</div>
+                <div class="thought-content">Analizando el contexto educativo...</div>
+              </div>
+              <div class="typing-indicator">
+                <span class="typing-dot"></span>
+                <span class="typing-dot"></span>
+                <span class="typing-dot"></span>
+              </div>
             </div>
           </div>
         `;
