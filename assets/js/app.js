@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    Kyrbi frontend app
    - Navigation behavior
    - Chat UI render
@@ -67,7 +67,17 @@
     navToggle: document.querySelector(".nav__toggle"),
     navLinks: document.getElementById("nav-links"),
     navAnchors: Array.from(document.querySelectorAll(".nav__link")),
-    modeTabs: Array.from(document.querySelectorAll(".mode-tab")),
+    // New Premium UI Elements
+    chatSidebar: document.getElementById("chat-sidebar"),
+    sidebarToggle: document.getElementById("sidebar-toggle"),
+    modeItems: Array.from(document.querySelectorAll(".mode-item")),
+    chatTextarea: document.getElementById("chat-textarea"),
+    sendMessageBtn: document.getElementById("send-message-btn"),
+    currentModeBadge: document.getElementById("current-mode-badge"),
+    settingsModal: document.getElementById("settings-modal"),
+    sidebarSettingsBtn: document.getElementById("sidebar-settings-btn"),
+    modalClose: document.querySelector(".modal-close"),
+    
     startButtons: Array.from(document.querySelectorAll('[data-action="start-kyrbi"]')),
     heroMount: document.getElementById("kyrbi-hero"),
     appMount: document.getElementById("kyrbi-app"),
@@ -589,11 +599,17 @@
     },
 
     syncModeTabs() {
-      dom.modeTabs.forEach((btn) => {
+      // Support both legacy and new premium mode items
+      const items = [...dom.modeItems, ...Array.from(document.querySelectorAll('.mode-tab'))];
+      items.forEach((btn) => {
         const active = btn.dataset.mode === state.mode;
         btn.classList.toggle("is-active", active);
         btn.setAttribute("aria-selected", active ? "true" : "false");
       });
+      
+      if (dom.currentModeBadge) {
+        dom.currentModeBadge.textContent = MODES[state.mode]?.label || "Kyrbi";
+      }
     },
 
     syncSettingsForm() {
@@ -748,6 +764,71 @@
       const active = getActiveNavKey();
       if (active) dom.navAnchors.forEach((a) => a.classList.toggle("is-active", a.dataset.nav === active));
 
+      // 1. Premium Sidebar Toggle
+      if (dom.sidebarToggle && dom.chatSidebar) {
+        dom.sidebarToggle.addEventListener("click", () => {
+          const isOpen = dom.chatSidebar.classList.toggle("is-open");
+          dom.sidebarToggle.setAttribute("aria-label", isOpen ? "Cerrar lateral" : "Abrir lateral");
+        });
+      }
+
+      // 2. Settings Modal Logic
+      if (dom.sidebarSettingsBtn && dom.settingsModal) {
+        dom.sidebarSettingsBtn.addEventListener("click", () => {
+          dom.settingsModal.hidden = false;
+          dom.settingsModal.setAttribute("aria-hidden", "false");
+        });
+
+        const closeModal = () => {
+          dom.settingsModal.hidden = true;
+          dom.settingsModal.setAttribute("aria-hidden", "true");
+        };
+
+        dom.modalClose?.addEventListener("click", closeModal);
+        dom.settingsModal.addEventListener("click", (e) => {
+          if (e.target === dom.settingsModal) closeModal();
+        });
+        
+        // Intercept save to close modal
+        const originalSave = dom.settingsSave?.onclick;
+        dom.settingsSave?.addEventListener("click", closeModal);
+      }
+
+      // 3. Premium Textarea Auto-resize
+      if (dom.chatTextarea) {
+        dom.chatTextarea.addEventListener("input", () => {
+          dom.chatTextarea.style.height = "auto";
+          dom.chatTextarea.style.height = (dom.chatTextarea.scrollHeight) + "px";
+          
+          if (dom.sendMessageBtn) {
+            dom.sendMessageBtn.disabled = !dom.chatTextarea.value.trim() || !isUserAuthenticated();
+          }
+        });
+
+        dom.chatTextarea.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            const value = dom.chatTextarea.value.trim();
+            if (value && isUserAuthenticated()) {
+              actions.sendUserMessage(value, { focusAfterSend: true });
+              dom.chatTextarea.value = "";
+              dom.chatTextarea.style.height = "auto";
+            }
+          }
+        });
+      }
+
+      if (dom.sendMessageBtn) {
+        dom.sendMessageBtn.addEventListener("click", () => {
+          const value = dom.chatTextarea.value.trim();
+          if (value) {
+            actions.sendUserMessage(value, { focusAfterSend: true });
+            dom.chatTextarea.value = "";
+            dom.chatTextarea.style.height = "auto";
+          }
+        });
+      }
+
       this.hero = dom.heroMount ? createChatUI(dom.heroMount, { variant: "hero" }) : null;
       this.app = dom.appMount ? createChatUI(dom.appMount, { variant: "app" }) : null;
 
@@ -784,13 +865,19 @@
       bindChat(this.app, true);
       this.syncChatAccess();
 
-      dom.modeTabs.forEach((btn) => {
-        btn.addEventListener("click", () => {
-          const mode = btn.dataset.mode;
-          if (!mode) return;
-          actions.setMode(mode, { announce: true });
-        });
-      });
+      const handleModeClick = (btn) => {
+        const mode = btn.dataset.mode;
+        if (!mode) return;
+        actions.setMode(mode, { announce: true });
+        
+        // Auto-close sidebar on mobile after selecting mode
+        if (window.innerWidth <= 768 && dom.chatSidebar) {
+          dom.chatSidebar.classList.remove("is-open");
+        }
+      };
+
+      dom.modeItems.forEach((btn) => btn.addEventListener("click", () => handleModeClick(btn)));
+      dom.modeTabs.forEach((btn) => btn.addEventListener("click", () => handleModeClick(btn)));
 
       dom.startButtons.forEach((btn) => {
         btn.addEventListener("click", () => {
@@ -860,11 +947,28 @@
         chatRefs.log.innerHTML = "";
         const msgs = limit ? state.messages.slice(-limit) : state.messages;
 
-        msgs.forEach((msg) => chatRefs.log.appendChild(renderMessage(msg)));
+        if (msgs.length === 0 && !limit) {
+          chatRefs.log.innerHTML = `
+            <div class="chat-empty-state">
+              <div class="empty-logo">
+                <img src="assets/img/logo.svg" alt="Kyrbi" />
+              </div>
+              <h2>¿En qué puedo ayudarte hoy?</h2>
+              <p>Elige un modo y comencemos a construir mejores hábitos juntos.</p>
+            </div>
+          `;
+        } else {
+          msgs.forEach((msg) => chatRefs.log.appendChild(renderMessage(msg)));
+        }
 
         const modeMeta = MODES[state.mode] || MODES.general || { label: "Kyrbi", tone: "" };
         const subtitle = chatRefs.root.querySelector(".chat__subtitle");
         if (subtitle) subtitle.textContent = `${modeMeta.label}${modeMeta.tone ? ` · ${modeMeta.tone}` : ""}`;
+        
+        if (dom.currentModeBadge) {
+          dom.currentModeBadge.textContent = modeMeta.label;
+        }
+
         scrollToBottom(chatRefs.log);
       };
 
@@ -878,40 +982,36 @@
   };
 
   function renderMessage(msg) {
+    const isAssistant = msg.role === "assistant";
     const wrap = document.createElement("div");
-    wrap.className = `msg ${msg.role === "user" ? "msg--user" : "msg--kyrbi"}`;
+    wrap.className = `message ${isAssistant ? "message--assistant" : "message--user"}`;
 
     const avatar = document.createElement("div");
-    avatar.className = "msg__avatar";
-    avatar.textContent = msg.role === "user" ? "Tu" : "K";
+    avatar.className = "message__avatar";
+    avatar.innerHTML = isAssistant 
+      ? '<img src="assets/img/logo.svg" alt="K" style="width:24px;height:24px;">' 
+      : '<i class="fa-solid fa-user"></i>';
 
-    const bubble = document.createElement("div");
-    bubble.className = "msg__bubble";
+    const content = document.createElement("div");
+    content.className = "message__content";
 
-    const text = document.createElement(msg.role === "assistant" ? "div" : "p");
-    text.className = msg.role === "assistant" ? "msg__text msg__rich" : "msg__text";
-    if (msg.role === "assistant") {
+    const author = document.createElement("span");
+    author.className = "message__author";
+    author.textContent = isAssistant ? (MODES[msg.mode || state.mode]?.label || "Kyrbi") : "Tú";
+
+    const text = document.createElement("div");
+    text.className = "message__text";
+    
+    if (isAssistant) {
       renderAssistantRichText(text, msg.text);
     } else {
       text.textContent = msg.text;
     }
 
-    const meta = document.createElement("div");
-    meta.className = "msg__meta";
-
-    const time = document.createElement("span");
-    time.textContent = msg.time || "";
-
-    const tag = document.createElement("span");
-    tag.className = "msg__tag";
-    tag.textContent = msg.role === "user" ? "Tu mensaje" : (MODES[msg.mode || state.mode]?.label || "Kyrbi");
-
-    meta.appendChild(tag);
-    meta.appendChild(time);
-    bubble.appendChild(text);
-    bubble.appendChild(meta);
+    content.appendChild(author);
+    content.appendChild(text);
     wrap.appendChild(avatar);
-    wrap.appendChild(bubble);
+    wrap.appendChild(content);
     return wrap;
   }
 
@@ -1224,6 +1324,27 @@
 
       state.typing = true;
       ui.setConnectionChip("Kyrbi está pensando...");
+      
+      // Show typing indicator in UI
+      if (dom.appMount) {
+        const typingEl = document.createElement('div');
+        typingEl.className = 'message message--assistant typing-msg';
+        typingEl.innerHTML = `
+          <div class="message__avatar">
+            <img src="assets/img/logo.svg" alt="K" style="width:24px;height:24px;">
+          </div>
+          <div class="message__content">
+            <span class="message__author">Kyrbi</span>
+            <div class="typing-indicator">
+              <span class="typing-dot"></span>
+              <span class="typing-dot"></span>
+              <span class="typing-dot"></span>
+            </div>
+          </div>
+        `;
+        dom.appMount.appendChild(typingEl);
+        scrollToBottom(dom.appMount);
+      }
 
       if (!window.KyrbiAPI) {
         state.typing = false;
@@ -1241,6 +1362,10 @@
 
         state.typing = false;
         ui.setConnectionChip("Disponible");
+        
+        // Remove typing indicator
+        const typingEl = dom.appMount?.querySelector('.typing-msg');
+        if (typingEl) typingEl.remove();
 
         this.addAssistantMessage(response.text, { mode: state.mode });
         if (dom.appMount) this.persistSession();

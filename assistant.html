@@ -55,137 +55,149 @@
       </nav>
     </header>
 
-    <main class="app-main" id="contenido">
-      <section class="section assistant assistant--premium reveal reveal--up" aria-label="Asistente IA">
-        <div class="container">
-          <div class="section__head reveal reveal--left">
-            <p class="assistant-kicker"><i class="fa-solid fa-gem" aria-hidden="true"></i> Workspace premium</p>
-            <h1 class="section__title">Asistente Kyrbi IA</h1>
-            <p class="section__lead">
-              Conversación educativa con continuidad real: historial, memoria y preferencias sincronizadas por cuenta.
-            </p>
+    <main class="app-main assistant-view" id="contenido">
+      <div class="chat-container">
+        <!-- Sidebar: Estilo ChatGPT Premium -->
+        <aside class="chat-sidebar" id="chat-sidebar">
+          <div class="sidebar-header">
+            <button id="new-chat-btn" type="button" class="button button--ghost button--sm button--full">
+              <i class="fa-solid fa-plus"></i> Nuevo chat
+            </button>
           </div>
 
-          <div class="assistant-premium-strip reveal reveal--right" aria-label="Beneficios premium">
-            <article class="assistant-premium-item">
-              <p class="assistant-premium-item__label">Disponibilidad</p>
-              <p class="assistant-premium-item__value">24/7</p>
-              <p class="assistant-premium-item__meta">Asistencia activa en todo momento</p>
-            </article>
-            <article class="assistant-premium-item">
-              <p class="assistant-premium-item__label">Continuidad</p>
-              <p class="assistant-premium-item__value">Historial + Memoria</p>
-              <p class="assistant-premium-item__meta">Contexto real entre sesiones</p>
-            </article>
-            <article class="assistant-premium-item">
-              <p class="assistant-premium-item__label">Calidad de respuesta</p>
-              <p class="assistant-premium-item__value">Modo experto</p>
-              <p class="assistant-premium-item__meta">Guia, Chef, Coach y Descanso</p>
-            </article>
-          </div>
-
-          <div class="assistant__layout">
-            <aside class="assistant__aside reveal reveal--left" aria-label="Panel lateral de control">
-              <div class="card card--soft">
-                <h2 class="card__title"><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> Modos de conversación</h2>
-                <p class="card__text">Selecciona un enfoque según el objetivo de la sesión.</p>
-                <div class="mode-tabs" role="tablist" aria-label="Modos de Kyrbi">
-                  <button class="mode-tab is-active" type="button" role="tab" aria-selected="true" data-mode="general">
-                    Guía general
-                  </button>
-                  <button class="mode-tab" type="button" role="tab" aria-selected="false" data-mode="chef">Chef</button>
-                  <button class="mode-tab" type="button" role="tab" aria-selected="false" data-mode="coach">Coach</button>
-                  <button class="mode-tab" type="button" role="tab" aria-selected="false" data-mode="descanso">
-                    Descanso
-                  </button>
-                </div>
+          <div class="sidebar-content">
+            <div class="sidebar-section">
+              <h2 class="sidebar-label">Modos de Kyrbi</h2>
+              <div class="mode-grid">
+                <button class="mode-item is-active" data-mode="general" title="Guía general">
+                  <i class="fa-solid fa-house-chimney"></i>
+                  <span>Guía</span>
+                </button>
+                <button class="mode-item" data-mode="chef" title="Chef">
+                  <i class="fa-solid fa-utensils"></i>
+                  <span>Chef</span>
+                </button>
+                <button class="mode-item" data-mode="coach" title="Coach">
+                  <i class="fa-solid fa-dumbbell"></i>
+                  <span>Coach</span>
+                </button>
+                <button class="mode-item" data-mode="descanso" title="Descanso">
+                  <i class="fa-solid fa-moon"></i>
+                  <span>Zzz</span>
+                </button>
               </div>
+            </div>
 
-              <div class="card card--soft assistant-panel">
-                <div class="assistant-panel__head">
-                  <h3 class="card__title"><i class="fa-regular fa-comments" aria-hidden="true"></i> Tus conversaciones</h3>
-                  <button id="new-chat-btn" type="button" class="button button--ghost button--sm">Nuevo chat</button>
-                </div>
-
-                <div class="history-toolbar">
-                  <input
-                    id="history-search"
-                    class="history-search"
-                    type="search"
-                    placeholder="Buscar conversaciones..."
-                    aria-label="Buscar en historial"
-                  />
-                </div>
-
-                <p class="card__text" id="history-status">Cargando historial...</p>
-                <ul id="conversation-history" class="history-list" aria-label="Historial de conversaciones"></ul>
+            <div class="sidebar-section">
+              <h2 class="sidebar-label">Historial</h2>
+              <div class="history-search-container">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input id="history-search" type="search" placeholder="Buscar..." />
               </div>
+              <ul id="conversation-history" class="sidebar-list"></ul>
+              <p id="history-status" class="sidebar-status">Cargando...</p>
+            </div>
 
-              <div class="card card--soft assistant-panel">
-                <h3 class="card__title"><i class="fa-solid fa-brain" aria-hidden="true"></i> Memoria guardada</h3>
-                <p class="card__text">Resumen persistente para continuidad entre sesiones.</p>
-                <pre id="memory-summary" class="memory-box">Sin memoria disponible.</pre>
-                <p class="memory-meta" id="memory-meta"></p>
+            <div class="sidebar-section">
+              <h2 class="sidebar-label">Memoria</h2>
+              <div class="sidebar-card">
+                <pre id="memory-summary">Sin memoria.</pre>
               </div>
-
-              <div class="card card--soft assistant-panel">
-                <h3 class="card__title"><i class="fa-solid fa-sliders" aria-hidden="true"></i> Configuración</h3>
-                <form id="chat-settings" class="settings-form" onsubmit="return false;">
-                  <label class="settings-row">
-                    <span>Auto-guardar chat</span>
-                    <input id="setting-autosave" type="checkbox" checked />
-                  </label>
-
-                  <label class="settings-row">
-                    <span>Modo por defecto</span>
-                    <select id="setting-default-mode">
-                      <option value="general">Guía general</option>
-                      <option value="chef">Chef</option>
-                      <option value="coach">Coach</option>
-                      <option value="descanso">Descanso</option>
-                    </select>
-                  </label>
-
-                  <label class="settings-row">
-                    <span>Tema</span>
-                    <select id="setting-theme">
-                      <option value="system">Sistema</option>
-                      <option value="light">Claro</option>
-                      <option value="dark">Oscuro</option>
-                    </select>
-                  </label>
-
-                  <button id="settings-save" type="button" class="button button--primary button--sm button--full">
-                    Guardar configuración
-                  </button>
-                  <button id="onboarding-reset" type="button" class="button button--ghost button--sm button--full">
-                    Reiniciar onboarding
-                  </button>
-                </form>
-              </div>
-            </aside>
-
-            <div class="assistant__chat reveal reveal--right">
-              <div class="onboarding-banner" id="onboarding-banner" aria-hidden="true" hidden>
-                <p class="onboarding-banner__title">Bienvenido a Kyrbi</p>
-                <p class="onboarding-banner__text">
-                  1) Elige modo, 2) escribe tu objetivo, 3) guarda conversaciones para dar seguimiento.
-                </p>
-                <div class="onboarding-banner__actions">
-                  <button id="onboarding-dismiss" type="button" class="button button--primary button--sm">Entendido</button>
-                </div>
-              </div>
-              <div class="assistant-live-bar" aria-label="Estado del workspace premium">
-                <span class="assistant-live-bar__item"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> Cuenta protegida</span>
-                <span class="assistant-live-bar__item"><i class="fa-solid fa-database" aria-hidden="true"></i> Historial sincronizado</span>
-                <span class="assistant-live-bar__item"><i class="fa-solid fa-bolt" aria-hidden="true"></i> Respuesta en tiempo real</span>
-              </div>
-              <div class="chat-shell" id="kyrbi-app" aria-label="Chat principal con Kyrbi"></div>
             </div>
           </div>
+
+          <div class="sidebar-footer">
+            <button id="sidebar-settings-btn" class="sidebar-footer-item">
+              <i class="fa-solid fa-gear"></i> Configuración
+            </button>
+          </div>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <div class="chat-main">
+          <header class="chat-header">
+            <button id="sidebar-toggle" class="sidebar-toggle-btn" aria-label="Cerrar lateral">
+              <i class="fa-solid fa-sidebar"></i>
+            </button>
+            <div class="chat-header-info">
+              <span id="current-mode-badge" class="mode-badge">Guía general</span>
+              <h1 class="chat-title">Chat con Kyrbi</h1>
+            </div>
+            <div class="chat-header-actions">
+              <span class="status-indicator online"></span>
+            </div>
+          </header>
+
+          <div class="chat-messages-wrapper" id="kyrbi-app">
+            <!-- Los mensajes se inyectan aquí -->
+            <div class="chat-empty-state">
+              <div class="empty-logo">
+                <img src="assets/img/logo.svg" alt="Kyrbi" />
+              </div>
+              <h2>¿En qué puedo ayudarte hoy?</h2>
+              <p>Elige un modo y comencemos a construir mejores hábitos juntos.</p>
+            </div>
+          </div>
+
+          <footer class="chat-input-area">
+            <div class="chat-input-container">
+              <div class="input-wrapper">
+                <textarea 
+                  id="chat-textarea" 
+                  placeholder="Envía un mensaje a Kyrbi..." 
+                  rows="1"
+                  maxlength="1200"
+                ></textarea>
+                <button id="send-message-btn" class="send-button" disabled>
+                  <i class="fa-solid fa-arrow-up"></i>
+                </button>
+              </div>
+              <p class="input-footer-text">
+                Kyrbi puede cometer errores. Verifica la información importante.
+              </p>
+            </div>
+          </footer>
         </div>
-      </section>
+      </div>
+
+      <!-- Settings Modal (Glassmorphism) -->
+      <div id="settings-modal" class="modal-overlay" hidden>
+        <div class="modal-content card">
+          <header class="modal-header">
+            <h3>Configuración de Kyrbi</h3>
+            <button class="modal-close"><i class="fa-solid fa-xmark"></i></button>
+          </header>
+          <form id="chat-settings" class="settings-form">
+            <div class="setting-group">
+              <label>Modo por defecto</label>
+              <select id="setting-default-mode">
+                <option value="general">Guía general</option>
+                <option value="chef">Chef</option>
+                <option value="coach">Coach</option>
+                <option value="descanso">Descanso</option>
+              </select>
+            </div>
+            <div class="setting-group">
+              <label>Tema visual</label>
+              <select id="setting-theme">
+                <option value="system">Sistema</option>
+                <option value="light">Claro</option>
+                <option value="dark">Oscuro</option>
+              </select>
+            </div>
+            <div class="setting-group flex-row">
+              <label>Auto-guardar conversaciones</label>
+              <input type="checkbox" id="setting-autosave" checked />
+            </div>
+            <div class="modal-actions">
+              <button type="button" id="onboarding-reset" class="button button--ghost">Reiniciar Onboarding</button>
+              <button type="button" id="settings-save" class="button button--primary">Guardar cambios</button>
+            </div>
+          </form>
+        </div>
+      </div>
     </main>
+
 
     <footer class="footer" aria-label="Pie de página">
       <div class="container footer__grid">
