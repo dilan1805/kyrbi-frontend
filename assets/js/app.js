@@ -782,26 +782,33 @@
         const panes = document.querySelectorAll(".tab-pane");
         const themeOptions = document.querySelectorAll(".theme-option");
 
-        const openModal = () => {
+        const openModal = (e) => {
+          if (e) e.preventDefault();
           modal.hidden = false;
+          modal.style.display = 'flex'; // Ensure it's visible
           modal.setAttribute("aria-hidden", "false");
         };
 
-        const closeModal = () => {
+        const closeModal = (e) => {
+          if (e) e.preventDefault();
           modal.hidden = true;
+          modal.style.display = 'none';
           modal.setAttribute("aria-hidden", "true");
         };
 
         dom.sidebarSettingsBtn.addEventListener("click", openModal);
         closeBtn?.addEventListener("click", closeModal);
         cancelBtn?.addEventListener("click", closeModal);
-        saveBtn?.addEventListener("click", () => {
-          // Save logic here (already handled by other listeners if any, 
-          // but we ensure it closes)
-          setTimeout(closeModal, 100); 
+        
+        // Use a more direct approach for the save button
+        saveBtn?.addEventListener("click", (e) => {
+          e.preventDefault();
+          // Logic to save settings could go here
+          console.log("Configuración guardada");
+          closeModal();
         });
 
-        modal.addEventListener("click", (e) => {
+        modal.addEventListener("mousedown", (e) => {
           if (e.target === modal) closeModal();
         });
 
