@@ -772,26 +772,64 @@
         });
       }
 
-      // 2. Settings Modal Logic
+      // 2. Settings Modal Logic (Enhanced)
       if (dom.sidebarSettingsBtn && dom.settingsModal) {
-        dom.sidebarSettingsBtn.addEventListener("click", () => {
-          dom.settingsModal.hidden = false;
-          dom.settingsModal.setAttribute("aria-hidden", "false");
-        });
+        const modal = dom.settingsModal;
+        const closeBtn = dom.modalClose;
+        const cancelBtn = document.getElementById("settings-cancel");
+        const saveBtn = dom.settingsSave;
+        const tabs = document.querySelectorAll(".settings-tab");
+        const panes = document.querySelectorAll(".tab-pane");
+        const themeOptions = document.querySelectorAll(".theme-option");
 
-        const closeModal = () => {
-          dom.settingsModal.hidden = true;
-          dom.settingsModal.setAttribute("aria-hidden", "true");
+        const openModal = () => {
+          modal.hidden = false;
+          modal.setAttribute("aria-hidden", "false");
         };
 
-        dom.modalClose?.addEventListener("click", closeModal);
-        dom.settingsModal.addEventListener("click", (e) => {
-          if (e.target === dom.settingsModal) closeModal();
+        const closeModal = () => {
+          modal.hidden = true;
+          modal.setAttribute("aria-hidden", "true");
+        };
+
+        dom.sidebarSettingsBtn.addEventListener("click", openModal);
+        closeBtn?.addEventListener("click", closeModal);
+        cancelBtn?.addEventListener("click", closeModal);
+        saveBtn?.addEventListener("click", () => {
+          // Save logic here (already handled by other listeners if any, 
+          // but we ensure it closes)
+          setTimeout(closeModal, 100); 
         });
-        
-        // Intercept save to close modal
-        const originalSave = dom.settingsSave?.onclick;
-        dom.settingsSave?.addEventListener("click", closeModal);
+
+        modal.addEventListener("click", (e) => {
+          if (e.target === modal) closeModal();
+        });
+
+        // Tab Switching Logic
+        tabs.forEach(tab => {
+          tab.addEventListener("click", () => {
+            const target = tab.dataset.tab;
+            tabs.forEach(t => t.classList.remove("is-active"));
+            panes.forEach(p => p.classList.remove("is-active"));
+            tab.classList.add("is-active");
+            document.getElementById(`tab-${target}`).classList.add("is-active");
+          });
+        });
+
+        // Theme Selection Logic
+        themeOptions.forEach(opt => {
+          opt.addEventListener("click", () => {
+            themeOptions.forEach(o => o.classList.remove("is-active"));
+            opt.classList.add("is-active");
+            const theme = opt.dataset.theme;
+            // Apply theme logic
+            if (theme === 'system') {
+              document.documentElement.removeAttribute('data-theme');
+            } else {
+              document.documentElement.setAttribute('data-theme', theme);
+            }
+          });
+        });
       }
 
       // 3. Premium Textarea Auto-resize
@@ -1325,9 +1363,10 @@
       state.typing = true;
       ui.setConnectionChip("Kyrbi está pensando...");
       
-      // Show typing indicator in UI
+      // 1. Thinking Phase UI (ChatGPT style)
+      let typingEl = null;
       if (dom.appMount) {
-        const typingEl = document.createElement('div');
+        typingEl = document.createElement('div');
         typingEl.className = 'message message--assistant typing-msg';
         typingEl.innerHTML = `
           <div class="message__avatar">
@@ -1335,6 +1374,10 @@
           </div>
           <div class="message__content">
             <span class="message__author">Kyrbi</span>
+            <div class="thought-block" id="thought-block-active">
+              <div class="thought-header"><i class="fa-solid fa-chevron-down"></i> Pensando...</div>
+              <div class="thought-content">Analizando el contexto educativo...</div>
+            </div>
             <div class="typing-indicator">
               <span class="typing-dot"></span>
               <span class="typing-dot"></span>
@@ -1348,12 +1391,20 @@
 
       if (!window.KyrbiAPI) {
         state.typing = false;
+        if (typingEl) typingEl.remove();
         this.addAssistantMessage("No se pudo conectar al backend.");
         ui.render();
         return;
       }
 
+      // 2. Simulated Delay (Thinking time)
+      const reasoningMode = document.getElementById('setting-reasoning')?.value || 'normal';
+      const thinkingDelay = reasoningMode === 'deep' ? 3000 : 1000;
+
       try {
+        // Wait for simulated thinking
+        await new Promise(r => setTimeout(r, thinkingDelay));
+
         const response = await window.KyrbiAPI.sendMessage(clean, mapModeToApi(state.mode), state.conversationId);
         if (response.conversationId) state.conversationId = response.conversationId;
 
@@ -1363,11 +1414,12 @@
         state.typing = false;
         ui.setConnectionChip("Disponible");
         
-        // Remove typing indicator
-        const typingEl = dom.appMount?.querySelector('.typing-msg');
+        // Remove typing indicator and start streaming
         if (typingEl) typingEl.remove();
 
-        this.addAssistantMessage(response.text, { mode: state.mode });
+        // 3. Streaming Effect Simulation
+        await this.addAssistantMessageWithStreaming(response.text, { mode: state.mode });
+        
         if (dom.appMount) this.persistSession();
         ui.render();
 
@@ -1378,6 +1430,7 @@
       } catch (error) {
         state.typing = false;
         ui.setConnectionChip("Error");
+        if (typingEl) typingEl.remove();
 
         const errorMessage = error.message || "error al comunicarse con Kyrbi.";
         this.addAssistantMessage(`Lo siento, ${errorMessage.toLowerCase()}`);
@@ -1385,6 +1438,41 @@
         ui.render();
         console.error("Error al enviar mensaje:", error);
       }
+    },
+
+    async addAssistantMessageWithStreaming(fullText, options) {
+      const msg = {
+        role: "assistant",
+        text: "",
+        mode: options.mode || state.mode,
+        time: nowTime()
+      };
+      
+      state.messages.push(msg);
+      ui.render();
+
+      const lastMsgEl = dom.appMount?.lastElementChild?.querySelector('.message__text');
+      if (!lastMsgEl) return;
+
+      // Simulated streaming
+      const speedSetting = parseInt(document.getElementById('setting-speed')?.value || 50);
+      const baseSpeed = 101 - speedSetting; // Higher value = Slower speed
+      
+      return new Promise((resolve) => {
+        let i = 0;
+        const interval = setInterval(() => {
+          if (i < fullText.length) {
+            msg.text += fullText.charAt(i);
+            // Only update the last message text to avoid full re-render
+            renderAssistantRichText(lastMsgEl, msg.text);
+            scrollToBottom(dom.appMount);
+            i++;
+          } else {
+            clearInterval(interval);
+            resolve();
+          }
+        }, baseSpeed / 3);
+      });
     },
 
     async boot() {

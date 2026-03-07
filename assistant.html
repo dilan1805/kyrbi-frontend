@@ -160,38 +160,97 @@
         </div>
       </div>
 
-      <!-- Settings Modal (Glassmorphism) -->
+      <!-- Settings Modal (Premium & Expanded) -->
       <div id="settings-modal" class="modal-overlay" hidden>
-        <div class="modal-content card">
+        <div class="modal-content card settings-card">
           <header class="modal-header">
-            <h3>Configuración de Kyrbi</h3>
-            <button class="modal-close"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-header-info">
+              <h3>Personalización de Kyrbi</h3>
+              <p>Ajusta tu experiencia con la IA</p>
+            </div>
+            <button class="modal-close" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
           </header>
+          
+          <div class="settings-tabs">
+            <button class="settings-tab is-active" data-tab="general">General</button>
+            <button class="settings-tab" data-tab="ia">IA & Respuesta</button>
+            <button class="settings-tab" data-tab="privacidad">Privacidad</button>
+          </div>
+
           <form id="chat-settings" class="settings-form">
-            <div class="setting-group">
-              <label>Modo por defecto</label>
-              <select id="setting-default-mode">
-                <option value="general">Guía general</option>
-                <option value="chef">Chef</option>
-                <option value="coach">Coach</option>
-                <option value="descanso">Descanso</option>
-              </select>
+            <!-- Tab: General -->
+            <div class="tab-pane is-active" id="tab-general">
+              <div class="setting-group">
+                <label><i class="fa-solid fa-palette"></i> Tema visual</label>
+                <div class="theme-grid">
+                  <button type="button" class="theme-option" data-theme="light">
+                    <i class="fa-solid fa-sun"></i> Claro
+                  </button>
+                  <button type="button" class="theme-option" data-theme="dark">
+                    <i class="fa-solid fa-moon"></i> Oscuro
+                  </button>
+                  <button type="button" class="theme-option is-active" data-theme="system">
+                    <i class="fa-solid fa-desktop"></i> Sistema
+                  </button>
+                </div>
+              </div>
+              <div class="setting-group">
+                <label><i class="fa-solid fa-language"></i> Idioma de interfaz</label>
+                <select id="setting-lang">
+                  <option value="es">Español (Predeterminado)</option>
+                  <option value="en">English</option>
+                </select>
+              </div>
             </div>
-            <div class="setting-group">
-              <label>Tema visual</label>
-              <select id="setting-theme">
-                <option value="system">Sistema</option>
-                <option value="light">Claro</option>
-                <option value="dark">Oscuro</option>
-              </select>
+
+            <!-- Tab: IA & Respuesta -->
+            <div class="tab-pane" id="tab-ia">
+              <div class="setting-group">
+                <label><i class="fa-solid fa-brain"></i> Modo de razonamiento</label>
+                <select id="setting-reasoning">
+                  <option value="normal">Estándar (Rápido)</option>
+                  <option value="deep">Pensamiento Profundo (Lento)</option>
+                </select>
+                <p class="setting-hint">El modo profundo permite a Kyrbi "pensar" antes de responder.</p>
+              </div>
+              <div class="setting-group">
+                <label><i class="fa-solid fa-bolt"></i> Velocidad de escritura</label>
+                <input type="range" id="setting-speed" min="1" max="100" value="50" />
+              </div>
+              <div class="setting-group">
+                <label><i class="fa-solid fa-comment-dots"></i> Tono de voz</label>
+                <select id="setting-tone">
+                  <option value="friendly">Amigable y Cercano</option>
+                  <option value="professional">Técnico y Profesional</option>
+                  <option value="motivational">Motivador y Enérgico</option>
+                </select>
+              </div>
             </div>
-            <div class="setting-group flex-row">
-              <label>Auto-guardar conversaciones</label>
-              <input type="checkbox" id="setting-autosave" checked />
+
+            <!-- Tab: Privacidad -->
+            <div class="tab-pane" id="tab-privacidad">
+              <div class="setting-item flex-row">
+                <div class="setting-info">
+                  <label>Auto-guardar historial</label>
+                  <p>Sincroniza tus chats en todos tus dispositivos.</p>
+                </div>
+                <input type="checkbox" id="setting-autosave" checked />
+              </div>
+              <div class="setting-item flex-row">
+                <div class="setting-info">
+                  <label>Memoria de contexto</label>
+                  <p>Permite que Kyrbi recuerde tus preferencias pasadas.</p>
+                </div>
+                <input type="checkbox" id="setting-memory" checked />
+              </div>
+              <button type="button" id="delete-data-btn" class="button button--ghost button--danger">
+                <i class="fa-solid fa-trash"></i> Borrar todos mis datos
+              </button>
             </div>
+
             <div class="modal-actions">
-              <button type="button" id="onboarding-reset" class="button button--ghost">Reiniciar Onboarding</button>
-              <button type="button" id="settings-save" class="button button--primary">Guardar cambios</button>
+              <button type="button" id="settings-cancel" class="button button--ghost">Cancelar</button>
+              <button type="button" id="settings-save" class="button button--primary">Guardar configuración</button>
             </div>
           </form>
         </div>
