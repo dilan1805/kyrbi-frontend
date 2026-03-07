@@ -1,106 +1,28 @@
 @import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap");
 
 /* ==========================================================================
-   Variables & Theme
+   Premium Color Palette - Rockstar Edition
    ========================================================================== */
 :root {
-  /* ==========================================================================
-     Premium Color Palette - Deep & Nuanced
-     ========================================================================== */
-  --brand-teal: #1a7c85;
-  --brand-teal-light: #26a9b5;
-  --brand-teal-dark: #125a61;
-  
-  --brand-pink: #e12d8a;
-  --brand-pink-light: #f062b0;
-  --brand-pink-dark: #b01e6a;
-  
-  --brand-cream: #fdf5f0;
-  --white: #ffffff;
-  
-  /* Modern Neutral Scale (Tailwind Slate Inspired) */
-  --slate-50: #f8fafc;
-  --slate-100: #f1f5f9;
-  --slate-200: #e2e8f0;
-  --slate-300: #cbd5e1;
-  --slate-400: #94a3b8;
-  --slate-500: #64748b;
-  --slate-600: #475569;
-  --slate-700: #334155;
-  --slate-800: #1e293b;
-  --slate-900: #0f172a;
-  --slate-950: #020617;
-
-  /* Deep Theme Overhaul */
-  --background: #050811; /* Even deeper than slate-950 */
-  --surface: rgba(15, 23, 42, 0.6);
-  --surface-elevated: rgba(30, 41, 59, 0.4);
+  --background: #050505;
+  --surface: #0a0a0a;
+  --surface-elevated: #1a1a1a;
   --surface-border: rgba(255, 255, 255, 0.08);
   
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-tertiary: #64748b;
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.6);
+  --text-tertiary: rgba(255, 255, 255, 0.4);
   
-  --primary: var(--brand-teal);
-  --primary-glow: rgba(26, 124, 133, 0.35);
-  --secondary: var(--brand-pink);
-  --secondary-glow: rgba(225, 45, 138, 0.35);
+  --primary: #ffffff;
+  --brand-teal: #16a6a0;
+  --accent-gradient: linear-gradient(135deg, #16a6a0 0%, #0f9497 100%);
   
-  --accent-gradient: linear-gradient(135deg, var(--brand-teal) 0%, var(--brand-pink) 100%);
-  --accent-gradient-hover: linear-gradient(135deg, var(--brand-teal-light) 0%, var(--brand-pink-light) 100%);
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
   
-  /* Advanced Glassmorphism */
-  --glass-bg: rgba(15, 23, 42, 0.7);
-  --glass-border: rgba(255, 255, 255, 0.1);
-  --glass-blur: 16px;
-  
-  /* Sophisticated Spacing */
-  --space-unit: 4px;
-  --space-2xs: 4px;
-  --space-xs: 8px;
-  --space-sm: 16px;
-  --space-md: 24px;
-  --space-lg: 40px;
-  --space-xl: 64px;
-  --space-2xl: 96px;
-  
-  /* Fluid Typography - Pro Level */
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-  --font-display: 'Outfit', var(--font-sans);
-  
-  --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.8125rem);
-  --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 0.9375rem);
-  --text-base: clamp(1rem, 0.95rem + 0.5vw, 1.0625rem);
-  --text-lg: clamp(1.125rem, 1.05rem + 0.75vw, 1.25rem);
-  --text-xl: clamp(1.25rem, 1.15rem + 1vw, 1.75rem);
-  --text-2xl: clamp(1.5rem, 1.25rem + 2vw, 2.5rem);
-  --text-3xl: clamp(2rem, 1.5rem + 4vw, 4rem);
-  --text-4xl: clamp(2.5rem, 2rem + 6vw, 6rem);
-
-  /* Premium Effects */
-  --radius-sm: 12px;
-  --radius-md: 16px;
-  --radius-lg: 24px;
-  --radius-xl: 32px;
-  --radius-full: 9999px;
-  
-  /* Layered Shadows for Real Depth */
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-  --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
-  --shadow-premium: 0 0 0 1px var(--surface-border), var(--shadow-2xl);
-
-  /* Motion System */
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
-  --transition-fast: 200ms var(--ease-out);
-  --transition-base: 350ms var(--ease-out);
-  --transition-slow: 500ms var(--ease-out);
-
-  --header-height: 5rem;
-  --nav-offset: 5rem;
+  --font-sans: 'Manrope', system-ui, -apple-system, sans-serif;
+  --font-display: 'Sora', var(--font-sans);
 }
 
 [data-theme="light"] {
@@ -847,10 +769,10 @@ body.nav-open {
 }
 
 /* ==========================================================================
-   Ultra-Premium Chat Layout (Kyrbi IA 2026)
+   Ultra-Premium Chat Layout (Kyrbi IA 2026) - Rockstar Edition
    ========================================================================== */
 .assistant-view {
-  background: var(--background);
+  background: #050505; /* Absolute Black for Rockstar look */
   height: 100vh;
   padding-block: 0;
   overflow: hidden;
@@ -858,53 +780,64 @@ body.nav-open {
   flex-direction: column;
 }
 
-.assistant-view .app-header {
-  flex-shrink: 0;
-}
-
 .chat-container {
   display: flex;
-  height: calc(100vh - var(--header-height));
+  height: 100vh; /* Changed from calc(100vh - var(--header-height)) to 100vh */
   width: 100%;
   overflow: hidden;
   position: relative;
+  background: #050505;
 }
 
-/* Sidebar Ultra-Premium */
+/* Collapsible Sidebar Rockstar Design */
 .chat-sidebar {
   width: 280px;
-  background: rgba(13, 15, 26, 0.7);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-right: 1px solid var(--surface-border);
+  background: #0a0a0a; /* Darker sidebar */
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
   display: flex;
   flex-direction: column;
-  transition: transform var(--transition-base);
-  z-index: 100;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1000;
+  position: relative;
+}
+
+.chat-container.sidebar-collapsed .chat-sidebar {
+  width: 0;
+  transform: translateX(-100%);
+  opacity: 0;
+  visibility: hidden;
 }
 
 .sidebar-header {
   padding: var(--space-md);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .sidebar-new-btn {
-  width: 100%;
+  flex: 1;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: var(--space-sm);
-  padding: var(--space-sm);
-  background: transparent;
-  border: 1px solid var(--surface-border);
-  border-radius: var(--radius-md);
-  color: var(--text-primary);
-  font-weight: 600;
+  padding: 12px;
+  background: #1a1a1a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #fff;
+  font-weight: 800;
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   cursor: pointer;
-  transition: var(--transition-fast);
+  transition: all 0.2s ease;
 }
 
 .sidebar-new-btn:hover {
-  background: var(--surface-elevated);
-  border-color: var(--text-tertiary);
+  background: #252525;
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
 }
 
 .sidebar-content {
@@ -914,130 +847,127 @@ body.nav-open {
 }
 
 .sidebar-section {
-  margin-bottom: var(--space-lg);
+  margin-bottom: var(--space-xl);
 }
 
 .sidebar-label {
-  font-size: var(--text-xs);
-  color: var(--text-tertiary);
+  font-size: 11px;
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.3);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.15em;
   padding: 0 var(--space-sm);
-  margin-bottom: var(--space-xs);
-}
-
-.sidebar-nav-list, .sidebar-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+  margin-bottom: var(--space-sm);
 }
 
 .sidebar-nav-item, .sidebar-history-item {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
-  padding: var(--space-sm);
-  border-radius: var(--radius-md);
-  color: var(--text-secondary);
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.6);
   cursor: pointer;
-  transition: var(--transition-fast);
-  font-size: var(--text-sm);
-  margin-bottom: 2px;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 4px;
 }
 
 .sidebar-nav-item:hover, .sidebar-history-item:hover {
-  background: var(--surface-elevated);
-  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
 }
 
 .sidebar-nav-item.is-active {
-  background: var(--surface-elevated);
-  color: var(--text-primary);
-  font-weight: 600;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  box-shadow: inset 2px 0 0 var(--brand-teal);
 }
 
 .sidebar-footer {
   padding: var(--space-md);
-  border-top: 1px solid var(--surface-border);
+  background: #080808;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .sidebar-user-pill {
   width: 100%;
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
-  padding: var(--space-xs);
+  gap: 12px;
+  padding: 8px;
   background: transparent;
   border: none;
-  border-radius: var(--radius-md);
-  color: var(--text-primary);
+  border-radius: 8px;
+  color: #fff;
   cursor: pointer;
-  transition: var(--transition-fast);
+  transition: background 0.2s;
 }
 
 .sidebar-user-pill:hover {
-  background: var(--surface-elevated);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .user-avatar {
-  width: 32px;
-  height: 32px;
-  background: var(--accent-gradient);
-  border-radius: var(--radius-sm);
+  width: 36px;
+  height: 36px;
+  background: #1a1a1a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
-}
-
-.user-info {
-  flex: 1;
-  text-align: left;
-  display: flex;
-  flex-direction: column;
 }
 
 .user-name {
-  font-size: var(--text-sm);
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 700;
 }
 
 .user-plan {
-  font-size: 10px;
-  color: var(--text-tertiary);
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
 }
 
-/* Main Chat Area */
+/* Main Chat Area - True Full Width */
 .chat-main {
   flex: 1;
   display: flex;
   flex-direction: column;
-  background: #0d0f1a; /* Deep Space Background */
+  background: #050505;
   position: relative;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 100%;
 }
 
 .chat-header-minimal {
-  height: 60px;
+  height: 64px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 var(--space-md);
+  padding: 0 var(--space-lg);
+  background: rgba(5, 5, 5, 0.8);
+  backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  position: sticky;
+  top: 0;
+  z-index: 500;
 }
 
-.chat-model-selector {
-  font-weight: 700;
-  font-family: var(--font-display);
+.sidebar-toggle-btn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 1.2rem;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: var(--space-xs);
-  padding: var(--space-xs) var(--space-sm);
-  border-radius: var(--radius-md);
-  transition: var(--transition-fast);
+  padding: 8px;
+  border-radius: 6px;
+  transition: all 0.2s;
 }
 
-.chat-model-selector:hover {
+.sidebar-toggle-btn:hover {
+  color: #fff;
   background: rgba(255, 255, 255, 0.05);
 }
 
@@ -1046,164 +976,112 @@ body.nav-open {
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  padding-bottom: 120px; /* Space for input */
+  padding-bottom: 140px;
+  scrollbar-gutter: stable;
 }
 
-/* Centered Messages with Wide Layout */
+/* Ultra-Wide Rockstar Layout */
 .message-row {
   width: 100%;
   display: flex;
   justify-content: center;
   padding: var(--space-lg) var(--space-md);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.02);
 }
 
 .message-row--assistant {
-  background: rgba(255, 255, 255, 0.015);
+  background: rgba(255, 255, 255, 0.01);
 }
 
 .message-content {
-  max-width: 1100px; /* Expanded Width like requested */
-  width: 100%;
+  max-width: 1400px; /* Even wider for true full-screen feel */
+  width: 90%;
   display: flex;
-  gap: var(--space-md);
+  gap: var(--space-xl);
 }
 
 .message-avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: var(--radius-sm);
+  width: 40px;
+  height: 40px;
+  border-radius: 4px; /* Rockstar square/blocky style */
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2rem;
-}
-
-.message-avatar--user {
-  background: var(--surface-elevated);
-  color: var(--text-secondary);
+  font-size: 1.4rem;
+  background: #111;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .message-avatar--assistant {
-  background: var(--accent-gradient);
-  color: white;
+  background: #fff;
+  color: #000;
 }
 
 .message-text {
   flex: 1;
-  font-size: 1.05rem;
-  line-height: 1.6;
-  color: var(--text-primary);
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.9);
+  font-family: var(--font-sans);
 }
 
-.message-text p {
-  margin-bottom: var(--space-sm);
-}
-
-.message-text p:last-child {
-  margin-bottom: 0;
-}
-
-/* Thinking Phase Styles */
+/* Thinking Box Rockstar Style */
 .thinking-box {
-  background: rgba(255, 255, 255, 0.03);
-  border-left: 2px solid var(--brand-teal);
-  padding: var(--space-sm) var(--space-md);
-  margin-bottom: var(--space-md);
-  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-  font-size: var(--text-sm);
-  color: var(--text-tertiary);
-  font-style: italic;
-}
-
-/* Empty State Styles */
-.chat-empty-state {
-  flex: 1;
+  background: #0a0a0a;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  border-radius: 4px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.4);
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: var(--space-xl);
-  text-align: center;
+  gap: 12px;
 }
 
-.empty-title {
-  font-size: var(--text-2xl);
-  margin-bottom: var(--space-xl);
-  background: linear-gradient(to bottom, #fff, #94a3b8);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.empty-suggestions {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: var(--space-md);
-  max-width: 800px;
-  width: 100%;
-}
-
-.suggestion-card {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--surface-border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-md);
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--space-xs);
-  cursor: pointer;
-  transition: var(--transition-base);
-  text-align: left;
-}
-
-.suggestion-card i {
-  font-size: 1.2rem;
+.thinking-box i {
   color: var(--brand-teal);
+  animation: pulse 2s infinite;
 }
 
-.suggestion-card:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: var(--brand-teal);
-  transform: translateY(-4px);
-}
-
-/* Floating Input Area */
+/* Input Area Rockstar Floating Style */
 .chat-input-area {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
-  padding: var(--space-md);
-  background: linear-gradient(transparent, #0d0f1a 40%);
+  padding: 32px var(--space-md);
+  background: linear-gradient(to top, #050505 60%, transparent);
   display: flex;
   justify-content: center;
-  z-index: 50;
+  z-index: 1000;
 }
 
 .chat-input-container {
-  max-width: 1100px;
-  width: 100%;
+  max-width: 1000px;
+  width: 95%;
   display: flex;
   flex-direction: column;
-  gap: var(--space-xs);
+  gap: 12px;
 }
 
 .input-wrapper-premium {
-  background: rgba(30, 41, 59, 0.5);
-  backdrop-filter: blur(20px);
-  border: 1px solid var(--surface-border);
-  border-radius: 24px;
-  padding: 8px 12px;
+  background: #0f0f0f;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px; /* Less round, more architectural */
+  padding: 12px 16px;
   display: flex;
   align-items: flex-end;
-  gap: 8px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-  transition: border-color var(--transition-fast);
+  gap: 12px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .input-wrapper-premium:focus-within {
-  border-color: var(--brand-teal);
+  border-color: rgba(255, 255, 255, 0.3);
+  background: #141414;
+  transform: translateY(-2px);
 }
 
 #chat-textarea {
@@ -1211,112 +1089,96 @@ body.nav-open {
   background: transparent;
   border: none;
   resize: none;
-  padding: 10px 4px;
-  color: var(--text-primary);
-  font-size: 1.05rem;
-  max-height: 200px;
-  min-height: 44px;
-}
-
-#chat-textarea:focus {
-  outline: none;
-}
-
-.input-action-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: none;
-  background: transparent;
-  color: var(--text-secondary);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: var(--transition-fast);
-}
-
-.input-action-btn:hover {
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--text-primary);
-}
-
-.input-actions-right {
-  display: flex;
-  align-items: center;
-  gap: 4px;
+  padding: 8px 0;
+  color: #fff;
+  font-size: 1.1rem;
+  max-height: 250px;
+  min-height: 24px;
+  font-family: var(--font-sans);
 }
 
 .send-btn-premium {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: none;
-  background: var(--text-primary);
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: #fff;
   color: #000;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: var(--transition-fast);
-}
-
-.send-btn-premium:disabled {
-  background: #333;
-  color: #666;
-  cursor: not-allowed;
+  font-size: 1.2rem;
+  transition: all 0.2s;
 }
 
 .send-btn-premium:not(:disabled):hover {
+  background: var(--brand-teal);
+  color: #fff;
   transform: scale(1.05);
+}
+
+/* Rockstar Navigation Auth Buttons */
+.sidebar-footer #nav-auth {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sidebar-footer #nav-auth .button {
+  width: 100%;
+  justify-content: flex-start;
+  padding: 10px 14px;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  border-radius: 6px;
+  min-height: 40px;
+}
+
+.sidebar-footer #nav-auth .button--ghost {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-footer #nav-auth .button--primary {
   background: #fff;
+  color: #000;
+  border: none;
 }
 
-.input-disclaimer {
-  font-size: 11px;
-  color: var(--text-tertiary);
-  text-align: center;
+@keyframes pulse {
+  0% { opacity: 0.4; transform: scale(0.95); }
+  50% { opacity: 1; transform: scale(1.05); }
+  100% { opacity: 0.4; transform: scale(0.95); }
 }
 
-/* Responsive Overrides for Chat */
-@media (max-width: 768px) {
-  .chat-sidebar {
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    transform: translateX(-100%);
-  }
-
-  .chat-sidebar.is-open {
-    transform: translateX(0);
-  }
-
-  .message-content, .chat-input-container {
-    max-width: 100%;
-  }
-
-  .empty-suggestions {
-    grid-template-columns: 1fr;
-  }
+.chat-container.sidebar-collapsed .chat-main {
+  width: 100vw;
 }
 
-/* Fix for Scrollbars */
+/* Ensure brand text doesn't wrap in sidebar */
+.sidebar-header .brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: #fff;
+  white-space: nowrap;
+}
+
+/* Scrollbar customization for Rockstar look */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: #050505;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
+  background: #1a1a1a;
+  border-radius: 0;
+  border: 2px solid #050505;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: #252525;
 }
 
 .helper-row {

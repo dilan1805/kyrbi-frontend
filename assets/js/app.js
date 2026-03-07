@@ -568,12 +568,12 @@
         const dashboardLink = document.createElement("a");
         dashboardLink.href = "dashboard.html";
         dashboardLink.className = "button button--ghost button--sm";
-        dashboardLink.textContent = "Dashboard";
+        dashboardLink.textContent = "DASHBOARD";
 
         const logoutLink = document.createElement("a");
         logoutLink.href = "#";
         logoutLink.className = "button button--primary button--sm";
-        logoutLink.textContent = "Cerrar sesión";
+        logoutLink.textContent = "CERRAR SESIÓN";
         logoutLink.addEventListener("click", (event) => {
           event.preventDefault();
           window.KyrbiAPI?.logout?.();
@@ -587,12 +587,12 @@
       const loginLink = document.createElement("a");
       loginLink.href = onAssistantRoute() ? buildAuthUrl("login.html", currentRelativePath()) : "login.html";
       loginLink.className = "button button--ghost button--sm";
-      loginLink.textContent = "Entrar";
+      loginLink.textContent = "ENTRAR";
 
       const registerLink = document.createElement("a");
       registerLink.href = onAssistantRoute() ? buildAuthUrl("register.html", currentRelativePath()) : "register.html";
       registerLink.className = "button button--primary button--sm";
-      registerLink.textContent = "Crear cuenta";
+      registerLink.textContent = "CREAR CUENTA";
 
       navAuth.appendChild(loginLink);
       navAuth.appendChild(registerLink);
@@ -764,12 +764,26 @@
       const active = getActiveNavKey();
       if (active) dom.navAnchors.forEach((a) => a.classList.toggle("is-active", a.dataset.nav === active));
 
-      // 1. Premium Sidebar Toggle
+      // 1. Premium Sidebar Toggle (Rockstar Edition)
       if (dom.sidebarToggle && dom.chatSidebar) {
-        dom.sidebarToggle.addEventListener("click", () => {
-          const isOpen = dom.chatSidebar.classList.toggle("is-open");
-          dom.sidebarToggle.setAttribute("aria-label", isOpen ? "Cerrar lateral" : "Abrir lateral");
-        });
+        const container = document.getElementById('chat-container');
+        const closeBtn = document.getElementById('sidebar-close-btn');
+
+        const toggleSidebar = () => {
+          const isCollapsed = container.classList.toggle('sidebar-collapsed');
+          dom.sidebarToggle.setAttribute("aria-label", isCollapsed ? "Abrir lateral" : "Cerrar lateral");
+          
+          // Optional: Store state in localStorage
+          localStorage.setItem('kyrbi_sidebar_collapsed', isCollapsed);
+        };
+
+        dom.sidebarToggle.addEventListener("click", toggleSidebar);
+        closeBtn?.addEventListener("click", toggleSidebar);
+
+        // Restore state
+        if (localStorage.getItem('kyrbi_sidebar_collapsed') === 'true') {
+          container.classList.add('sidebar-collapsed');
+        }
       }
 
       // 2. Settings Modal Logic (Enhanced)
@@ -995,19 +1009,19 @@
         if (msgs.length === 0 && !limit) {
           chatRefs.log.innerHTML = `
             <div class="chat-empty-state">
-              <h1 class="empty-title">¿En qué puedo ayudarte hoy?</h1>
+              <h1 class="empty-title">¿EN QUÉ PUEDO AYUDARTE HOY?</h1>
               <div class="empty-suggestions">
                 <button class="suggestion-card" data-prompt="Plan de alimentación saludable">
                   <i class="fa-solid fa-apple-whole"></i>
-                  <span>Plan de alimentación</span>
+                  <span>PLAN DE ALIMENTACIÓN</span>
                 </button>
                 <button class="suggestion-card" data-prompt="Rutina de ejercicio para casa">
                   <i class="fa-solid fa-person-running"></i>
-                  <span>Rutina de ejercicio</span>
+                  <span>RUTINA DE EJERCICIO</span>
                 </button>
                 <button class="suggestion-card" data-prompt="Técnicas para dormir mejor">
                   <i class="fa-solid fa-bed"></i>
-                  <span>Mejorar sueño</span>
+                  <span>MEJORAR SUEÑO</span>
                 </button>
               </div>
             </div>
