@@ -568,12 +568,12 @@
         const dashboardLink = document.createElement("a");
         dashboardLink.href = "dashboard.html";
         dashboardLink.className = "button button--ghost button--sm";
-        dashboardLink.textContent = "DASHBOARD";
+        dashboardLink.textContent = "Dashboard";
 
         const logoutLink = document.createElement("a");
         logoutLink.href = "#";
         logoutLink.className = "button button--primary button--sm";
-        logoutLink.textContent = "CERRAR SESIÓN";
+        logoutLink.textContent = "Cerrar sesión";
         logoutLink.addEventListener("click", (event) => {
           event.preventDefault();
           window.KyrbiAPI?.logout?.();
@@ -587,12 +587,12 @@
       const loginLink = document.createElement("a");
       loginLink.href = onAssistantRoute() ? buildAuthUrl("login.html", currentRelativePath()) : "login.html";
       loginLink.className = "button button--ghost button--sm";
-      loginLink.textContent = "ENTRAR";
+      loginLink.textContent = "Entrar";
 
       const registerLink = document.createElement("a");
       registerLink.href = onAssistantRoute() ? buildAuthUrl("register.html", currentRelativePath()) : "register.html";
       registerLink.className = "button button--primary button--sm";
-      registerLink.textContent = "CREAR CUENTA";
+      registerLink.textContent = "Crear cuenta";
 
       navAuth.appendChild(loginLink);
       navAuth.appendChild(registerLink);
@@ -764,26 +764,12 @@
       const active = getActiveNavKey();
       if (active) dom.navAnchors.forEach((a) => a.classList.toggle("is-active", a.dataset.nav === active));
 
-      // 1. Premium Sidebar Toggle (Rockstar Edition)
+      // 1. Premium Sidebar Toggle
       if (dom.sidebarToggle && dom.chatSidebar) {
-        const container = document.getElementById('chat-container');
-        const closeBtn = document.getElementById('sidebar-close-btn');
-
-        const toggleSidebar = () => {
-          const isCollapsed = container.classList.toggle('sidebar-collapsed');
-          dom.sidebarToggle.setAttribute("aria-label", isCollapsed ? "Abrir lateral" : "Cerrar lateral");
-          
-          // Optional: Store state in localStorage
-          localStorage.setItem('kyrbi_sidebar_collapsed', isCollapsed);
-        };
-
-        dom.sidebarToggle.addEventListener("click", toggleSidebar);
-        closeBtn?.addEventListener("click", toggleSidebar);
-
-        // Restore state
-        if (localStorage.getItem('kyrbi_sidebar_collapsed') === 'true') {
-          container.classList.add('sidebar-collapsed');
-        }
+        dom.sidebarToggle.addEventListener("click", () => {
+          const isOpen = dom.chatSidebar.classList.toggle("is-open");
+          dom.sidebarToggle.setAttribute("aria-label", isOpen ? "Cerrar lateral" : "Abrir lateral");
+        });
       }
 
       // 2. Settings Modal Logic (Enhanced)
@@ -1009,31 +995,13 @@
         if (msgs.length === 0 && !limit) {
           chatRefs.log.innerHTML = `
             <div class="chat-empty-state">
-              <h1 class="empty-title">¿EN QUÉ PUEDO AYUDARTE HOY?</h1>
-              <div class="empty-suggestions">
-                <button class="suggestion-card" data-prompt="Plan de alimentación saludable">
-                  <i class="fa-solid fa-apple-whole"></i>
-                  <span>PLAN DE ALIMENTACIÓN</span>
-                </button>
-                <button class="suggestion-card" data-prompt="Rutina de ejercicio para casa">
-                  <i class="fa-solid fa-person-running"></i>
-                  <span>RUTINA DE EJERCICIO</span>
-                </button>
-                <button class="suggestion-card" data-prompt="Técnicas para dormir mejor">
-                  <i class="fa-solid fa-bed"></i>
-                  <span>MEJORAR SUEÑO</span>
-                </button>
+              <div class="empty-logo">
+                <img src="assets/img/logo.svg" alt="Kyrbi" />
               </div>
+              <h2>¿En qué puedo ayudarte hoy?</h2>
+              <p>Elige un modo y comencemos a construir mejores hábitos juntos.</p>
             </div>
           `;
-          
-          // Re-bind suggestion clicks
-          chatRefs.log.querySelectorAll('.suggestion-card').forEach(card => {
-            card.addEventListener('click', () => {
-              const prompt = card.dataset.prompt;
-              if (prompt) actions.sendUserMessage(prompt, { focusAfterSend: true });
-            });
-          });
         } else {
           msgs.forEach((msg) => chatRefs.log.appendChild(renderMessage(msg)));
         }
@@ -1060,44 +1028,40 @@
 
   function renderMessage(msg) {
     const isAssistant = msg.role === "assistant";
-    const row = document.createElement("div");
-    row.className = `message-row ${isAssistant ? "message-row--assistant" : "message-row--user"}`;
+    const wrap = document.createElement("div");
+    wrap.className = `message ${isAssistant ? "message--assistant" : "message--user"}`;
 
-    const content = document.createElement("div");
-    content.className = "message-content";
+    const inner = document.createElement("div");
+    inner.className = "message__inner";
 
     const avatar = document.createElement("div");
-    avatar.className = `message-avatar ${isAssistant ? "message-avatar--assistant" : "message-avatar--user"}`;
+    avatar.className = "message__avatar";
     avatar.innerHTML = isAssistant 
       ? '<img src="assets/img/logo.svg" alt="K" style="width:24px;height:24px;">' 
       : '<i class="fa-solid fa-user"></i>';
 
+    const content = document.createElement("div");
+    content.className = "message__content";
+
+    const author = document.createElement("span");
+    author.className = "message__author";
+    author.textContent = isAssistant ? (MODES[msg.mode || state.mode]?.label || "Kyrbi") : "Tú";
+
     const text = document.createElement("div");
-    text.className = "message-text";
+    text.className = "message__text";
     
     if (isAssistant) {
-      // If there's a thought/thinking phase, we could add it here
-      if (msg.thought) {
-        const thoughtBox = document.createElement("div");
-        thoughtBox.className = "thinking-box";
-        thoughtBox.textContent = msg.thought;
-        text.appendChild(thoughtBox);
-      }
-      
-      const textBody = document.createElement("div");
-      textBody.className = "text-body";
-      renderAssistantRichText(textBody, msg.text);
-      text.appendChild(textBody);
+      renderAssistantRichText(text, msg.text);
     } else {
-      const p = document.createElement("p");
-      p.textContent = msg.text;
-      text.appendChild(p);
+      text.textContent = msg.text;
     }
 
-    content.appendChild(avatar);
+    content.appendChild(author);
     content.appendChild(text);
-    row.appendChild(content);
-    return row;
+    inner.appendChild(avatar);
+    inner.appendChild(content);
+    wrap.appendChild(inner);
+    return wrap;
   }
 
   const actions = {
@@ -1414,15 +1378,22 @@
       let typingEl = null;
       if (dom.appMount) {
         typingEl = document.createElement('div');
-        typingEl.className = 'message-row message-row--assistant typing-msg';
+        typingEl.className = 'message message--assistant typing-msg';
         typingEl.innerHTML = `
-          <div class="message-content">
-            <div class="message-avatar message-avatar--assistant">
+          <div class="message__inner">
+            <div class="message__avatar">
               <img src="assets/img/logo.svg" alt="K" style="width:24px;height:24px;">
             </div>
-            <div class="message-text">
-              <div class="thinking-box">
-                <i class="fa-solid fa-brain"></i> Kyrbi está pensando...
+            <div class="message__content">
+              <span class="message__author">Kyrbi</span>
+              <div class="thought-block" id="thought-block-active">
+                <div class="thought-header"><i class="fa-solid fa-chevron-down"></i> Pensando...</div>
+                <div class="thought-content">Analizando el contexto educativo...</div>
+              </div>
+              <div class="typing-indicator">
+                <span class="typing-dot"></span>
+                <span class="typing-dot"></span>
+                <span class="typing-dot"></span>
               </div>
             </div>
           </div>
@@ -1493,7 +1464,7 @@
       state.messages.push(msg);
       ui.render();
 
-      const lastMsgEl = dom.appMount?.lastElementChild?.querySelector('.text-body');
+      const lastMsgEl = dom.appMount?.lastElementChild?.querySelector('.message__text');
       if (!lastMsgEl) return;
 
       // Simulated streaming
